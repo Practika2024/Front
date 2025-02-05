@@ -145,7 +145,7 @@ button:focus-visible {
 
 /* Стилі для основного контенту */
 .ml-0 {
-  margin-left: 0;
+  margin-left: 25px;
   transition: margin-left 0.3s ease;
 }
 
