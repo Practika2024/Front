@@ -18,7 +18,9 @@ import ProductEdit from "../pages/products/components/productEdit/ProductEdit";
 import UsersPage from "../pages/users/UsersPage";
 import ProtectedRoute from "./ProtectedRoute";
 import ProductCreate from "../pages/products/components/productCreate/ProductCreate";
+import TarePage from "../pages/tare/TarePage"; // Import TarePage
 
+// eslint-disable-next-line react/display-name
 const BasicRoute = memo(() => {
   return (
     <>
@@ -109,6 +111,7 @@ const BasicRoute = memo(() => {
               </ProtectedRoute>
             }
           />
+            <Route path="/tare" element={<TarePage />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/error" element={<ErrorPage />} />
