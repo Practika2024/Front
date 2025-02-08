@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button } from 'react-bootstrap';
+import { Table, Button, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import containerTypes from '../../../constants/containerTypes'; // Adjust the path as needed
+import TareFilterForm from './TareFilterForm';
 
 const TareTableContainer = () => {
     const [tares, setTares] = useState([]);
+    const [filteredTares, setFilteredTares] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -13,6 +15,7 @@ const TareTableContainer = () => {
             try {
                 const response = await axios.get('http://localhost:5081/containers/all');
                 setTares(response.data);
+                setFilteredTares(response.data);
             } catch (error) {
                 console.error('Error fetching tares:', error);
             }
@@ -34,42 +37,60 @@ const TareTableContainer = () => {
         try {
             await axios.delete(`http://localhost:5081/containers/delete/${id}`);
             setTares(tares.filter(tare => tare.id !== id));
+            setFilteredTares(filteredTares.filter(tare => tare.id !== id));
         } catch (error) {
             console.error('Error deleting tare:', error);
         }
     };
 
+    const handleFilter = (filters) => {
+        const { name, minVolume, maxVolume, type, isEmpty } = filters;
+        setFilteredTares(tares.filter(tare =>
+            (name ? tare.name.includes(name) : true) &&
+            (tare.volume >= minVolume && tare.volume <= maxVolume) &&
+            (type.length ? type.includes(tare.type) : true) &&
+            (isEmpty !== null ? tare.isEmpty === isEmpty : true)
+        ));
+    };
+
     return (
         <div className="container mt-5">
-            <h2 className="mb-4">Tare List</h2>
-            <Link to="/tare/create" className="btn btn-primary mb-3">Create New Tare</Link>
-            <Table striped bordered hover>
-                <thead>
-                <tr>
-                    <th>Ім'я</th>
-                    <th>Тип</th>
-                    <th>Об'єм(л)</th>
-                    <th>Чи порожній</th>
-                    <th>Нотатки</th>
-                    <th>Дії</th>
-                </tr>
-                </thead>
-                <tbody>
-                {tares.map((tare) => (
-                    <tr key={tare.id}>
-                        <td>{tare.name}</td>
-                        <td>{getTypeName(tare.type)}</td>
-                        <td>{tare.volume}</td>
-                        <td>{tare.isEmpty ? 'так' : 'ні'}</td>
-                        <td>{tare.notes}</td>
-                        <td>
-                            <Button variant="warning" onClick={() => handleUpdate(tare.id)}>Update</Button>
-                            <Button variant="danger" onClick={() => handleDelete(tare.id)} className="ms-2">Delete</Button>
-                        </td>
-                    </tr>
-                ))}
-                </tbody>
-            </Table>
+            <h2 className="mb-4">Список контейнерів</h2>
+            <Row>
+                <Col md={3}>
+                    <TareFilterForm onFilter={handleFilter} />
+                </Col>
+                <Col md={9}>
+                    <Link to="/tare/create" className="btn btn-primary mb-3">Створити новий контейнер</Link>
+                    <Table striped bordered hover>
+                        <thead>
+                        <tr>
+                            <th>Ім'я</th>
+                            <th>Тип</th>
+                            <th>Об'єм(л)</th>
+                            <th>Чи порожній</th>
+                            <th>Нотатки</th>
+                            <th>Дії</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {filteredTares.map((tare) => (
+                            <tr key={tare.id}>
+                                <td>{tare.name}</td>
+                                <td>{getTypeName(tare.type)}</td>
+                                <td>{tare.volume}</td>
+                                <td>{tare.isFilling ? 'ні' : 'так'}</td>
+                                <td>{tare.notes}</td>
+                                <td>
+                                    <Button variant="warning" onClick={() => handleUpdate(tare.id)}>Оновити інформацію</Button>
+                                    <Button variant="danger" onClick={() => handleDelete(tare.id)} className="ms-2">Видалити</Button>
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </Table>
+                </Col>
+            </Row>
         </div>
     );
 };

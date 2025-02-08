@@ -100,7 +100,7 @@ const UpdateTare = () => {
                         onChange={(e) => setNotes(e.target.value)}
                     />
                 </div>
-                <button type="submit" className="btn btn-primary">Update</button>
+                <button type="submit" className="btn btn-primary">Оновити інформацію</button>
             </form>
         </div>
     );
