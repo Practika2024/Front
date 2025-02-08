@@ -1,57 +1,48 @@
-// src/pages/tare/components/TareTableContainer.jsx
 import React, { useEffect, useState } from 'react';
-import { TareService } from '../../../utils/services/TareService';
+import { Table } from 'react-bootstrap';
+import axios from 'axios';
 
 const TareTableContainer = () => {
     const [tares, setTares] = useState([]);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchTares = async () => {
             try {
-                const data = await TareService.getTares();
-                setTares(data);
+                const response = await axios.get('http://localhost:5081/containers/all');
+                setTares(response.data);
             } catch (error) {
                 console.error('Error fetching tares:', error);
-            } finally {
-                setLoading(false);
             }
         };
 
         fetchTares();
     }, []);
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
     return (
-        <div>
-            <h2>Tare List</h2>
-            <table>
+        <div className="container mt-5">
+            <h2 className="mb-4">Tare List</h2>
+            <Table striped bordered hover>
                 <thead>
                 <tr>
-                    <th>Unique Code</th>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Volume</th>
-                    <th>Notes</th>
-                    <th>Status</th>
+                    <th>Ім'я</th>
+                    <th>Тип</th>
+                    <th>Об'єм(л)</th>
+                    <th>Чи порожній</th>
+                    <th>Нотатки</th>
                 </tr>
                 </thead>
                 <tbody>
                 {tares.map((tare) => (
                     <tr key={tare.id}>
-                        <td>{tare.unique_code}</td>
                         <td>{tare.name}</td>
                         <td>{tare.type}</td>
-                        <td>{tare.volume}L</td>
+                        <td>{tare.volume}</td>
+                        <td>{tare.isEmpty ? 'так' : 'ні'}</td>
                         <td>{tare.notes}</td>
-                        <td>{tare.is_empty ? 'Empty' : 'Filled'}</td>
                     </tr>
                 ))}
                 </tbody>
-            </table>
+            </Table>
         </div>
     );
 };

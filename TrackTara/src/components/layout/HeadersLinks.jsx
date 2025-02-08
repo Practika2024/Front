@@ -18,7 +18,7 @@ const HeadersLinks = () => {
             <Link to="/">Home</Link>
           </li>
           <li className="nav-item">
-            <Link to="/electronicItem">Electronic Item</Link>
+            <Link to="/tare">Containers</Link>
           </li>
         </ul>
       </div>
