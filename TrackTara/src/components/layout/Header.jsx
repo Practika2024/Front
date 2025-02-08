@@ -10,7 +10,7 @@ import {ShoppingCart, Favorite} from "@mui/icons-material";
 
 const adminPages = [
   { title: "Categories", path: "/categories" },
-  { title: "Manufacturers", path: "/manufacturers" },
+  { title: "Manufacturers", path: "/tare" },
   { title: "Users", path: "/users" },
   { title: "Products", path: "/products" },
 ];

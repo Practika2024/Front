@@ -19,6 +19,8 @@ import UsersPage from "../pages/users/UsersPage";
 import ProtectedRoute from "./ProtectedRoute";
 import ProductCreate from "../pages/products/components/productCreate/ProductCreate";
 import TarePage from "../pages/tare/TarePage"; // Import TarePage
+import CreateTare from "../pages/tare/components/CreateTare.jsx"; // Import TarePage
+import UpdateTare from "../pages/tare/components/UpdateTare.jsx"; // Import TarePage
 
 // eslint-disable-next-line react/display-name
 const BasicRoute = memo(() => {
@@ -112,6 +114,8 @@ const BasicRoute = memo(() => {
             }
           />
             <Route path="/tare" element={<TarePage />} />
+            <Route path="/tare/update/:id" element={<UpdateTare />} />
+            <Route path="/tare/create" element={<CreateTare />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/error" element={<ErrorPage />} />
