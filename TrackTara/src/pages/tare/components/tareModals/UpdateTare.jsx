@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
-import containerTypes from '../../../constants/containerTypes'; // Adjust the path as needed
+import containerTypes from '../../../../constants/containerTypes.js'; // Adjust the path as needed
 
 const UpdateTare = () => {
     const { id } = useParams();

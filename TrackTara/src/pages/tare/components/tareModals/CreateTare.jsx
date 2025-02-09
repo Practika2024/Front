@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import containerTypes from '../../../constants/containerTypes.js'; // Adjust the path as needed
+import containerTypes from '../../../../constants/containerTypes.js'; // Adjust the path as needed
 
 const CreateTare = () => {
     const [name, setName] = useState('');
