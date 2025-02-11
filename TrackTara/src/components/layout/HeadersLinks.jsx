@@ -3,26 +3,25 @@ import { Link } from "react-router-dom";
 
 const HeadersLinks = () => {
   return (
-    <div>
-      <div className="collapse navbar-collapse" id="navbarSupportedContent">
-        <a className="navbar-brand mt-2 mt-lg-0" href="#">
+      <div className="collapse navbar-collapse d-flex justify-content-start align-items-center" id="navbarSupportedContent">
+        <a className="navbar-brand d-flex align-items-center" href="#">
           <img
-            src="https://mdbcdn.b-cdn.net/img/logo/mdb-transaprent-noshadows.webp"
-            height="15"
-            alt="MDB Logo"
-            loading="lazy"
+              src="public/image-removebg-preview.png" // Замінити на новий логотип
+              height="50"
+              alt="TaraTrack Logo"
+              loading="lazy"
           />
+          <h5 className="navbar-title fs-5 ms-3 mb-0">TaraTrack</h5>
         </a>
-        <ul className="navbar-nav me-auto mb-2 mb-lg-0 gap-3">
+        <ul className="navbar-nav ms-5 mb-2 mb-lg-0 gap-3">
           <li className="nav-item">
-            <Link to="/">Home</Link>
+            <Link className="nav-link fs-5" to="/">Home</Link>
           </li>
           <li className="nav-item">
-            <Link to="/tare">Containers</Link>
+            <Link className="nav-link fs-5" to="/tare">Containers</Link>
           </li>
         </ul>
       </div>
-    </div>
   );
 };
 
