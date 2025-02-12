@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Modal, Form, Table, Container } from 'react-bootstrap';
-import { FaEdit, FaTrash, FaPlus, FaTimes, FaInfoCircle } from 'react-icons/fa';
 import axios from 'axios';
 import containerTypes from '../../../../constants/containerTypes';
 import Loader from '../../../../components/common/loader/Loader.jsx';
@@ -104,20 +103,20 @@ const TareDetailPage = () => {
                     <td>{container.isEmpty ? 'Так' : 'Ні'}</td>
                     <td>{container.notes || 'Немає'}</td>
                     <td>
-                        <Button variant="link" onClick={handleUpdate} className="me-2">
-                            <FaEdit size={20} style={{ color: 'black' }} />
+                        <Button variant="link" onClick={handleUpdate} className="p-0 border-4">
+                            <img src="/Icons for functions/free-icon-edit-3597088.png" alt="Edit" height="20" />
                         </Button>
-                        <Button variant="link" onClick={handleDelete} className="me-2">
-                            <FaTrash size={20} style={{ color: 'black' }} />
+                        <Button variant="link" onClick={handleDelete} className="p-0 border-4">
+                            <img src="/Icons for functions/free-icon-recycle-bin-3156999.png" alt="Delete" height="20" />
                         </Button>
-                        <Button variant="link" onClick={() => setShowModal(true)} className="me-2">
-                            <FaPlus size={20} style={{ color: 'black' }} />
+                        <Button variant="link" onClick={() => setShowModal(true)} className="p-0 border-4">
+                            <img src="/Icons for functions/free-icon-import-7234396.png" alt="Add Product" height="20" />
                         </Button>
-                        <Button variant="link" onClick={handleClearProduct} className="me-2">
-                            <FaTimes size={20} style={{ color: 'black' }} />
+                        <Button variant="link" onClick={handleClearProduct} className="p-0 border-4">
+                            <img src="/Icons for functions/free-icon-package-1666995.png" alt="Clear Product" height="20" />
                         </Button>
-                        <Button variant="link" onClick={() => navigate(`/tare/info/${containerId}`)}>
-                            <FaInfoCircle size={20} style={{ color: 'black' }} />
+                        <Button variant="link" onClick={() => navigate(`/tare/info/${containerId}`)} className="p-0 border-4">
+                            <img src="/Icons for functions/free-icon-info-1445402.png" alt="Info" height="20" />
                         </Button>
                     </td>
                 </tr>
