@@ -18,7 +18,7 @@ const CreateTare = () => {
                 type,
                 volume,
                 notes,
-                userId: '56b51b17-0c27-477e-8c55-4f95d3ef7ae1', // Automatically pass userId
+                userId: '9fc4514d-4b64-48f5-bb64-2e9e4cd95d98', // Automatically pass userId
             });
             navigate('/tare');
         } catch (error) {

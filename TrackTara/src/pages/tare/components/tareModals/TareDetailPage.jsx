@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Modal, Form } from 'react-bootstrap';
+import { Button, Modal, Form, Table, Container } from 'react-bootstrap';
+import { FaEdit, FaTrash, FaPlus, FaTimes, FaInfoCircle } from 'react-icons/fa';
 import axios from 'axios';
-import containerTypes from '../../../../constants/containerTypes'; // Adjust the path as needed
-import Loader from '../../../../components/common/loader/Loader.jsx'; // Adjust the path as needed
+import containerTypes from '../../../../constants/containerTypes';
+import Loader from '../../../../components/common/loader/Loader.jsx';
 
 const TareDetailPage = () => {
     const { containerId } = useParams();
@@ -11,19 +12,21 @@ const TareDetailPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [products, setProducts] = useState([]);
-    const [selectedProductId, setSelectedProductId] = useState(null);
+    const [selectedProductId, setSelectedProductId] = useState('');
     const [showModal, setShowModal] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
+        if (!containerId) return;
+
         const fetchContainer = async () => {
             try {
                 const response = await axios.get(`http://localhost:5081/containers/${containerId}`);
                 setContainer(response.data);
-                setLoading(false);
             } catch (error) {
                 console.error('Error fetching container:', error);
                 setError(true);
+            } finally {
                 setLoading(false);
             }
         };
@@ -46,9 +49,7 @@ const TareDetailPage = () => {
         return type ? type.name : 'Unknown';
     };
 
-    const handleUpdate = () => {
-        navigate(`/tare/update/${containerId}`);
-    };
+    const handleUpdate = () => navigate(`/tare/update/${containerId}`);
 
     const handleDelete = async () => {
         try {
@@ -60,10 +61,10 @@ const TareDetailPage = () => {
     };
 
     const handleAddProduct = async () => {
+        if (!selectedProductId) return;
         try {
             await axios.put(`http://localhost:5081/containers/set-product/${containerId}`, { productId: selectedProductId });
             setShowModal(false);
-            // Optionally, you can fetch the updated container details here
         } catch (error) {
             console.error('Error adding product to container:', error);
         }
@@ -72,49 +73,58 @@ const TareDetailPage = () => {
     const handleClearProduct = async () => {
         try {
             await axios.put(`http://localhost:5081/containers/clear-product/${containerId}`);
-            // Optionally, you can fetch the updated container details here
         } catch (error) {
             console.error('Error clearing products from container:', error);
         }
     };
 
-    const openModal = () => {
-        setShowModal(true);
-    };
-
-    if (loading) {
-        return <Loader />;
-    }
-
-    if (error) {
-        return <div className="alert alert-danger">Помилка завантаження дани��</div>;
-    }
+    if (loading) return <Loader />;
+    if (error) return <div className="alert alert-danger">Помилка завантаження даних</div>;
+    if (!container) return <div className="alert alert-warning">Контейнер не знайдено</div>;
 
     return (
-        <div className="container mt-5">
-            <h2 className="mb-4">Деталі контейнера</h2>
-            <div className="mb-3">
-                <strong>Ім&#39;я:</strong> {container.name}
-            </div>
-            <div className="mb-3">
-                <strong>Тип:</strong> {getTypeName(container.type)}
-            </div>
-            <div className="mb-3">
-                <strong>Об&#39;єм(л):</strong> {container.volume}
-            </div>
-            <div className="mb-3">
-                <strong>Чи порожній:</strong> {container.isEmpty ? 'так' : 'ні'}
-            </div>
-            <div className="mb-3">
-                <strong>Нотатки:</strong> {container.notes}
-            </div>
-            <div className="mb-3">
-                <Button variant="warning" onClick={handleUpdate}>Оновити інформацію</Button>
-                <Button variant="danger" onClick={handleDelete} className="ms-2">Видалити</Button>
-                <Button variant="success" onClick={openModal} className="ms-2">Додати продукт</Button>
-                <Button variant="secondary" onClick={handleClearProduct} className="ms-2">Прибрати продукти</Button>
-            </div>
+        <Container className="mt-5">
+            <h2 className="text-center mb-4">Деталі контейнера</h2>
+            <Table striped bordered hover responsive>
+                <thead className="table-primary">
+                <tr>
+                    <th>Ім'я</th>
+                    <th>Тип</th>
+                    <th>Об'єм (л)</th>
+                    <th>Чи порожній</th>
+                    <th>Нотатки</th>
+                    <th>Дії</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>{container.name}</td>
+                    <td>{getTypeName(container.type)}</td>
+                    <td>{container.volume}</td>
+                    <td>{container.isEmpty ? 'Так' : 'Ні'}</td>
+                    <td>{container.notes || 'Немає'}</td>
+                    <td>
+                        <Button variant="link" onClick={handleUpdate} className="me-2">
+                            <FaEdit size={20} style={{ color: 'black' }} />
+                        </Button>
+                        <Button variant="link" onClick={handleDelete} className="me-2">
+                            <FaTrash size={20} style={{ color: 'black' }} />
+                        </Button>
+                        <Button variant="link" onClick={() => setShowModal(true)} className="me-2">
+                            <FaPlus size={20} style={{ color: 'black' }} />
+                        </Button>
+                        <Button variant="link" onClick={handleClearProduct} className="me-2">
+                            <FaTimes size={20} style={{ color: 'black' }} />
+                        </Button>
+                        <Button variant="link" onClick={() => navigate(`/tare/info/${containerId}`)}>
+                            <FaInfoCircle size={20} style={{ color: 'black' }} />
+                        </Button>
+                    </td>
+                </tr>
+                </tbody>
+            </Table>
 
+            {/* Модальне вікно для вибору продукту */}
             <Modal show={showModal} onHide={() => setShowModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Виберіть продукт</Modal.Title>
@@ -134,10 +144,10 @@ const TareDetailPage = () => {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowModal(false)}>Закрити</Button>
-                    <Button variant="primary" onClick={handleAddProduct}>Додати продукт</Button>
+                    <Button variant="primary" onClick={handleAddProduct} disabled={!selectedProductId}>Додати продукт</Button>
                 </Modal.Footer>
             </Modal>
-        </div>
+        </Container>
     );
 };
 
