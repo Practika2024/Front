@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import containerTypes from '../../../../constants/containerTypes.js'; // Adjust the path as needed
+import containerTypes from '../../../../constants/containerTypes.js';
+import {Button} from "react-bootstrap"; // Adjust the path as needed
 
 const CreateTare = () => {
     const [name, setName] = useState('');
@@ -18,7 +19,7 @@ const CreateTare = () => {
                 type,
                 volume,
                 notes,
-                userId: '9fc4514d-4b64-48f5-bb64-2e9e4cd95d98', // Automatically pass userId
+                userId: '56b51b17-0c27-477e-8c55-4f95d3ef7ae1', // Automatically pass userId
             });
             navigate('/tare');
         } catch (error) {
@@ -37,7 +38,16 @@ const CreateTare = () => {
 
     return (
         <div className="container mt-5">
-            <h2 className="mb-4">Create New Tare</h2>
+            <div className="d-flex justify-content-start mb-4">
+                <Button
+                    variant="secondary"
+                    onClick={() => navigate('/tare')}
+                >
+                    ← Назад
+                </Button>
+            </div>
+
+            <h2 className="mb-4">Створити нову тару</h2>
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                     <label className="form-label">Ім'я</label>

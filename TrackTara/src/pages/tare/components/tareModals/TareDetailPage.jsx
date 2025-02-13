@@ -83,6 +83,16 @@ const TareDetailPage = () => {
 
     return (
         <Container className="mt-5">
+            <div className="d-flex justify-content-start mb-4">
+                <Button
+                    variant="secondary"
+                    onClick={() => navigate('/tare')}
+                >
+                    ← Назад
+                </Button>
+            </div>
+
+
             <h2 className="text-center mb-4">Деталі контейнера</h2>
             <Table striped bordered hover responsive>
                 <thead className="table-primary">
