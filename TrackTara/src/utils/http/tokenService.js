@@ -37,7 +37,7 @@ export const refreshToken = async (originalRequest, setAuthorizationToken) => {
     const accessToken = localStorage.getItem("accessToken");
 
     const { data } = await axios.post(
-      "http://13.60.245.135:4312/account/refresh-token",
+      "http://localhost:5081/account/refresh-token",
       { refreshToken, accessToken }
     );
 

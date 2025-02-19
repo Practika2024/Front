@@ -2,7 +2,7 @@ import HttpClient from "../http/HttpClient";
 
 export class RoleService {
   static httpClient = new HttpClient({
-    baseURL: "http://13.60.245.135:4312/roles",
+    baseURL: "http://localhost:5081/roles",
   });
 
   static setAuthorizationToken(token) {

@@ -20,7 +20,7 @@ const TareDetailPage = () => {
 
         const fetchContainer = async () => {
             try {
-                const response = await axios.get(`http://localhost:5081/containers/${containerId}`);
+                const response = await axios.get(`http://localhost:5081/containers/get-by-id/${containerId}`);
                 setContainer(response.data);
             } catch (error) {
                 console.error('Error fetching container:', error);

@@ -24,7 +24,7 @@ const TareTableContainer = () => {
     useEffect(() => {
         const fetchTares = async () => {
             try {
-                const response = await axios.get('http://localhost:5081/containers/all');
+                const response = await axios.get('http://localhost:5081/containers/get-all');
                 setTares(response.data);
                 setFilteredTares(response.data);
                 setLoading(false);

@@ -2,8 +2,7 @@ import HttpClient from "../http/HttpClient";
 
 export class AuthService {
   static httpClient = new HttpClient({
-    // baseURL: "http://13.60.245.135:4312/account",
-    baseURL: "http://13.60.245.135:4312/account",
+    baseURL: "http://localhost:5081/account",
   });
 
   static setAuthorizationToken(token) {
@@ -11,15 +10,20 @@ export class AuthService {
   }
 
   static async signIn(model) {
-    const admin = {
-      email: "admin@example.com",
-      password: "123456",
-    };
-
     return await this.httpClient.post("signin", model);
   }
 
   static async signUp(model) {
-    return await this.httpClient.post("signup", model);
+    try {
+      return await this.httpClient.post("signup", model);
+    } catch (error) {
+      console.error("SignUp error:", error);
+      return { success: false, message: error.response?.data || "Unknown error" };
+    }
+  }
+
+
+  static async refreshToken(model) {
+    return await this.httpClient.post("refresh-token", model);
   }
 }
