@@ -18,10 +18,10 @@ import ProductEdit from "../pages/products/components/productEdit/ProductEdit";
 import UsersPage from "../pages/users/UsersPage";
 import ProtectedRoute from "./ProtectedRoute";
 import ProductCreate from "../pages/products/components/productCreate/ProductCreate";
-import TarePage from "../pages/tare/TarePage";
-import CreateTare from "../pages/tare/components/tareModals/CreateTare.jsx";
-import UpdateTare from "../pages/tare/components/tareModals/UpdateTare.jsx";
-import TareDetailPage from "../pages/tare/components/tareModals/TareDetailPage.jsx"; // Import TareDetailPage
+import ContainersPage from "../pages/tare/ContainersPage.jsx";
+import CreateContainer from "../pages/tare/components/tareModals/CreateContainer.jsx";
+import UpdateContainer from "../pages/tare/components/tareModals/UpdateContainer.jsx";
+import ContainerDetailPage from "../pages/tare/components/tareModals/ContainerDetailPage.jsx"; // Import TareDetailPage
 
 // eslint-disable-next-line react/display-name
 const BasicRoute = memo(() => {
@@ -114,10 +114,10 @@ const BasicRoute = memo(() => {
                             </ProtectedRoute>
                         }
                     />
-                    <Route path="/tare" element={<TarePage />} />
-                    <Route path="/tare/update/:id" element={<UpdateTare />} />
-                    <Route path="/tare/create" element={<CreateTare />} />
-                    <Route path="/tare/detail/:containerId" element={<TareDetailPage />} /> {/* Add TareDetailPage route */}
+                    <Route path="/tare" element={<ContainersPage />} />
+                    <Route path="/tare/update/:id" element={<UpdateContainer />} />
+                    <Route path="/tare/create" element={<CreateContainer />} />
+                    <Route path="/tare/detail/:containerId" element={<ContainerDetailPage />} /> {/* Add TareDetailPage route */}
                     <Route path="/register" element={<Register />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/error" element={<ErrorPage />} />

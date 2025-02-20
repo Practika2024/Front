@@ -4,7 +4,7 @@ import 'rc-slider/assets/index.css';
 import Slider from 'rc-slider';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 
-const TareFilterForm = ({ onFilter }) => {
+const ContainerFilterForm = ({ onFilter }) => {
     const [name, setName] = useState('');
     const [minVolume, setMinVolume] = useState(0);
     const [maxVolume, setMaxVolume] = useState(1000);
@@ -122,4 +122,4 @@ const TareFilterForm = ({ onFilter }) => {
     );
 };
 
-export default TareFilterForm;
+export default ContainerFilterForm;

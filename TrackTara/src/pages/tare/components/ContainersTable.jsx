@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Table, Button, Row, Col, Modal, Form, OverlayTrigger, Tooltip, Pagination, Offcanvas } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import containerTypes from '../../../constants/containerTypes';
-import TareFilterForm from './TareFilterForm';
+import ContainerFilterForm from './ContainerFilterForm.jsx';
 import Loader from '../../../components/common/loader/Loader';
-import { getAllTares, deleteTare, setProductToTare, clearProductFromTare } from '../../../utils/services/TareService';
+import { getAllContainers, deleteContainer, setProductToContainer, clearProductFromTare } from '../../../utils/services/ContainerService.js';
 import { getAllProducts } from '../../../utils/services/ProductService';
 
-const TareTableContainer = () => {
+const ContainersTable = () => {
     const [tares, setTares] = useState([]);
     const [filteredTares, setFilteredTares] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -27,7 +27,7 @@ const TareTableContainer = () => {
     useEffect(() => {
         const fetchTares = async () => {
             try {
-                const data = await getAllTares();
+                const data = await getAllContainers();
                 setTares(data);
                 setFilteredTares(data);
             } catch (error) {
@@ -68,7 +68,7 @@ const TareTableContainer = () => {
     const confirmDelete = async () => {
         if (confirmText === 'Видалити') {
             try {
-                await deleteTare(selectedContainerId);
+                await deleteContainer(selectedContainerId);
                 setTares(tares.filter(tare => tare.id !== selectedContainerId));
                 setFilteredTares(filteredTares.filter(tare => tare.id !== selectedContainerId));
                 setShowConfirmModal(false);
@@ -91,7 +91,7 @@ const TareTableContainer = () => {
 
     const handleAddProduct = async () => {
         try {
-            await setProductToTare(selectedContainerId, selectedProductId);
+            await setProductToContainer(selectedContainerId, selectedProductId);
             setShowModal(false);
         } catch (error) {
             console.error('Error adding product to container:', error);
@@ -158,7 +158,7 @@ const TareTableContainer = () => {
             </Button>
             <Row>
                 <Col lg={3} className="d-none d-lg-block">
-                    <TareFilterForm onFilter={handleFilter} />
+                    <ContainerFilterForm onFilter={handleFilter} />
                 </Col>
                 <Col lg={9}>
                     {filteredTares.length === 0 ? (
@@ -261,7 +261,7 @@ const TareTableContainer = () => {
                     <Offcanvas.Title>Фільтри</Offcanvas.Title>
                 </Offcanvas.Header>
                 <Offcanvas.Body>
-                    <TareFilterForm onFilter={handleFilter} />
+                    <ContainerFilterForm onFilter={handleFilter} />
                 </Offcanvas.Body>
             </Offcanvas>
 
@@ -313,4 +313,4 @@ const TareTableContainer = () => {
     );
 };
 
-export default TareTableContainer;
+export default ContainersTable;

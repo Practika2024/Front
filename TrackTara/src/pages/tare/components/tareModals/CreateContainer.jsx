@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import containerTypes from '../../../../constants/containerTypes.js';
 import { Button } from "react-bootstrap";
-import { createTare } from '../../../../utils/services/TareService';
+import { createContainer } from '../../../../utils/services/ContainerService.js';
 
-const CreateTare = () => {
+const CreateContainer = () => {
     const [name, setName] = useState('');
     const [type, setType] = useState(containerTypes[0].id);
     const [volume, setVolume] = useState('');
@@ -14,7 +14,7 @@ const CreateTare = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await createTare({
+            await createContainer({
                 name,
                 type,
                 volume,
@@ -89,4 +89,4 @@ const CreateTare = () => {
     );
 };
 
-export default CreateTare;
+export default CreateContainer;
