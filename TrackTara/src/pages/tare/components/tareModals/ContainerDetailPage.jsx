@@ -3,10 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Modal, Form, Table, Container } from 'react-bootstrap';
 import containerTypes from '../../../../constants/containerTypes';
 import Loader from '../../../../components/common/loader/Loader.jsx';
-import { getTareById, deleteTare, setProductToTare, clearProductFromTare } from '../../../../utils/services/TareService';
+import { getContainerById, deleteContainer, setProductToContainer, clearProductFromTare } from '../../../../utils/services/ContainerService.js';
 import { getAllProducts } from '../../../../utils/services/ProductService';
 
-const TareDetailPage = () => {
+const ContainerDetailPage = () => {
     const { containerId } = useParams();
     const [container, setContainer] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -21,7 +21,7 @@ const TareDetailPage = () => {
 
         const fetchContainer = async () => {
             try {
-                const tare = await getTareById(containerId);
+                const tare = await getContainerById(containerId);
                 setContainer(tare);
             } catch (error) {
                 console.error('Error fetching container:', error);
@@ -53,7 +53,7 @@ const TareDetailPage = () => {
 
     const handleDelete = async () => {
         try {
-            await deleteTare(containerId);
+            await deleteContainer(containerId);
             navigate('/tare');
         } catch (error) {
             console.error('Error deleting container:', error);
@@ -63,7 +63,7 @@ const TareDetailPage = () => {
     const handleAddProduct = async () => {
         if (!selectedProductId) return;
         try {
-            await setProductToTare(containerId, selectedProductId);
+            await setProductToContainer(containerId, selectedProductId);
             setShowModal(false);
         } catch (error) {
             console.error('Error adding product to container:', error);
@@ -159,4 +159,4 @@ const TareDetailPage = () => {
     );
 };
 
-export default TareDetailPage;
+export default ContainerDetailPage;

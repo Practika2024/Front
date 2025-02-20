@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import containerTypes from '../../../../constants/containerTypes.js';
-import { getTareById, updateTare } from '../../../../utils/services/TareService';
+import { getContainerById, updateContainer } from '../../../../utils/services/ContainerService.js';
 
-const UpdateTare = () => {
+const UpdateContainer = () => {
     const { id } = useParams();
     const [name, setName] = useState('');
     const [type, setType] = useState(containerTypes[0].id);
@@ -12,9 +12,9 @@ const UpdateTare = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchTare = async () => {
+        const fetchContainer = async () => {
             try {
-                const tare = await getTareById(id);
+                const tare = await getContainerById(id);
                 setName(tare.name);
                 setType(tare.type);
                 setVolume(tare.volume);
@@ -24,13 +24,13 @@ const UpdateTare = () => {
             }
         };
 
-        fetchTare();
+        fetchContainer();
     }, [id]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await updateTare(id, {
+            await updateContainer(id, {
                 name,
                 type,
                 volume,
@@ -96,4 +96,4 @@ const UpdateTare = () => {
     );
 };
 
-export default UpdateTare;
+export default UpdateContainer;

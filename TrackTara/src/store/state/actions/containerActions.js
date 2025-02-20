@@ -1,9 +1,9 @@
-import { getAllTares, deleteTare, setProductToTare, clearProductFromTare } from '../../../utils/services/TareService.js';
+import { getAllContainers, deleteContainer, setProductToContainer, clearProductFromTare } from '../../../utils/services/ContainerService.js';
 import { getAll, deleteTareSlice, setProduct, clearProduct } from './../reduserSlises/containerSlice';
 
 export const fetchContainers = () => async (dispatch) => {
     try {
-        const response = await getAllTares();
+        const response = await getAllContainers();
         dispatch(getAll(response));
     } catch (error) {
         console.error('Error fetching containers:', error);
@@ -12,7 +12,7 @@ export const fetchContainers = () => async (dispatch) => {
 
 export const removeContainer = (id) => async (dispatch) => {
     try {
-        await deleteTare(id);
+        await deleteContainer(id);
         dispatch(deleteTareSlice(id));
     } catch (error) {
         console.error('Error deleting container:', error);
@@ -21,7 +21,7 @@ export const removeContainer = (id) => async (dispatch) => {
 
 export const addProductToContainer = (containerId, productId) => async (dispatch) => {
     try {
-        await setProductToTare(containerId, productId);
+        await setProductToContainer(containerId, productId);
         dispatch(setProduct({ containerId, productId }));
     } catch (error) {
         console.error('Error adding product to container:', error);
