@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Row, Col, Modal, Form, OverlayTrigger, Tooltip, Pagination } from 'react-bootstrap';
-import axios from 'axios';
+import { Table, Button, Row, Col, Modal, Form, OverlayTrigger, Tooltip, Pagination, Offcanvas } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import containerTypes from '../../../constants/containerTypes'; // Adjust the path as needed
+import containerTypes from '../../../constants/containerTypes';
 import TareFilterForm from './TareFilterForm';
-import Loader from '../../../components/common/loader/Loader'; // Adjust the path as needed
+import Loader from '../../../components/common/loader/Loader';
+import { getAllTares, deleteTare, setProductToTare, clearProductFromTare } from '../../../utils/services/TareService';
+import { getAllProducts } from '../../../utils/services/ProductService';
 
 const TareTableContainer = () => {
     const [tares, setTares] = useState([]);
@@ -19,26 +20,28 @@ const TareTableContainer = () => {
     const [confirmText, setConfirmText] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10);
+    const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'ascending' });
+    const [showOffcanvas, setShowOffcanvas] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchTares = async () => {
             try {
-                const response = await axios.get('http://localhost:5081/containers/get-all');
-                setTares(response.data);
-                setFilteredTares(response.data);
-                setLoading(false);
+                const data = await getAllTares();
+                setTares(data);
+                setFilteredTares(data);
             } catch (error) {
                 console.error('Error fetching tares:', error);
                 setError(true);
+            } finally {
                 setLoading(false);
             }
         };
 
         const fetchProducts = async () => {
             try {
-                const response = await axios.get('http://localhost:5081/products/all');
-                setProducts(response.data);
+                const data = await getAllProducts();
+                setProducts(data);
             } catch (error) {
                 console.error('Error fetching products:', error);
             }
@@ -65,7 +68,7 @@ const TareTableContainer = () => {
     const confirmDelete = async () => {
         if (confirmText === 'Видалити') {
             try {
-                await axios.delete(`http://localhost:5081/containers/delete/${selectedContainerId}`);
+                await deleteTare(selectedContainerId);
                 setTares(tares.filter(tare => tare.id !== selectedContainerId));
                 setFilteredTares(filteredTares.filter(tare => tare.id !== selectedContainerId));
                 setShowConfirmModal(false);
@@ -88,9 +91,8 @@ const TareTableContainer = () => {
 
     const handleAddProduct = async () => {
         try {
-            await axios.put(`http://localhost:5081/containers/set-product/${selectedContainerId}`, { productId: selectedProductId });
+            await setProductToTare(selectedContainerId, selectedProductId);
             setShowModal(false);
-            // Optionally, you can fetch the updated tares list here
         } catch (error) {
             console.error('Error adding product to container:', error);
         }
@@ -98,8 +100,7 @@ const TareTableContainer = () => {
 
     const handleClearProduct = async (containerId) => {
         try {
-            await axios.put(`http://localhost:5081/containers/clear-product/${containerId}`);
-            // Optionally, you can fetch the updated tares list here
+            await clearProductFromTare(containerId);
         } catch (error) {
             console.error('Error clearing products from container:', error);
         }
@@ -114,9 +115,27 @@ const TareTableContainer = () => {
         setCurrentPage(pageNumber);
     };
 
+    const handleSort = (key) => {
+        let direction = 'ascending';
+        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+            direction = 'descending';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const sortedTares = [...filteredTares].sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+            return sortConfig.direction === 'ascending' ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+            return sortConfig.direction === 'ascending' ? 1 : -1;
+        }
+        return 0;
+    });
+
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredTares.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = sortedTares.slice(indexOfFirstItem, indexOfLastItem);
 
     if (loading) {
         return <Loader />;
@@ -134,99 +153,117 @@ const TareTableContainer = () => {
                     <img src="Icons for functions/free-icon-plus-3303893.png" alt="Create New Container" height="20" />
                 </Link>
             </div>
+            <Button variant="primary" className="d-lg-none mb-3" onClick={() => setShowOffcanvas(true)}>
+                Показати фільтри
+            </Button>
             <Row>
-                <Col md={3}>
+                <Col lg={3} className="d-none d-lg-block">
                     <TareFilterForm onFilter={handleFilter} />
                 </Col>
-                <Col md={9}>
-                    <Table striped bordered hover>
-                        <thead>
-                        <tr>
-                            <th>Ім&#39;я</th>
-                            <th>Тип</th>
-                            <th>Об&#39;єм(л)</th>
-                            <th>Чи порожній</th>
-                            <th>Нотатки</th>
-                            <th style={{ width: '200px' }}>Дії</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {currentItems.map((tare) => (
-                            <tr key={tare.id}>
-                                <td>{tare.name}</td>
-                                <td>{getTypeName(tare.type)}</td>
-                                <td>{tare.volume}</td>
-                                <td>{tare.isEmpty ? 'так' : 'ні'}</td>
-                                <td>{tare.notes}</td>
-                                <td style={{ width: '200px' }}>
-                                    <Row>
-                                        <Col>
-                                            <OverlayTrigger
-                                                placement="top"
-                                                overlay={<Tooltip>Update Container</Tooltip>}
-                                            >
-                                                <Button variant="link" className="p-0 border-0" onClick={() => handleUpdate(tare.id)}>
-                                                    <img src="Icons for functions/free-icon-edit-3597088.png" alt="Update Container" height="20" />
-                                                </Button>
-                                            </OverlayTrigger>
-                                        </Col>
-                                        <Col>
-                                            <OverlayTrigger
-                                                placement="top"
-                                                overlay={<Tooltip>Delete Container</Tooltip>}
-                                            >
-                                                <Button variant="link" className="p-0 border-0" onClick={() => handleDelete(tare.id)}>
-                                                    <img src="Icons for functions/free-icon-recycle-bin-3156999.png" alt="Delete Container" height="20" />
-                                                </Button>
-                                            </OverlayTrigger>
-                                        </Col>
-                                    </Row>
-                                    <Row className="mt-2">
-                                        <Col>
-                                            <OverlayTrigger
-                                                placement="top"
-                                                overlay={<Tooltip>Add Product</Tooltip>}
-                                            >
-                                                <Button variant="link" className="p-0 border-0" onClick={() => openModal(tare.id)}>
-                                                    <img src="Icons for functions/free-icon-import-7234396.png" alt="Add Product" height="20" />
-                                                </Button>
-                                            </OverlayTrigger>
-                                        </Col>
-                                        <Col>
-                                            <OverlayTrigger
-                                                placement="top"
-                                                overlay={<Tooltip>Clear Product</Tooltip>}
-                                            >
-                                                <Button variant="link" className="p-0 border-0" onClick={() => handleClearProduct(tare.id)}>
-                                                    <img src="Icons for functions/free-icon-package-1666995.png" alt="Clear Product" height="20" />
-                                                </Button>
-                                            </OverlayTrigger>
-                                        </Col>
-                                        <Col>
-                                            <OverlayTrigger
-                                                placement="top"
-                                                overlay={<Tooltip>More Info</Tooltip>}
-                                            >
-                                                <Button variant="link" className="p-0 border-0" onClick={() => navigate(`/tare/detail/${tare.id}`)}>
-                                                    <img src="Icons for functions/free-icon-info-1445402.png" alt="More Info" height="20" />
-                                                </Button>
-                                            </OverlayTrigger>
-                                        </Col>
-                                    </Row>
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </Table>
-                    <Pagination>
-                        {Array.from({ length: Math.ceil(filteredTares.length / itemsPerPage) }, (_, index) => (
-                            <Pagination.Item key={index + 1} active={index + 1 === currentPage} onClick={() => handlePageChange(index + 1)}>
-                                {index + 1}
-                            </Pagination.Item>
-                        ))}
-                    </Pagination>
+                <Col lg={9}>
+                    {filteredTares.length === 0 ? (
+                        <div className="alert alert-warning">Контейнери відсутні</div>
+                    ) : (
+                        <>
+                            <Table striped bordered hover>
+                                <thead>
+                                <tr>
+                                    <th onClick={() => handleSort('name')}>Ім&#39;я</th>
+                                    <th onClick={() => handleSort('type')}>Тип</th>
+                                    <th onClick={() => handleSort('volume')}>Об&#39;єм(л)</th>
+                                    <th onClick={() => handleSort('isEmpty')}>Чи порожній</th>
+                                    <th onClick={() => handleSort('notes')}>Нотатки</th>
+                                    <th style={{ width: '200px' }}>Дії</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {currentItems.map((tare) => (
+                                    <tr key={tare.id}>
+                                        <td>{tare.name}</td>
+                                        <td>{getTypeName(tare.type)}</td>
+                                        <td>{tare.volume}</td>
+                                        <td>{tare.isEmpty ? 'так' : 'ні'}</td>
+                                        <td>{tare.notes}</td>
+                                        <td style={{ width: '200px' }}>
+                                            <Row>
+                                                <Col>
+                                                    <OverlayTrigger
+                                                        placement="top"
+                                                        overlay={<Tooltip>Update Container</Tooltip>}
+                                                    >
+                                                        <Button variant="link" className="p-0 border-0" onClick={() => handleUpdate(tare.id)}>
+                                                            <img src="Icons for functions/free-icon-edit-3597088.png" alt="Update Container" height="20" />
+                                                        </Button>
+                                                    </OverlayTrigger>
+                                                </Col>
+                                                <Col>
+                                                    <OverlayTrigger
+                                                        placement="top"
+                                                        overlay={<Tooltip>Delete Container</Tooltip>}
+                                                    >
+                                                        <Button variant="link" className="p-0 border-0" onClick={() => handleDelete(tare.id)}>
+                                                            <img src="Icons for functions/free-icon-recycle-bin-3156999.png" alt="Delete Container" height="20" />
+                                                        </Button>
+                                                    </OverlayTrigger>
+                                                </Col>
+                                            </Row>
+                                            <Row className="mt-2">
+                                                <Col>
+                                                    <OverlayTrigger
+                                                        placement="top"
+                                                        overlay={<Tooltip>Add Product</Tooltip>}
+                                                    >
+                                                        <Button variant="link" className="p-0 border-0" onClick={() => openModal(tare.id)}>
+                                                            <img src="Icons for functions/free-icon-import-7234396.png" alt="Add Product" height="20" />
+                                                        </Button>
+                                                    </OverlayTrigger>
+                                                </Col>
+                                                <Col>
+                                                    <OverlayTrigger
+                                                        placement="top"
+                                                        overlay={<Tooltip>Clear Product</Tooltip>}
+                                                    >
+                                                        <Button variant="link" className="p-0 border-0" onClick={() => handleClearProduct(tare.id)}>
+                                                            <img src="Icons for functions/free-icon-package-1666995.png" alt="Clear Product" height="20" />
+                                                        </Button>
+                                                    </OverlayTrigger>
+                                                </Col>
+                                                <Col>
+                                                    <OverlayTrigger
+                                                        placement="top"
+                                                        overlay={<Tooltip>More Info</Tooltip>}
+                                                    >
+                                                        <Button variant="link" className="p-0 border-0" onClick={() => navigate(`/tare/detail/${tare.id}`)}>
+                                                            <img src="Icons for functions/free-icon-info-1445402.png" alt="More Info" height="20" />
+                                                        </Button>
+                                                    </OverlayTrigger>
+                                                </Col>
+                                            </Row>
+                                        </td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </Table>
+                            <Pagination>
+                                {Array.from({ length: Math.ceil(filteredTares.length / itemsPerPage) }, (_, index) => (
+                                    <Pagination.Item key={index + 1} active={index + 1 === currentPage} onClick={() => handlePageChange(index + 1)}>
+                                        {index + 1}
+                                    </Pagination.Item>
+                                ))}
+                            </Pagination>
+                        </>
+                    )}
                 </Col>
             </Row>
+
+            <Offcanvas show={showOffcanvas} onHide={() => setShowOffcanvas(false)} placement="end">
+                <Offcanvas.Header closeButton>
+                    <Offcanvas.Title>Фільтри</Offcanvas.Title>
+                </Offcanvas.Header>
+                <Offcanvas.Body>
+                    <TareFilterForm onFilter={handleFilter} />
+                </Offcanvas.Body>
+            </Offcanvas>
 
             <Modal show={showModal} onHide={() => setShowModal(false)}>
                 <Modal.Header closeButton>

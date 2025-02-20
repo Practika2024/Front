@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import containerTypes from '../../../../constants/containerTypes.js';
-import {Button} from "react-bootstrap"; // Adjust the path as needed
+import { Button } from "react-bootstrap";
+import { createTare } from '../../../../utils/services/TareService';
 
 const CreateTare = () => {
     const [name, setName] = useState('');
-    const [type, setType] = useState(containerTypes[0].id); // Default to the first type
+    const [type, setType] = useState(containerTypes[0].id);
     const [volume, setVolume] = useState('');
     const [notes, setNotes] = useState('');
     const navigate = useNavigate();
@@ -14,25 +14,16 @@ const CreateTare = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:5081/containers/add', {
+            await createTare({
                 name,
                 type,
                 volume,
                 notes,
-                userId: '56b51b17-0c27-477e-8c55-4f95d3ef7ae1', // Automatically pass userId
+                userId: '56b51b17-0c27-477e-8c55-4f95d3ef7ae1',
             });
             navigate('/tare');
         } catch (error) {
             console.error('Error creating tare:', error);
-            if (error.response) {
-                console.error('Response data:', error.response.data);
-                console.error('Response status:', error.response.status);
-                console.error('Response headers:', error.response.headers);
-            } else if (error.request) {
-                console.error('Request data:', error.request);
-            } else {
-                console.error('Error message:', error.message);
-            }
         }
     };
 

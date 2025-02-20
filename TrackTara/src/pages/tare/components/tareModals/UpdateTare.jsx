@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
-import containerTypes from '../../../../constants/containerTypes.js'; // Adjust the path as needed
+import containerTypes from '../../../../constants/containerTypes.js';
+import { getTareById, updateTare } from '../../../../utils/services/TareService';
 
 const UpdateTare = () => {
     const { id } = useParams();
@@ -14,8 +14,7 @@ const UpdateTare = () => {
     useEffect(() => {
         const fetchTare = async () => {
             try {
-                const response = await axios.get(`http://localhost:5081/containers/${id}`);
-                const tare = response.data;
+                const tare = await getTareById(id);
                 setName(tare.name);
                 setType(tare.type);
                 setVolume(tare.volume);
@@ -31,25 +30,16 @@ const UpdateTare = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.put(`http://localhost:5081/containers/update/${id}`, {
+            await updateTare(id, {
                 name,
                 type,
                 volume,
                 notes,
-                userId: '56b51b17-0c27-477e-8c55-4f95d3ef7ae1', // Automatically pass userId
+                userId: '56b51b17-0c27-477e-8c55-4f95d3ef7ae1',
             });
             navigate('/tare');
         } catch (error) {
             console.error('Error updating tare:', error);
-            if (error.response) {
-                console.error('Response data:', error.response.data);
-                console.error('Response status:', error.response.status);
-                console.error('Response headers:', error.response.headers);
-            } else if (error.request) {
-                console.error('Request data:', error.request);
-            } else {
-                console.error('Error message:', error.message);
-            }
         }
     };
 

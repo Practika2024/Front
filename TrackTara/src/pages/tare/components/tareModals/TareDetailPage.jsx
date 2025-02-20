@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Modal, Form, Table, Container } from 'react-bootstrap';
-import axios from 'axios';
 import containerTypes from '../../../../constants/containerTypes';
 import Loader from '../../../../components/common/loader/Loader.jsx';
+import { getTareById, deleteTare, setProductToTare, clearProductFromTare } from '../../../../utils/services/TareService';
+import { getAllProducts } from '../../../../utils/services/ProductService';
 
 const TareDetailPage = () => {
     const { containerId } = useParams();
@@ -20,8 +21,8 @@ const TareDetailPage = () => {
 
         const fetchContainer = async () => {
             try {
-                const response = await axios.get(`http://localhost:5081/containers/get-by-id/${containerId}`);
-                setContainer(response.data);
+                const tare = await getTareById(containerId);
+                setContainer(tare);
             } catch (error) {
                 console.error('Error fetching container:', error);
                 setError(true);
@@ -32,8 +33,8 @@ const TareDetailPage = () => {
 
         const fetchProducts = async () => {
             try {
-                const response = await axios.get('http://localhost:5081/products/all');
-                setProducts(response.data);
+                const products = await getAllProducts();
+                setProducts(products);
             } catch (error) {
                 console.error('Error fetching products:', error);
             }
@@ -52,7 +53,7 @@ const TareDetailPage = () => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`http://localhost:5081/containers/delete/${containerId}`);
+            await deleteTare(containerId);
             navigate('/tare');
         } catch (error) {
             console.error('Error deleting container:', error);
@@ -62,7 +63,7 @@ const TareDetailPage = () => {
     const handleAddProduct = async () => {
         if (!selectedProductId) return;
         try {
-            await axios.put(`http://localhost:5081/containers/set-product/${containerId}`, { productId: selectedProductId });
+            await setProductToTare(containerId, selectedProductId);
             setShowModal(false);
         } catch (error) {
             console.error('Error adding product to container:', error);
@@ -71,7 +72,7 @@ const TareDetailPage = () => {
 
     const handleClearProduct = async () => {
         try {
-            await axios.put(`http://localhost:5081/containers/clear-product/${containerId}`);
+            await clearProductFromTare(containerId);
         } catch (error) {
             console.error('Error clearing products from container:', error);
         }
@@ -91,7 +92,6 @@ const TareDetailPage = () => {
                     ← Назад
                 </Button>
             </div>
-
 
             <h2 className="text-center mb-4">Деталі контейнера</h2>
             <Table striped bordered hover responsive>
@@ -133,7 +133,6 @@ const TareDetailPage = () => {
                 </tbody>
             </Table>
 
-            {/* Модальне вікно для вибору продукту */}
             <Modal show={showModal} onHide={() => setShowModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Виберіть продукт</Modal.Title>
