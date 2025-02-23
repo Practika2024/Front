@@ -1,38 +1,55 @@
-// import { getAllContainers, deleteContainer, setProductToContainer, clearProductFromTare } from '../../../utils/services/ContainerService.js';
-import { getAll, deleteTareSlice, setProduct, clearProduct } from './../reduserSlises/containerSlice';
+import { getAll, deleteTareSlice, setProduct, clearProduct, setLoading, setError } from '../reduserSlises/containerSlice';
+import { getAllContainers, deleteContainer, setProductToContainer, clearProductFromTare } from '../../../utils/services/ContainerService';
+import { getContainerTypeNameById } from '../../../utils/services/ContainerTypesService';
 
 export const fetchContainers = () => async (dispatch) => {
+    dispatch(setLoading(true));
     try {
-        // const response = await getAllContainers();
+        const response = await getAllContainers();
         dispatch(getAll(response));
     } catch (error) {
-        console.error('Error fetching containers:', error);
+        dispatch(setError(error.message));
+    } finally {
+        dispatch(setLoading(false));
+    }
+};
+export const fetchContainerTypeNameById = (id) => async (dispatch) => {
+    dispatch(setLoading(true));
+    try {
+        const name = await getContainerTypeNameById(id);
+        console.log('Fetched container type name:', name);
+        return name;
+    } catch (error) {
+        dispatch(setError(error.message));
+    } finally {
+        dispatch(setLoading(false));
     }
 };
 
+
 export const removeContainer = (id) => async (dispatch) => {
     try {
-        // await deleteContainer(id);
+        await deleteContainer(id);
         dispatch(deleteTareSlice(id));
     } catch (error) {
-        console.error('Error deleting container:', error);
+        dispatch(setError(error.message));
     }
 };
 
 export const addProductToContainer = (containerId, productId) => async (dispatch) => {
     try {
-        // await setProductToContainer(containerId, productId);
+        await setProductToContainer(containerId, productId);
         dispatch(setProduct({ containerId, productId }));
     } catch (error) {
-        console.error('Error adding product to container:', error);
+        dispatch(setError(error.message));
     }
 };
 
 export const removeProductFromContainer = (containerId) => async (dispatch) => {
     try {
-        // await clearProductFromTare(containerId);
+        await clearProductFromTare(containerId);
         dispatch(clearProduct(containerId));
     } catch (error) {
-        console.error('Error clearing product from container:', error);
+        dispatch(setError(error.message));
     }
 };

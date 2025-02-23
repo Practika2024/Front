@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Modal, Form, Table, Container } from 'react-bootstrap';
-import containerTypes from '../../../../constants/containerTypes';
 import Loader from '../../../../components/common/loader/Loader.jsx';
 import { getContainerById, deleteContainer, setProductToContainer, clearProductFromTare } from '../../../../utils/services/ContainerService.js';
 import { getAllProducts } from '../../../../utils/services/ProductService';

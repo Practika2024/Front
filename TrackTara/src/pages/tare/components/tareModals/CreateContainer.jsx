@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import containerTypes from '../../../../constants/containerTypes.js';
 import { Button } from "react-bootstrap";
 import { createContainer } from '../../../../utils/services/ContainerService.js';
 

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import containerTypes from '../../../constants/containerTypes';
 import 'rc-slider/assets/index.css';
 import Slider from 'rc-slider';
 import { Form, Button, Row, Col } from 'react-bootstrap';
@@ -75,22 +74,6 @@ const ContainerFilterForm = ({ onFilter }) => {
                         />
                     </Col>
                 </Row>
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-                <Form.Label>Тип</Form.Label>
-                <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                    {containerTypes.map(containerType => (
-                        <div key={containerType.id} style={{ marginRight: '15px' }}>
-                            <Form.Check
-                                type="checkbox"
-                                label={containerType.name}
-                                checked={type.includes(containerType.id)}
-                                onChange={() => handleTypeChange(containerType.id)}
-                            />
-                        </div>
-                    ))}
-                </div>
             </Form.Group>
             <Form.Group className="mb-3">
                 <Form.Label>Чи заповнений</Form.Label>

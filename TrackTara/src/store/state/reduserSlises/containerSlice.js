@@ -12,6 +12,7 @@ const containerSlice = createSlice({
     reducers: {
         getAll: (state, action) => {
             state.containers = action.payload;
+            state.loading = false;
         },
         deleteTareSlice: (state, action) => {
             state.containers = state.containers.filter(container => container.id !== action.payload);
@@ -19,15 +20,11 @@ const containerSlice = createSlice({
         setProduct: (state, action) => {
             const { containerId, productId } = action.payload;
             const container = state.containers.find(container => container.id === containerId);
-            if (container) {
-                container.productId = productId;
-            }
+            if (container) container.productId = productId;
         },
         clearProduct: (state, action) => {
             const container = state.containers.find(container => container.id === action.payload);
-            if (container) {
-                container.productId = null;
-            }
+            if (container) container.productId = null;
         },
         setLoading: (state, action) => {
             state.loading = action.payload;
@@ -39,5 +36,4 @@ const containerSlice = createSlice({
 });
 
 export const { getAll, deleteTareSlice, setProduct, clearProduct, setLoading, setError } = containerSlice.actions;
-
 export default containerSlice.reducer;

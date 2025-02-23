@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import containerTypes from '../../../../constants/containerTypes.js';
 import { getContainerById, updateContainer } from '../../../../utils/services/ContainerService.js';
 
 const UpdateContainer = () => {

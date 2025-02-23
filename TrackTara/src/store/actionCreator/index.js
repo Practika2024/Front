@@ -7,6 +7,7 @@ import * as AppSettingActions from "../state/actions/appSettingActions";
 import * as CartItemActions from "../state/actions/cartItemActions";
 import * as FiltersActions from "../state/actions/filtersActions";
 import * as ContainerActions from "../state/actions/containerActions";
+import * as ContainerTypeActions from "../state/actions/containerTypeActions.js";
 
 const actions = {
   ...UserActionCreators,
@@ -17,6 +18,7 @@ const actions = {
   ...AppSettingActions,
   ...CartItemActions,
   ...ContainerActions,
+  ...ContainerTypeActions,
   ...FiltersActions
 };
 
