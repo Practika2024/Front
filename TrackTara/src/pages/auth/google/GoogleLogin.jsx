@@ -45,7 +45,7 @@ const GoogleLogin = () => {
   useEffect(() => {
     const loadGoogleApi = () => {
       const script = document.createElement("script");
-      script.src = "https://accounts.google.com/gsi/client?lang=en";
+      script.src = "https://accounts.google.com/gsi/client?hl=uk";
       script.async = true;
       script.defer = true;
       script.onload = () => {
@@ -73,6 +73,7 @@ const GoogleLogin = () => {
       window.google.accounts.id.renderButton(
         document.getElementById("loginGoogleBtn"),
         {
+
             theme: "outline",
             size: "large", 
             shape: "pill",    
@@ -83,9 +84,9 @@ const GoogleLogin = () => {
   }, [googleApiLoaded]);
 
   return (
-    <div className="d-flex justify-center align-items-center">
+    <div className="d-flex justify-center align-items-center my-3 mx-3">
         {googleApiLoaded ? (
-          <div id="loginGoogleBtn"></div>
+          <div id="loginGoogleBtn">Google</div>
         ) : (
           <div>Loading...</div>
         )}

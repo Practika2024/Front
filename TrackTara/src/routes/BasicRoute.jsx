@@ -67,7 +67,7 @@ const BasicRoute = memo(() => {
                     <Route
                         path="/cartItems"
                         element={
-                            <ProtectedRoute allowedRoles={["User"]}>
+                            <ProtectedRoute allowedRoles={["Operator"]}>
                                 <CartItemsPage />
                             </ProtectedRoute>
                         }
@@ -76,7 +76,7 @@ const BasicRoute = memo(() => {
                     <Route
                         path="/favoriteProducts"
                         element={
-                            <ProtectedRoute allowedRoles={['User']}>
+                            <ProtectedRoute allowedRoles={['Operator']}>
                                 <FavoriteProductPage />
                             </ProtectedRoute>
                         }
@@ -109,7 +109,7 @@ const BasicRoute = memo(() => {
                     <Route
                         path="/profile"
                         element={
-                            <ProtectedRoute allowedRoles={["User"]}>
+                            <ProtectedRoute allowedRoles={["Operator"]}>
                                 <MyProfilePage />
                             </ProtectedRoute>
                         }
