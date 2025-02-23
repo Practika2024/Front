@@ -1,24 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Card } from 'react-bootstrap';
-import { Bar } from 'react-chartjs-2';
-import axios from 'axios';
 import 'chart.js/auto'; // Необхідно для Chart.js
+import React, { useState } from 'react';
+import { Card, Col, Container, Row } from 'react-bootstrap';
+import { Bar } from 'react-chartjs-2';
 
 const HomePage = () => {
     const [containerData, setContainerData] = useState([]);
 
-    useEffect(() => {
-        // Імітація запиту до API для отримання даних
-        const fetchData = async () => {
-            try {
-                const response = await axios.get('http://localhost:5081/containers/created-per-month');
-                setContainerData(response.data);
-            } catch (error) {
-                console.error('Помилка завантаження даних:', error);
-            }
-        };
-        fetchData();
-    }, []);
 
     // Формування даних для графіка
     const chartData = {

@@ -21,6 +21,16 @@ export const signInUser = (model) => async (dispatch) => {
     return { success: false, message: errorMessage };
   }
 };
+export const externalLoginUser = (model) => async (dispatch) => {
+  try {
+    const response = await AuthService.externalLogin(model);
+    await AuthByToken(response)(dispatch);
+    return { success: true, message: "You login successfuly!" };
+  } catch (error) {
+    const errorMessage = error.response?.data;
+    return { success: false, message: errorMessage };
+  }
+};
 
 export const AuthByToken = (tokens) => async (dispatch) => {
   if (tokens) {

@@ -9,6 +9,7 @@ import appSettingSlice from '../store/state/reduserSlises/appSettingSlice';
 import roleReducer from '../store/state/reduserSlises/roleSlice'
 import cartItemReducer from '../store/state/reduserSlises/cartItemSlice';
 import filtersReducer from '../store/state/reduserSlises/filtersSlice';
+import containersReducer from '../store/state/reduserSlises/containerSlice';
 
 export const rootReducer = combineReducers({
     user: userReducer,
@@ -19,6 +20,7 @@ export const rootReducer = combineReducers({
     appSettings: appSettingSlice,
     users: usersReducer,
     filters: filtersReducer,
+    containers: containersReducer,
     cartItem : cartItemReducer
   });
 

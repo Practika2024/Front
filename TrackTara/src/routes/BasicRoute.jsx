@@ -8,7 +8,6 @@ import CartItemsPage from "../pages/cartItems/CartitemsPage";
 import CategoriesPage from "../pages/categories/CategoriesPage";
 import ElectronicItemPage from "../pages/electronicItem/ElectronicItemPage";
 import ProductDetailsPage from "../pages/electronicItem/components/productDetailsPage/ProductDetailsPage";
-import ErrorPage from "../pages/errorPages/ErrorPage";
 import FavoriteProductPage from "../pages/favoriteProducts/FavoriteProductPage";
 import HomePage from "../pages/home/HomePage";
 import ManufacturersPage from "../pages/manufacturers/ManufacturersPage";
@@ -67,7 +66,7 @@ const BasicRoute = memo(() => {
                     <Route
                         path="/cartItems"
                         element={
-                            <ProtectedRoute allowedRoles={["User"]}>
+                            <ProtectedRoute allowedRoles={["Operator"]}>
                                 <CartItemsPage />
                             </ProtectedRoute>
                         }
@@ -76,7 +75,7 @@ const BasicRoute = memo(() => {
                     <Route
                         path="/favoriteProducts"
                         element={
-                            <ProtectedRoute allowedRoles={['User']}>
+                            <ProtectedRoute allowedRoles={['Operator']}>
                                 <FavoriteProductPage />
                             </ProtectedRoute>
                         }
@@ -109,7 +108,7 @@ const BasicRoute = memo(() => {
                     <Route
                         path="/profile"
                         element={
-                            <ProtectedRoute allowedRoles={["User"]}>
+                            <ProtectedRoute allowedRoles={["Operator"]}>
                                 <MyProfilePage />
                             </ProtectedRoute>
                         }
@@ -120,7 +119,6 @@ const BasicRoute = memo(() => {
                     <Route path="/tare/detail/:containerId" element={<ContainerDetailPage />} /> {/* Add TareDetailPage route */}
                     <Route path="/register" element={<Register />} />
                     <Route path="/login" element={<Login />} />
-                    <Route path="/error" element={<ErrorPage />} />
                     <Route path="*" element={<NotFoundPage />} />
                 </Route>
             </Routes>

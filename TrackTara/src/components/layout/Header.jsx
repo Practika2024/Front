@@ -97,11 +97,11 @@ const Header = memo(() => {
             ) : (
                 <div className="d-flex gap-3">
                   <Link to="/login" className="btn btn-outline-primary">
-                    Login
+                    Login/Register
                   </Link>
-                  <Link to="/register" className="btn btn-primary text-white">
+                  {/* <Link to="/register" className="btn btn-primary text-white">
                     Register
-                  </Link>
+                  </Link> */}
                 </div>
             )}
           </div>

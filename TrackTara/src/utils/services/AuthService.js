@@ -12,6 +12,9 @@ export class AuthService {
   static async signIn(model) {
     return await this.httpClient.post("signin", model);
   }
+  static async externalLogin(model) {
+    return await this.httpClient.post("externalLogin", model);
+  }
 
   static async signUp(model) {
     try {

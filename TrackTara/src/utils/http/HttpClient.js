@@ -1,9 +1,7 @@
 import axios from "axios";
 import {
-  setIsLoading,
-  setStatus,
+  setIsLoading
 } from "../../store/state/actions/appSettingActions";
-import { PageStatuses } from "../../store/state/reduserSlises/appSettingSlice";
 import { store } from "../../store/store";
 
 export default class HttpClient {
@@ -75,19 +73,8 @@ export default class HttpClient {
     setIsLoading(true)(store.dispatch);
     try {
       const response = await this.axiosInstance.request(config);
-      setStatus(PageStatuses.GOOD)(store.dispatch);
       return response.data;
     } catch (error) {
-      const status = error.response ? error.response.status : 500;
-      if (status === 404) {
-        setStatus(PageStatuses.NOT_FOUND)(store.dispatch);
-      } else if (status === 400) {
-        //setStatus(PageStatuses.BAD_REQUEST)(store.dispatch);
-      } else if (status === 409) {
-        //setStatus(PageStatuses.BAD_REQUEST)(store.dispatch);
-      } else {
-        setStatus(PageStatuses.TOO_MANY_REQUESTS)(store.dispatch);
-      }
       return Promise.reject(error);
     } finally {
       setIsLoading(false)(store.dispatch);
