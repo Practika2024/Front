@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import useActions from "../../../hooks/useActions";
 import { toast } from "react-toastify";
+import GoogleLogin from "../google/GoogleLogin";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -64,30 +65,44 @@ const Register = () => {
   }, [isAuthenticated, navigate]);
 
   return (
-      <div className="container align-items-center d-flex flex-column my-4">
-        <div className="register-box w-50">
-          <form onSubmit={handleSubmit} className="form d-flex flex-column gap-3 text-start align-items-center">
-            <h1>Реєстрація</h1>
-            {Object.entries({ name: "Ім'я", surname: "Прізвище", patronymic: "По батькові", email: "Email", password: "Пароль" }).map(([field, label]) => (
-                <div className="form-group w-50" key={field}>
-                  <label>{label}</label>
-                  <input
-                      type={field === "password" ? "password" : "text"}
-                      name={field}
-                      onChange={handleChange}
-                      value={formValues[field]}
-                      className={`form-control ${errors[field] ? "is-invalid" : ""}`}
-                  />
-                  {errors[field] && <div className="invalid-feedback">{errors[field]}</div>}
-                </div>
-            ))}
-            <button type="submit" className="btn btn-primary w-25">Зареєструватися</button>
-            <div className="login-link">
-              <Link to="/login">Вже маєте акаунт? Увійти</Link>
+    <div className="container align-items-center d-flex flex-column my-4">
+      <div className="register-box w-50">
+        <form
+          onSubmit={handleSubmit}
+          className="form d-flex flex-column gap-3 text-start align-items-center"
+        >
+          <h1>Реєстрація</h1>
+          {Object.entries({
+            name: "Ім'я",
+            surname: "Прізвище",
+            patronymic: "По батькові",
+            email: "Email",
+            password: "Пароль",
+          }).map(([field, label]) => (
+            <div className="form-group w-50" key={field}>
+              <label>{label}</label>
+              <input
+                type={field === "password" ? "password" : "text"}
+                name={field}
+                onChange={handleChange}
+                value={formValues[field]}
+                className={`form-control ${errors[field] ? "is-invalid" : ""}`}
+              />
+              {errors[field] && (
+                <div className="invalid-feedback">{errors[field]}</div>
+              )}
             </div>
-          </form>
-        </div>
+          ))}
+          <button type="submit" className="btn btn-primary w-25">
+            Зареєструватися
+          </button>
+          <div className="login-link">
+            <Link to="/login">Вже маєте акаунт? Увійти</Link>
+          </div>
+        </form>
       </div>
+      <GoogleLogin />
+    </div>
   );
 };
 
