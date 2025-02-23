@@ -6,6 +6,7 @@ import * as ProductsActions from "../state/actions/productActions";
 import * as AppSettingActions from "../state/actions/appSettingActions";
 import * as CartItemActions from "../state/actions/cartItemActions";
 import * as FiltersActions from "../state/actions/filtersActions";
+import * as ContainerActions from "../state/actions/containerActions";
 
 const actions = {
   ...UserActionCreators,
@@ -15,6 +16,7 @@ const actions = {
   ...ProductsActions,
   ...AppSettingActions,
   ...CartItemActions,
+  ...ContainerActions,
   ...FiltersActions
 };
 

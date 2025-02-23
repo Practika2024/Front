@@ -4,10 +4,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import containerTypes from '../../../constants/containerTypes';
 import ContainerFilterForm from './ContainerFilterForm.jsx';
 import Loader from '../../../components/common/loader/Loader';
-import { getAllContainers, deleteContainer, setProductToContainer, clearProductFromTare } from '../../../utils/services/ContainerService.js';
-import { getAllProducts } from '../../../utils/services/ProductService';
+import { deleteContainer, setProductToContainer, clearProductFromTare } from '../../../utils/services/ContainerService.js';
+import useActions from '../../../hooks/useActions.js';
+import { useSelector } from 'react-redux';
+// import { getAllProducts } from '../../../utils/services/ProductService';
 
 const ContainersTable = () => {
+    const { fetchContainers } = useActions();
     const [tares, setTares] = useState([]);
     const [filteredTares, setFilteredTares] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -24,31 +27,11 @@ const ContainersTable = () => {
     const [showOffcanvas, setShowOffcanvas] = useState(false);
     const navigate = useNavigate();
 
+
+    const containers = useSelector((state) => state.containers.containers) 
+
     useEffect(() => {
-        const fetchTares = async () => {
-            try {
-                const data = await getAllContainers();
-                setTares(data);
-                setFilteredTares(data);
-            } catch (error) {
-                console.error('Error fetching tares:', error);
-                setError(true);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        const fetchProducts = async () => {
-            try {
-                const data = await getAllProducts();
-                setProducts(data);
-            } catch (error) {
-                console.error('Error fetching products:', error);
-            }
-        };
-
-        fetchTares();
-        fetchProducts();
+        fetchContainers();
     }, []);
 
     const getTypeName = (typeId) => {
@@ -177,7 +160,7 @@ const ContainersTable = () => {
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {currentItems.map((tare) => (
+                                {containers.map((tare) => (
                                     <tr key={tare.id}>
                                         <td>{tare.name}</td>
                                         <td>{getTypeName(tare.type)}</td>
