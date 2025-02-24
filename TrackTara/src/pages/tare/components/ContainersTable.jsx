@@ -5,10 +5,11 @@ import { fetchContainers } from '../../../store/state/actions/containerActions';
 import { fetchContainerTypes, fetchContainerTypeNameById } from '../../../store/state/actions/containerTypeActions';
 import ContainerFilterForm from './ContainerFilterForm.jsx';
 import { deleteContainer } from '../../../utils/services/ContainerService.js';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const ContainersTable = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const containers = useSelector(state => state.containers?.containers || []);
     const containerTypes = useSelector(state => state.containerTypes?.types || []);
 
@@ -22,18 +23,15 @@ const ContainersTable = () => {
 
     const itemsPerPage = 10;
 
-    // Завантаження контейнерів та типів контейнерів
     useEffect(() => {
         dispatch(fetchContainers());
         dispatch(fetchContainerTypes());
     }, [dispatch]);
 
-    // Встановлення відфільтрованих контейнерів
     useEffect(() => {
         setFilteredContainers(containers);
     }, [containers]);
 
-    // Завантаження назв типів контейнерів
     useEffect(() => {
         const fetchTypeNames = async () => {
             const names = { ...typeNames };
@@ -48,12 +46,10 @@ const ContainersTable = () => {
         fetchTypeNames();
     }, [containers, dispatch]);
 
-    // Лог для перевірки завантаження типів контейнерів
     useEffect(() => {
         console.log('Fetched container types in ContainersTable:', containerTypes);
     }, [containerTypes]);
 
-    // Обробка видалення контейнера
     const handleDelete = (id) => {
         setSelectedContainerId(id);
         setShowConfirmModal(true);
@@ -74,7 +70,6 @@ const ContainersTable = () => {
         }
     };
 
-    // Фільтрація контейнерів за заданими фільтрами
     const handleFilter = (filters) => {
         const { uniqueCode, name, minVolume, maxVolume, type, isEmpty } = filters;
         setFilteredContainers(
@@ -89,8 +84,6 @@ const ContainersTable = () => {
         );
     };
 
-
-    // Сортування контейнерів
     const handleSort = (key) => {
         setSortConfig(prev => ({
             key,
@@ -113,8 +106,8 @@ const ContainersTable = () => {
     return (
         <div className="container mt-5">
             <h2 className="mb-4">Список контейнерів</h2>
-            <div className="text-end">
-                <Link to="/tare/create" className="btn btn-primary mb-3">
+            <div className="text-end mb-3">
+                <Link to="/tare/create" className="btn btn-primary">
                     <img
                         src="public/Icons for functions/free-icon-plus-3303893.png"
                         alt="Create New Container"
@@ -153,10 +146,37 @@ const ContainersTable = () => {
                                     </td>
                                     <td>
                                         <Button
-                                            variant="danger"
-                                            onClick={() => handleDelete(container.id)}
+                                            variant="link"
+                                            onClick={() => navigate(`/tare/update/${container.id}`)}
+                                            className="p-0 border-4"
                                         >
-                                            Видалити
+                                            <img
+                                                src="/Icons for functions/free-icon-edit-3597088.png"
+                                                alt="Edit"
+                                                height="20"
+                                            />
+                                        </Button>
+                                        <Button
+                                            variant="link"
+                                            onClick={() => handleDelete(container.id)}
+                                            className="p-0 border-4"
+                                        >
+                                            <img
+                                                src="/Icons for functions/free-icon-recycle-bin-3156999.png"
+                                                alt="Delete"
+                                                height="20"
+                                            />
+                                        </Button>
+                                        <Button
+                                            variant="link"
+                                            onClick={() => navigate(`/tare/detail/${container.id}`)}
+                                            className="p-0 border-4"
+                                        >
+                                            <img
+                                                src="/Icons for functions/free-icon-info-1445402.png"
+                                                alt="Details"
+                                                height="20"
+                                            />
                                         </Button>
                                     </td>
                                 </tr>
@@ -181,14 +201,10 @@ const ContainersTable = () => {
                 </Col>
             </Row>
             <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Підтвердження видалення</Modal.Title>
-                </Modal.Header>
+                <Modal.Header closeButton></Modal.Header>
                 <Modal.Body>
                     <Form.Group>
-                        <Form.Label>
-                            Введіть &quot;Видалити&quot; для підтвердження
-                        </Form.Label>
+                        <Form.Label>Введіть &quot;Видалити&quot; для підтвердження</Form.Label>
                         <Form.Control
                             type="text"
                             value={confirmText}
