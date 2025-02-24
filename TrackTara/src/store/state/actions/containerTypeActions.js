@@ -1,4 +1,8 @@
-import {getAllContainerTypes, getContainerTypeNameById} from '../../../utils/services/ContainerTypesService';
+import {
+    createContainerType, deleteContainerType,
+    getAllContainerTypes,
+    getContainerTypeNameById, updateContainerType
+} from '../../../utils/services/ContainerTypesService';
 import { getAll, setLoading, setError } from '../reduserSlises/containerTypeSlice.js';
 
 

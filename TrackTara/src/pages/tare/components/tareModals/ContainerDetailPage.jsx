@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Modal, Form, Table, Container } from 'react-bootstrap';
+import { Button, Modal, Form, Card, Container } from 'react-bootstrap';
 import Loader from '../../../../components/common/loader/Loader.jsx';
 import { getContainerById, deleteContainer, setProductToContainer, clearProductFromTare } from '../../../../utils/services/ContainerService.js';
 import { getAllProducts } from '../../../../utils/services/ProductService';
+import { getAllContainerTypes } from '../../../../utils/services/ContainerTypesService.js';
 
 const ContainerDetailPage = () => {
     const { containerId } = useParams();
@@ -13,6 +14,7 @@ const ContainerDetailPage = () => {
     const [products, setProducts] = useState([]);
     const [selectedProductId, setSelectedProductId] = useState('');
     const [showModal, setShowModal] = useState(false);
+    const [containerTypes, setContainerTypes] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -39,8 +41,18 @@ const ContainerDetailPage = () => {
             }
         };
 
+        const fetchContainerTypes = async () => {
+            try {
+                const types = await getAllContainerTypes();
+                setContainerTypes(types);
+            } catch (error) {
+                console.error('Error fetching container types:', error);
+            }
+        };
+
         fetchContainer();
         fetchProducts();
+        fetchContainerTypes();
     }, [containerId]);
 
     const getTypeName = (typeId) => {
@@ -84,53 +96,38 @@ const ContainerDetailPage = () => {
     return (
         <Container className="mt-5">
             <div className="d-flex justify-content-start mb-4">
-                <Button
-                    variant="secondary"
-                    onClick={() => navigate('/tare')}
-                >
+                <Button variant="secondary" onClick={() => navigate('/tare')}>
                     ← Назад
                 </Button>
             </div>
 
             <h2 className="text-center mb-4">Деталі контейнера</h2>
-            <Table striped bordered hover responsive>
-                <thead className="table-primary">
-                <tr>
-                    <th>Ім'я</th>
-                    <th>Тип</th>
-                    <th>Об'єм (л)</th>
-                    <th>Чи порожній</th>
-                    <th>Нотатки</th>
-                    <th>Дії</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>{container.name}</td>
-                    <td>{getTypeName(container.type)}</td>
-                    <td>{container.volume}</td>
-                    <td>{container.isEmpty ? 'Так' : 'Ні'}</td>
-                    <td>{container.notes || 'Немає'}</td>
-                    <td>
-                        <Button variant="link" onClick={handleUpdate} className="p-0 border-4">
-                            <img src="/Icons for functions/free-icon-edit-3597088.png" alt="Edit" height="20" />
-                        </Button>
-                        <Button variant="link" onClick={handleDelete} className="p-0 border-4">
-                            <img src="/Icons for functions/free-icon-recycle-bin-3156999.png" alt="Delete" height="20" />
-                        </Button>
-                        <Button variant="link" onClick={() => setShowModal(true)} className="p-0 border-4">
-                            <img src="/Icons for functions/free-icon-import-7234396.png" alt="Add Product" height="20" />
-                        </Button>
-                        <Button variant="link" onClick={handleClearProduct} className="p-0 border-4">
-                            <img src="/Icons for functions/free-icon-package-1666995.png" alt="Clear Product" height="20" />
-                        </Button>
-                        <Button variant="link" onClick={() => navigate(`/tare/info/${containerId}`)} className="p-0 border-4">
-                            <img src="/Icons for functions/free-icon-info-1445402.png" alt="Info" height="20" />
-                        </Button>
-                    </td>
-                </tr>
-                </tbody>
-            </Table>
+            <Card>
+                <Card.Body>
+                    <Card.Title>{container.name}</Card.Title>
+                    <Card.Text>
+                        <strong>Тип:</strong> {getTypeName(container.typeId)}<br />
+                        <strong>Об'єм (л):</strong> {container.volume}<br />
+                        <strong>Чи порожній:</strong> {container.containerId ? 'тут буде назва продукту' : 'Так'}<br />
+                        <strong>Нотатки:</strong> {container.notes || 'Немає'}
+                    </Card.Text>
+                    <Button variant="link" onClick={handleUpdate} className="p-0 border-4">
+                        <img src="/Icons for functions/free-icon-edit-3597088.png" alt="Edit" height="20" />
+                    </Button>
+                    <Button variant="link" onClick={handleDelete} className="p-0 border-4">
+                        <img src="/Icons for functions/free-icon-recycle-bin-3156999.png" alt="Delete" height="20" />
+                    </Button>
+                    <Button variant="link" onClick={() => setShowModal(true)} className="p-0 border-4">
+                        <img src="/Icons for functions/free-icon-import-7234396.png" alt="Add Product" height="20" />
+                    </Button>
+                    <Button variant="link" onClick={handleClearProduct} className="p-0 border-4">
+                        <img src="/Icons for functions/free-icon-package-1666995.png" alt="Clear Product" height="20" />
+                    </Button>
+                    <Button variant="link" onClick={() => navigate(`/tare/info/${containerId}`)} className="p-0 border-4">
+                        <img src="/Icons for functions/free-icon-info-1445402.png" alt="Info" height="20" />
+                    </Button>
+                </Card.Body>
+            </Card>
 
             <Modal show={showModal} onHide={() => setShowModal(false)}>
                 <Modal.Header closeButton>

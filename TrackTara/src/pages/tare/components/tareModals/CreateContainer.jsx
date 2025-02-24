@@ -1,38 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "react-bootstrap";
 import { createContainer } from '../../../../utils/services/ContainerService.js';
+import { getAllContainerTypes } from '../../../../utils/services/ContainerTypesService.js';
 
 const CreateContainer = () => {
     const [name, setName] = useState('');
-    const [type, setType] = useState(containerTypes[0].id);
-    const [volume, setVolume] = useState('');
+    const [typeId, setTypeId] = useState('');
+    const [volume, setVolume] = useState(0);
     const [notes, setNotes] = useState('');
+    const [containerTypes, setContainerTypes] = useState([]);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchContainerTypes = async () => {
+            try {
+                const types = await getAllContainerTypes();
+                setContainerTypes(types);
+            } catch (error) {
+                console.error('Error fetching container types:', error);
+            }
+        };
+
+        fetchContainerTypes();
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             await createContainer({
                 name,
-                type,
-                volume,
+                volume: Number(volume),
                 notes,
-                userId: '56b51b17-0c27-477e-8c55-4f95d3ef7ae1',
+                typeId,
             });
             navigate('/tare');
         } catch (error) {
-            console.error('Error creating tare:', error);
+            console.error('Error creating container:', error);
         }
     };
 
     return (
         <div className="container mt-5">
             <div className="d-flex justify-content-start mb-4">
-                <Button
-                    variant="secondary"
-                    onClick={() => navigate('/tare')}
-                >
+                <Button variant="secondary" onClick={() => navigate('/tare')}>
                     ← Назад
                 </Button>
             </div>
@@ -53,10 +64,11 @@ const CreateContainer = () => {
                     <label className="form-label">Тип</label>
                     <select
                         className="form-control"
-                        value={type}
-                        onChange={(e) => setType(Number(e.target.value))}
+                        value={typeId}
+                        onChange={(e) => setTypeId(e.target.value)}
                         required
                     >
+                        <option value="" disabled>Оберіть тип</option>
                         {containerTypes.map((containerType) => (
                             <option key={containerType.id} value={containerType.id}>
                                 {containerType.name}
@@ -65,7 +77,7 @@ const CreateContainer = () => {
                     </select>
                 </div>
                 <div className="mb-3">
-                    <label className="form-label">Об'єм(л)</label>
+                    <label className="form-label">Об'єм (л)</label>
                     <input
                         type="number"
                         className="form-control"
@@ -82,7 +94,7 @@ const CreateContainer = () => {
                         onChange={(e) => setNotes(e.target.value)}
                     />
                 </div>
-                <button type="submit" className="btn btn-primary">Create</button>
+                <button type="submit" className="btn btn-primary">Створити</button>
             </form>
         </div>
     );

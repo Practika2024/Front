@@ -1,50 +1,89 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getContainerById, updateContainer } from '../../../../utils/services/ContainerService.js';
+import { getAllContainerTypes } from '../../../../utils/services/ContainerTypesService.js';
+import { Button } from "react-bootstrap";
+import { jwtDecode } from 'jwt-decode';
 
 const UpdateContainer = () => {
     const { id } = useParams();
-    const [name, setName] = useState('');
-    const [type, setType] = useState(containerTypes[0].id);
-    const [volume, setVolume] = useState('');
-    const [notes, setNotes] = useState('');
     const navigate = useNavigate();
 
+    const [name, setName] = useState('');
+    const [typeId, setTypeId] = useState('');
+    const [volume, setVolume] = useState(0);
+    const [notes, setNotes] = useState('');
+    const [containerTypes, setContainerTypes] = useState([]);
+
     useEffect(() => {
-        const fetchContainer = async () => {
+        const fetchContainerData = async () => {
             try {
-                const tare = await getContainerById(id);
-                setName(tare.name);
-                setType(tare.type);
-                setVolume(tare.volume);
-                setNotes(tare.notes);
+                const container = await getContainerById(id);
+                setName(container.name);
+                setTypeId(container.typeId);
+                setVolume(container.volume);
+                setNotes(container.notes);
             } catch (error) {
-                console.error('Error fetching tare:', error);
+                console.error('Error fetching container:', error);
             }
         };
 
-        fetchContainer();
+        const fetchContainerTypes = async () => {
+            try {
+                const types = await getAllContainerTypes();
+                setContainerTypes(types);
+            } catch (error) {
+                console.error('Error fetching container types:', error);
+            }
+        };
+
+        fetchContainerData();
+        fetchContainerTypes();
     }, [id]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const token = localStorage.getItem('accessToken'); // Отримуємо токен з локального сховища
+        if (!token) {
+            console.error('JWT token not found in local storage');
+            return;
+        }
+
         try {
-            await updateContainer(id, {
+            const decodedToken = jwtDecode(token);
+            const modifiedBy = decodedToken.id; // Витягуємо user ID
+
+            if (!modifiedBy) {
+                console.error('User ID not found in token');
+                return;
+            }
+
+            const updatedData = {
                 name,
-                type,
-                volume,
+                volume: Number(volume),
                 notes,
-                userId: '56b51b17-0c27-477e-8c55-4f95d3ef7ae1',
-            });
+                modifiedBy,
+                typeId,
+            };
+
+            console.log('Decoded Token:', decodedToken);
+            console.log('Submitting data:', JSON.stringify(updatedData, null, 2));
+
+            await updateContainer(id, updatedData);
             navigate('/tare');
         } catch (error) {
-            console.error('Error updating tare:', error);
+            console.error('Error decoding token or updating container:', error);
         }
     };
 
     return (
         <div className="container mt-5">
-            <h2 className="mb-4">Update Tare</h2>
+            <div className="d-flex justify-content-start mb-4">
+                <Button variant="secondary" onClick={() => navigate('/tare')}>
+                    ← Назад
+                </Button>
+            </div>
+            <h2 className="mb-4">Оновити тару</h2>
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                     <label className="form-label">Ім'я</label>
@@ -60,8 +99,8 @@ const UpdateContainer = () => {
                     <label className="form-label">Тип</label>
                     <select
                         className="form-control"
-                        value={type}
-                        onChange={(e) => setType(Number(e.target.value))}
+                        value={typeId}
+                        onChange={(e) => setTypeId(e.target.value)}
                         required
                     >
                         {containerTypes.map((containerType) => (
@@ -72,7 +111,7 @@ const UpdateContainer = () => {
                     </select>
                 </div>
                 <div className="mb-3">
-                    <label className="form-label">Об'єм(л)</label>
+                    <label className="form-label">Об'єм (л)</label>
                     <input
                         type="number"
                         className="form-control"
@@ -89,7 +128,9 @@ const UpdateContainer = () => {
                         onChange={(e) => setNotes(e.target.value)}
                     />
                 </div>
-                <button type="submit" className="btn btn-primary">Оновити інформацію</button>
+                <button type="submit" className="btn btn-primary">
+                    Оновити
+                </button>
             </form>
         </div>
     );

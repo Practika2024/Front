@@ -35,7 +35,13 @@ export const setProductToContainer = async (containerId, productId) => {
 };
 
 export const updateContainer = async (id, tareData) => {
-    await axios.put(`${API_URL}/update/${id}`, tareData, getAuthHeaders());
+    try {
+        const response = await axios.put(`${API_URL}/update/${id}`, tareData, getAuthHeaders());
+        return response.data;
+    } catch (error) {
+        console.error('Error updating container:', error.response ? error.response.data : error.message);
+        throw error;
+    }
 };
 
 export const clearProductFromTare = async (containerId) => {
