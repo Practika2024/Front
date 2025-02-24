@@ -15,10 +15,13 @@ const HeadersLinks = () => {
             </a>
             <ul className="navbar-nav ms-auto mb-2 mb-lg-0 gap-3">
                 <li className="nav-item">
-                    <Link className="nav-link fs-5" to="/">Home</Link>
+                    <Link className="nav-link fs-5" to="/">Головна</Link>
                 </li>
                 <li className="nav-item">
-                    <Link className="nav-link fs-5" to="/tare">Containers</Link>
+                    <Link className="nav-link fs-5" to="/tare">Контейнери</Link>
+                </li>
+                <li className="nav-item">
+                    <Link className="nav-link fs-5" to="/container/containerTypes">Типи контейнерів</Link>
                 </li>
             </ul>
         </div>

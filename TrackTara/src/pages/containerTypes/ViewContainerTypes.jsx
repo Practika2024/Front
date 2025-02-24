@@ -64,10 +64,15 @@ const ViewContainerTypes = () => {
                         <td>{type.name}</td>
                         <td>
                             <Button
-                                variant="danger"
+                                variant="link"
                                 onClick={() => handleDelete(type.id)}
+                                className="p-0 border-4"
                             >
-                                Delete
+                                <img
+                                    src="/Icons for functions/free-icon-recycle-bin-3156999.png"
+                                    alt="Delete"
+                                    height="20"
+                                />
                             </Button>
                         </td>
                     </tr>
