@@ -49,7 +49,6 @@ const ViewContainerTypes = () => {
             <Row className="mb-4 text-center">
                 <Col>
                     <h1>Типи контейнерів</h1>
-                    <p>Тут ви можете переглядати, додавати та видаляти типи контейнерів.</p>
                 </Col>
             </Row>
 
@@ -62,7 +61,7 @@ const ViewContainerTypes = () => {
                                 <thead>
                                 <tr>
                                     <th>Назва</th>
-                                    <th>Дії</th>
+                                    <th></th>
                                 </tr>
                                 </thead>
                                 <tbody>
