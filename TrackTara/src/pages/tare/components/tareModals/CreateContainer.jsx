@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from "react-bootstrap";
+import { Button, Modal, Form } from 'react-bootstrap';
 import { createContainer } from '../../../../utils/services/ContainerService.js';
-import { getAllContainerTypes } from '../../../../utils/services/ContainerTypesService.js';
+import { getAllContainerTypes, createContainerType } from '../../../../utils/services/ContainerTypesService.js';
 
 const CreateContainer = () => {
     const [name, setName] = useState('');
@@ -10,6 +10,8 @@ const CreateContainer = () => {
     const [volume, setVolume] = useState(0);
     const [notes, setNotes] = useState('');
     const [containerTypes, setContainerTypes] = useState([]);
+    const [showModal, setShowModal] = useState(false);
+    const [newTypeName, setNewTypeName] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -40,6 +42,20 @@ const CreateContainer = () => {
         }
     };
 
+    const handleCreateType = async () => {
+        try {
+            const newType = await createContainerType({ name: newTypeName });
+            if (newType && newType.id) {
+                setContainerTypes([...containerTypes, newType]);
+                setTypeId(newType.id);
+            }
+            setShowModal(false);
+            window.location.reload(); // Reload the page
+        } catch (error) {
+            console.error('Error creating container type:', error);
+        }
+    };
+
     return (
         <div className="container mt-5">
             <div className="d-flex justify-content-start mb-4">
@@ -65,15 +81,22 @@ const CreateContainer = () => {
                     <select
                         className="form-control"
                         value={typeId}
-                        onChange={(e) => setTypeId(e.target.value)}
+                        onChange={(e) => {
+                            if (e.target.value === 'new') {
+                                setShowModal(true);
+                            } else {
+                                setTypeId(e.target.value);
+                            }
+                        }}
                         required
                     >
                         <option value="" disabled>Оберіть тип</option>
                         {containerTypes.map((containerType) => (
-                            <option key={containerType.id} value={containerType.id}>
+                            containerType && <option key={containerType.id} value={containerType.id}>
                                 {containerType.name}
                             </option>
                         ))}
+                        <option value="new">Створити новий тип</option>
                     </select>
                 </div>
                 <div className="mb-3">
@@ -96,6 +119,29 @@ const CreateContainer = () => {
                 </div>
                 <button type="submit" className="btn btn-primary">Створити</button>
             </form>
+
+            <Modal show={showModal} onHide={() => setShowModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Створити новий тип</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Form.Group controlId="formNewTypeName">
+                            <Form.Label>Назва нового типу</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={newTypeName}
+                                onChange={(e) => setNewTypeName(e.target.value)}
+                                required
+                            />
+                        </Form.Group>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowModal(false)}>Закрити</Button>
+                    <Button variant="primary" onClick={handleCreateType}>Створити</Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 };
