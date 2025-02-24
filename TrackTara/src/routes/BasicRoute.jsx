@@ -20,7 +20,8 @@ import ProductCreate from "../pages/products/components/productCreate/ProductCre
 import ContainersPage from "../pages/tare/ContainersPage.jsx";
 import CreateContainer from "../pages/tare/components/tareModals/CreateContainer.jsx";
 import UpdateContainer from "../pages/tare/components/tareModals/UpdateContainer.jsx";
-import ContainerDetailPage from "../pages/tare/components/tareModals/ContainerDetailPage.jsx"; // Import TareDetailPage
+import ContainerDetailPage from "../pages/tare/components/tareModals/ContainerDetailPage.jsx";
+import ViewContainerTypes from "../pages/containerTypes/ViewContainerTypes.jsx"; // Import TareDetailPage
 
 // eslint-disable-next-line react/display-name
 const BasicRoute = memo(() => {
@@ -117,6 +118,7 @@ const BasicRoute = memo(() => {
                     <Route path="/tare/update/:id" element={<UpdateContainer />} />
                     <Route path="/tare/create" element={<CreateContainer />} />
                     <Route path="/tare/detail/:containerId" element={<ContainerDetailPage />} /> {/* Add TareDetailPage route */}
+                    <Route path="/container/containerTypes" element={<ViewContainerTypes />} /> {/* Add TareDetailPage route */}
                     <Route path="/register" element={<Register />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="*" element={<NotFoundPage />} />
