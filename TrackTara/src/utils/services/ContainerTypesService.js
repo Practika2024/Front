@@ -18,8 +18,10 @@ export const getAllContainerTypes = async () => {
 };
 
 export const createContainerType = async (typeData) => {
-    await axios.post(`${API_URL}/add`, typeData, getAuthHeaders());
+    const response = await axios.post(`${API_URL}/add`, typeData, getAuthHeaders());
+    return response.data; // Повертаємо створений об'єкт
 };
+
 
 export const getContainerTypeNameById = async (id) => {
     const containerTypes = await getAllContainerTypes();
