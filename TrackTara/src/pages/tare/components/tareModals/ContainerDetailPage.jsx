@@ -111,21 +111,19 @@ const ContainerDetailPage = () => {
                         <strong>Чи порожній:</strong> {container.containerId ? 'тут буде назва продукту' : 'Так'}<br />
                         <strong>Нотатки:</strong> {container.notes || 'Немає'}
                     </Card.Text>
-                    <Button variant="link" onClick={handleUpdate} className="p-0 border-4">
+                    <Button title={`Редагувати контейнер `} variant="link" onClick={handleUpdate} className="p-0 border-4">
                         <img src="/Icons for functions/free-icon-edit-3597088.png" alt="Edit" height="20" />
                     </Button>
-                    <Button variant="link" onClick={handleDelete} className="p-0 border-4">
+                    <Button title={`Видалити контейнер `} variant="link" onClick={handleDelete} className="p-0 border-4">
                         <img src="/Icons for functions/free-icon-recycle-bin-3156999.png" alt="Delete" height="20" />
                     </Button>
-                    <Button variant="link" onClick={() => setShowModal(true)} className="p-0 border-4">
+                    <Button title={`Додати продукт `} variant="link" onClick={() => setShowModal(true)} className="p-0 border-4">
                         <img src="/Icons for functions/free-icon-import-7234396.png" alt="Add Product" height="20" />
                     </Button>
                     <Button variant="link" onClick={handleClearProduct} className="p-0 border-4">
                         <img src="/Icons for functions/free-icon-package-1666995.png" alt="Clear Product" height="20" />
                     </Button>
-                    <Button variant="link" onClick={() => navigate(`/tare/info/${containerId}`)} className="p-0 border-4">
-                        <img src="/Icons for functions/free-icon-info-1445402.png" alt="Info" height="20" />
-                    </Button>
+
                 </Card.Body>
             </Card>
 

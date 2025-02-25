@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Table, Button, Row, Col, Modal, Form, Pagination } from 'react-bootstrap';
+import { Table, Button, Row, Col, Offcanvas, Form, Pagination } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchContainers } from '../../../store/state/actions/containerActions';
 import { fetchContainerTypes, fetchContainerTypeNameById } from '../../../store/state/actions/containerTypeActions';
@@ -20,6 +20,7 @@ const ContainersTable = () => {
     const [filteredContainers, setFilteredContainers] = useState([]);
     const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'ascending' });
     const [typeNames, setTypeNames] = useState({});
+    const [showFilterOffcanvas, setShowFilterOffcanvas] = useState(false); // Offcanvas state
 
     const itemsPerPage = 10;
 
@@ -45,10 +46,6 @@ const ContainersTable = () => {
         };
         fetchTypeNames();
     }, [containers, dispatch]);
-
-    useEffect(() => {
-        console.log('Fetched container types in ContainersTable:', containerTypes);
-    }, [containerTypes]);
 
     const handleDelete = (id) => {
         setSelectedContainerId(id);
@@ -107,7 +104,7 @@ const ContainersTable = () => {
         <div className="container mt-5">
             <h2 className="mb-4">Список контейнерів</h2>
             <div className="text-end mb-3">
-                <Link to="/tare/create" className="btn btn-primary">
+                <Link  title={`Додати контейнер `} to="/tare/create" className="btn btn-primary">
                     <img
                         src="public/Icons for functions/free-icon-plus-3303893.png"
                         alt="Create New Container"
@@ -116,14 +113,17 @@ const ContainersTable = () => {
                 </Link>
             </div>
             <Row>
-                <Col lg={3}>
+                <Col lg={3} className="d-none d-lg-block">
                     <ContainerFilterForm onFilter={handleFilter} />
                 </Col>
                 <Col lg={9}>
+                    <Button className="d-lg-none mb-3" onClick={() => setShowFilterOffcanvas(true)}>
+                        Фільтрувати
+                    </Button>
                     {filteredContainers.length === 0 ? (
                         <div className="alert alert-warning">Контейнери відсутні</div>
                     ) : (
-                        <Table striped bordered hover>
+                        <Table striped bordered hover responsive>
                             <thead>
                             <tr>
                                 <th onClick={() => handleSort('uniqueCode')}>Код</th>
@@ -146,10 +146,12 @@ const ContainersTable = () => {
                                     </td>
                                     <td>
                                         <Button
+                                            title={`Редагувати контейнер `}
                                             variant="link"
                                             onClick={() => navigate(`/tare/update/${container.id}`)}
                                             className="p-0 border-4"
                                         >
+
                                             <img
                                                 src="/Icons for functions/free-icon-edit-3597088.png"
                                                 alt="Edit"
@@ -157,6 +159,7 @@ const ContainersTable = () => {
                                             />
                                         </Button>
                                         <Button
+                                            title={`Видалити контейнер `}
                                             variant="link"
                                             onClick={() => handleDelete(container.id)}
                                             className="p-0 border-4"
@@ -168,6 +171,7 @@ const ContainersTable = () => {
                                             />
                                         </Button>
                                         <Button
+                                            title={`Деталі контейнера`}
                                             variant="link"
                                             onClick={() => navigate(`/tare/detail/${container.id}`)}
                                             className="p-0 border-4"
@@ -200,27 +204,24 @@ const ContainersTable = () => {
                     </Pagination>
                 </Col>
             </Row>
-            <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
-                <Modal.Header closeButton></Modal.Header>
-                <Modal.Body>
-                    <Form.Group>
-                        <Form.Label>Введіть &quot;Видалити&quot; для підтвердження</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={confirmText}
-                            onChange={(e) => setConfirmText(e.target.value)}
-                        />
-                    </Form.Group>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>
-                        Скасувати
+
+            {/* Offcanvas for mobile filters */}
+            <Offcanvas
+                show={showFilterOffcanvas}
+                onHide={() => setShowFilterOffcanvas(false)}
+                placement="start"
+                className="offcanvas-fullscreen" // Make it full screen
+            >
+                <Offcanvas.Header>
+                    <Button variant="secondary" onClick={() => setShowFilterOffcanvas(false)}>
+                        Назад
                     </Button>
-                    <Button variant="danger" onClick={confirmDelete}>
-                        Видалити
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+                    <Offcanvas.Title className="ms-3">Фільтри</Offcanvas.Title>
+                </Offcanvas.Header>
+                <Offcanvas.Body>
+                    <ContainerFilterForm onFilter={handleFilter} />
+                </Offcanvas.Body>
+            </Offcanvas>
         </div>
     );
 };
