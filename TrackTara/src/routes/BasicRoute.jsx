@@ -85,9 +85,7 @@ const BasicRoute = memo(() => {
                     <Route
                         path="/users"
                         element={
-                            <ProtectedRoute allowedRoles={["Administrator"]}>
                                 <UsersPage />
-                            </ProtectedRoute>
                         }
                     />
                     <Route

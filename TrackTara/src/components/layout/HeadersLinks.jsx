@@ -23,6 +23,9 @@ const HeadersLinks = () => {
                 <li className="nav-item">
                     <Link className="nav-link fs-5" to="/container/containerTypes">Типи контейнерів</Link>
                 </li>
+                <li className="nav-item">
+                    <Link className="nav-link fs-5" to="/users">Користувачі</Link>
+                </li>
             </ul>
         </div>
     );
