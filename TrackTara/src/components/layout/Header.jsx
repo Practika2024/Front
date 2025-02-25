@@ -1,12 +1,12 @@
-import "./layout.css";
-import { Link, useNavigate } from "react-router-dom";
+import React, { memo } from "react";
+import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { memo } from "react";
-import useActions from "../../hooks/useActions";
-import userImage from "../../hooks/userImage";
-import HeadersLinks from "./HeadersLinks";
 import { Badge } from "@mui/material";
 import { ShoppingCart, Favorite } from "@mui/icons-material";
+import HeadersLinks from "./HeadersLinks";
+import useActions from "../../hooks/useActions";
+import userImage from "../../hooks/userImage";
+import { useNavigate } from "react-router-dom";
 
 const Header = memo(() => {
   const currentUser = useSelector((store) => store.user.currentUser);
@@ -26,7 +26,7 @@ const Header = memo(() => {
 
   return (
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
-        <div className="container-fluid d-flex justify-content-between">
+        <div className="container-fluid d-flex justify-content-between align-items-center" style={{ minHeight: "80px" }}>
           <button
               className="navbar-toggler"
               type="button"
@@ -39,9 +39,13 @@ const Header = memo(() => {
             <span className="navbar-toggler-icon"></span>
           </button>
 
-          <HeadersLinks />
+          {/* Навігаційні посилання */}
+          <div className="collapse navbar-collapse" id="navbarSupportedContent">
+            <HeadersLinks />
+          </div>
 
-          <div className="d-flex align-items-center">
+          {/* Блок іконок, який буде адаптивним */}
+          <div className="icon-block d-flex align-items-center">
             <Link to="/favoriteProducts" className="text-reset me-3">
               <Badge color="error" badgeContent={favoriteProducts.length}>
                 <Favorite />
@@ -76,20 +80,21 @@ const Header = memo(() => {
                   <ul
                       className="dropdown-menu dropdown-menu-end"
                       aria-labelledby="navbarDropdownMenuAvatar"
+                      style={{ zIndex: 1050 }}
                   >
                     <li>
                       <Link className="dropdown-item" to="/profile">
-                        My Profile
+                        Мій профіль
                       </Link>
                     </li>
                     <li>
                       <Link className="dropdown-item" to="/settings">
-                        Settings
+                        Налаштування
                       </Link>
                     </li>
                     <li>
                       <button className="dropdown-item" onClick={logoutHandler}>
-                        Logout
+                        Вихід
                       </button>
                     </li>
                   </ul>
@@ -97,11 +102,8 @@ const Header = memo(() => {
             ) : (
                 <div className="d-flex gap-3">
                   <Link to="/login" className="btn btn-outline-primary">
-                    Login/Register
+                    Вхід/Реєстрація
                   </Link>
-                  {/* <Link to="/register" className="btn btn-primary text-white">
-                    Register
-                  </Link> */}
                 </div>
             )}
           </div>
