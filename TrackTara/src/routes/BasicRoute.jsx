@@ -15,7 +15,8 @@ import UpdateContainer from "../pages/tare/components/tareModals/UpdateContainer
 import ContainerDetailPage from "../pages/tare/components/tareModals/ContainerDetailPage.jsx";
 import ViewContainerTypes from "../pages/containerTypes/ViewContainerTypes.jsx";
 import ProductDetail from "../pages/products/components/ProductDetail.jsx";
-import CreateProduct from "../pages/products/components/modals/CreateProduct.jsx"; // Import TareDetailPage
+import CreateProduct from "../pages/products/components/modals/CreateProduct.jsx";
+import ProductTypesPage from "../pages/ProductTypesPage/ProductTypesPage.jsx"; // Import TareDetailPage
 
 // eslint-disable-next-line react/display-name
 const BasicRoute = memo(() => {
@@ -76,6 +77,15 @@ const BasicRoute = memo(() => {
                             {
                                 <ProtectedRoute allowedRoles={["Operator"]}>
                                     <CreateProduct/>
+                                </ProtectedRoute>
+                            }
+                    />
+                    <Route
+                        path="/productType"
+                        element=
+                            {
+                                <ProtectedRoute allowedRoles={["Operator"]}>
+                                    <ProductTypesPage/>
                                 </ProtectedRoute>
                             }
                     />

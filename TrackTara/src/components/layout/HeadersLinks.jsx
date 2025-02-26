@@ -1,6 +1,6 @@
-import React, { memo } from "react";
-import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import React, {memo} from "react";
+import {Link} from "react-router-dom";
+import {useSelector} from "react-redux";
 
 const HeadersLinks = () => {
     const user = useSelector((state) => state.user.currentUser);
@@ -26,8 +26,12 @@ const HeadersLinks = () => {
                         <li className="nav-item">
                             <Link className="nav-link fs-5" to="/tare">Контейнери</Link>
                         </li>
+
                         <li className="nav-item">
                             <Link className="nav-link fs-5" to="/products">Продукти</Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link className="nav-link fs-5" to="/productType">Типи продуктів</Link>
                         </li>
                         <li className="nav-item">
                             <Link className="nav-link fs-5" to="/container/containerTypes">Типи контейнерів</Link>
