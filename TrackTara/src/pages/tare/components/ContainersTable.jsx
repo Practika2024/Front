@@ -25,13 +25,16 @@ const ContainersTable = () => {
     const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'ascending' });
     const [typeNames, setTypeNames] = useState({});
     const [showFilterOffcanvas, setShowFilterOffcanvas] = useState(false); // Offcanvas state
+    const [searchQuery, setSearchQuery] = useState('');
     const [showConfirmClearModal, setShowConfirmClearModal] = useState(false);
     const itemsPerPage = 10;
     const handleClearProduct = (id) => {
         setSelectedContainerId(id);
         setShowConfirmClearModal(true);
     };
-
+    const filteredProducts = products.filter(product =>
+        product.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
     const confirmClearProduct = () => {
         dispatch(removeProductFromContainer(selectedContainerId)).then(() => {
             setFilteredContainers(prevContainers =>
@@ -267,12 +270,19 @@ const ContainersTable = () => {
             </Row>
             <Modal show={showProductModal} onHide={() => setShowProductModal(false)}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Вибір продукту</Modal.Title>
+                    <Modal.Title>Choose a Product</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <p>Виберіть продукт для додавання до контейнера:</p>
+                    <p>Select a product to add to the container:</p>
+                    <input
+                        type="text"
+                        placeholder="Search by product name"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="form-control mb-3"
+                    />
                     <form>
-                        {products.map(product => (
+                        {filteredProducts.map(product => (
                             <div key={product.id} className="form-check">
                                 <input
                                     className="form-check-input"
@@ -291,10 +301,10 @@ const ContainersTable = () => {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowProductModal(false)}>
-                        Скасувати
+                        Cancel
                     </Button>
                     <Button variant="primary" onClick={confirmSetProduct}>
-                        Підтвердити
+                        Confirm
                     </Button>
                 </Modal.Footer>
             </Modal>
