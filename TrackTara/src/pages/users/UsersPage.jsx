@@ -4,7 +4,7 @@ import UsersTableContainer from "./components/UsersTableContainer";
 const UsersPage = () => {
   return (
     <div className="container my-3">
-      <h1>Users</h1>
+      <h1>Користувачі</h1>
       <UsersTableContainer />
     </div>
   );

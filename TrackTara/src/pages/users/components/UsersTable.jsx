@@ -15,12 +15,11 @@ const UsersTable = () => {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Name</th>
+            <th>Ім&#39;я</th>
             <th>Email</th>
-            <th>Roles</th>
-            <th>Avatar</th>
-            <th>Actions</th>
-            <th>Render Count</th>
+            <th>Ролі</th>
+            <th>Аватар</th>
+            <th>Дії</th>
           </tr>
         </thead>
         <tbody>

@@ -74,9 +74,7 @@ const UsersTableRow = React.memo(
               Delete
             </button>
           </td>
-          <td>
-            <h5>UsersTableRow render count: {renderCount}</h5>
-          </td>
+
         </tr>
         <DeleteUserModal
           showModal={showDeleteModal}

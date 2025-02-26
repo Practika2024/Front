@@ -1,5 +1,5 @@
-import React, { memo } from "react";
-import { Route, Routes } from "react-router-dom";
+import React, {memo} from "react";
+import {Route, Routes} from "react-router-dom";
 import NotFoundPage from "../components/NotFoundPage";
 import Layout from "../components/layout/Layout";
 import Login from "../pages/auth/login/Login";
@@ -28,15 +28,15 @@ const BasicRoute = memo(() => {
     return (
         <>
             <Routes>
-                <Route path="/" element={<Layout />}>
-                    <Route index element={<HomePage />} />
+                <Route path="/" element={<Layout/>}>
+                    <Route index element={<HomePage/>}/>
 
                     <Route path="/products">
                         <Route
                             index
                             element={
                                 <ProtectedRoute allowedRoles={["Administrator"]}>
-                                    <ProductPage />
+                                    <ProductPage/>
                                 </ProtectedRoute>
                             }
                         />
@@ -44,7 +44,7 @@ const BasicRoute = memo(() => {
                             path="edit/:productId"
                             element={
                                 <ProtectedRoute allowedRoles={["Administrator"]}>
-                                    <ProductEdit />
+                                    <ProductEdit/>
                                 </ProtectedRoute>
                             }
                         />
@@ -52,23 +52,23 @@ const BasicRoute = memo(() => {
                             path="create"
                             element={
                                 <ProtectedRoute allowedRoles={["Administrator"]}>
-                                    <ProductCreate />
+                                    <ProductCreate/>
                                 </ProtectedRoute>
                             }
                         />
                     </Route>
 
                     <Route path="/electronicItem">
-                        <Route index element={<ElectronicItemPage />} />
-                        <Route path=":categoryId" element={<ElectronicItemPage />} />
-                        <Route path="product/:productId" element={<ProductDetailsPage />} />
+                        <Route index element={<ElectronicItemPage/>}/>
+                        <Route path=":categoryId" element={<ElectronicItemPage/>}/>
+                        <Route path="product/:productId" element={<ProductDetailsPage/>}/>
                     </Route>
 
                     <Route
                         path="/cartItems"
                         element={
                             <ProtectedRoute allowedRoles={["Operator"]}>
-                                <CartItemsPage />
+                                <CartItemsPage/>
                             </ProtectedRoute>
                         }
                     />
@@ -77,7 +77,7 @@ const BasicRoute = memo(() => {
                         path="/favoriteProducts"
                         element={
                             <ProtectedRoute allowedRoles={['Operator']}>
-                                <FavoriteProductPage />
+                                <FavoriteProductPage/>
                             </ProtectedRoute>
                         }
                     />
@@ -85,14 +85,16 @@ const BasicRoute = memo(() => {
                     <Route
                         path="/users"
                         element={
-                                <UsersPage />
+                            <ProtectedRoute allowedRoles={["Administrator"]}>
+                                <UsersPage/>
+                            </ProtectedRoute>
                         }
                     />
                     <Route
                         path="/categories"
                         element={
                             <ProtectedRoute allowedRoles={["Administrator"]}>
-                                <CategoriesPage />
+                                <CategoriesPage/>
                             </ProtectedRoute>
                         }
                     />
@@ -100,7 +102,7 @@ const BasicRoute = memo(() => {
                         path="/manufacturers"
                         element={
                             <ProtectedRoute allowedRoles={["Administrator"]}>
-                                <ManufacturersPage />
+                                <ManufacturersPage/>
                             </ProtectedRoute>
                         }
                     />
@@ -108,18 +110,58 @@ const BasicRoute = memo(() => {
                         path="/profile"
                         element={
                             <ProtectedRoute allowedRoles={["Operator"]}>
-                                <MyProfilePage />
+                                <MyProfilePage/>
                             </ProtectedRoute>
                         }
                     />
-                    <Route path="/tare" element={<ContainersPage />} />
-                    <Route path="/tare/update/:id" element={<UpdateContainer />} />
-                    <Route path="/tare/create" element={<CreateContainer />} />
-                    <Route path="/tare/detail/:containerId" element={<ContainerDetailPage />} /> {/* Add TareDetailPage route */}
-                    <Route path="/container/containerTypes" element={<ViewContainerTypes />} /> {/* Add TareDetailPage route */}
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="*" element={<NotFoundPage />} />
+                    <Route
+                        path="/tare"
+                        element=
+                            {
+                                <ProtectedRoute allowedRoles={["Operator"]}>
+                                    <ContainersPage/>
+                                </ProtectedRoute>
+                            }
+                    />
+                    <Route
+                        path="/tare/update/:id"
+                        element=
+                            {
+                                <ProtectedRoute allowedRoles={["Operator"]}>
+                                    <UpdateContainer/>
+                                </ProtectedRoute>
+                            }
+                    />
+                    <Route
+                        path="/tare/create"
+                        element=
+                            {
+                                <ProtectedRoute allowedRoles={["Operator"]}>
+                                    <CreateContainer/>
+                                </ProtectedRoute>
+                            }
+                    />
+                    <Route
+                        path="/tare/detail/:containerId"
+                        element=
+                            {
+                                <ProtectedRoute allowedRoles={["Operator"]}>
+                                    <ContainerDetailPage/>
+                                </ProtectedRoute>
+                            }
+                    /> {/* Add TareDetailPage route */}
+                    <Route
+                        path="/container/containerTypes"
+                        element=
+                            {
+                                <ProtectedRoute allowedRoles={["Operator"]}>
+                                    <ViewContainerTypes/>
+                                </ProtectedRoute>
+                            }
+                    /> {/* Add TareDetailPage route */}
+                    <Route path="/register" element={<Register/>}/>
+                    <Route path="/login" element={<Login/>}/>
+                    <Route path="*" element={<NotFoundPage/>}/>
                 </Route>
             </Routes>
         </>
