@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { Table, Button, Modal,Row, Col, Offcanvas, Pagination } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchContainers } from '../../../store/state/actions/containerActions';
+import { addProductToContainer, removeProductFromContainer } from '../../../store/state/actions/containerActions';
 import { fetchContainerTypes, fetchContainerTypeNameById } from '../../../store/state/actions/containerTypeActions';
 import ContainerFilterForm from './ContainerFilterForm.jsx';
 import { deleteContainer } from '../../../utils/services/ContainerService.js';
 import { Link, useNavigate } from 'react-router-dom';
+
 import { fetchProducts } from '../../../store/state/actions/productActions';
 const ContainersTable = () => {
     const dispatch = useDispatch();
@@ -13,17 +15,33 @@ const ContainersTable = () => {
     const containers = useSelector(state => state.containers?.containers || []);
     const products = useSelector(state => state.product?.products || []);
 
+
+    const [showProductModal, setShowProductModal] = useState(false);
     const [selectedContainerId, setSelectedContainerId] = useState(null);
+    const [selectedProductId, setSelectedProductId] = useState(null);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
-    const [confirmText, setConfirmText] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [filteredContainers, setFilteredContainers] = useState([]);
     const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'ascending' });
     const [typeNames, setTypeNames] = useState({});
     const [showFilterOffcanvas, setShowFilterOffcanvas] = useState(false); // Offcanvas state
-
+    const [showConfirmClearModal, setShowConfirmClearModal] = useState(false);
     const itemsPerPage = 10;
+    const handleClearProduct = (id) => {
+        setSelectedContainerId(id);
+        setShowConfirmClearModal(true);
+    };
 
+    const confirmClearProduct = () => {
+        dispatch(removeProductFromContainer(selectedContainerId)).then(() => {
+            setFilteredContainers(prevContainers =>
+                prevContainers.map(container =>
+                    container.id === selectedContainerId ? { ...container, productId: null, isEmpty: true } : container
+                )
+            );
+            setShowConfirmClearModal(false);
+        });
+    };
     useEffect(() => {
         dispatch(fetchContainers());
         dispatch(fetchContainerTypes());
@@ -33,7 +51,23 @@ const ContainersTable = () => {
     useEffect(() => {
         setFilteredContainers(containers);
     }, [containers]);
-
+    const handleSetProduct = (id) => {
+        setSelectedContainerId(id);
+        setShowProductModal(true);
+    };
+    const confirmSetProduct = () => {
+        if (selectedProductId) {
+            dispatch(addProductToContainer(selectedContainerId, selectedProductId)).then(() => {
+                setFilteredContainers(prevContainers =>
+                    prevContainers.map(container =>
+                        container.id === selectedContainerId ? { ...container, productId: selectedProductId, isEmpty: false } : container
+                    )
+                );
+                setShowProductModal(false);
+                setSelectedProductId(null);
+            });
+        }
+    };
     useEffect(() => {
         const fetchTypeNames = async () => {
             const names = { ...typeNames };
@@ -180,6 +214,35 @@ const ContainersTable = () => {
                                                 height="20"
                                             />
                                         </Button>
+                                        {container.isEmpty ? (
+                                            <Button
+                                                title={`Set Product`}
+                                                variant="link"
+                                                onClick={() => handleSetProduct(container.id)}
+                                                className="p-0 border-4"
+                                            >
+                                                <img
+                                                    src="/Icons for functions/free-icon-import-7234396.png"
+                                                    alt="Set Product"
+                                                    height="20"
+                                                />
+                                            </Button>
+                                        ) : (
+                                            <>
+                                                <Button
+                                                    title={`Clear Product`}
+                                                    variant="link"
+                                                    onClick={() => handleClearProduct(container.id)}
+                                                    className="p-0 border-4"
+                                                >
+                                                    <img
+                                                        src="/Icons for functions/free-icon-package-1666995.png"
+                                                        alt="Clear Product"
+                                                        height="20"
+                                                    />
+                                                </Button>
+                                            </>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
@@ -202,7 +265,39 @@ const ContainersTable = () => {
                     </Pagination>
                 </Col>
             </Row>
-
+            <Modal show={showProductModal} onHide={() => setShowProductModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Вибір продукту</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>Виберіть продукт для додавання до контейнера:</p>
+                    <form>
+                        {products.map(product => (
+                            <div key={product.id} className="form-check">
+                                <input
+                                    className="form-check-input"
+                                    type="radio"
+                                    name="product"
+                                    id={`product-${product.id}`}
+                                    value={product.id}
+                                    onChange={() => setSelectedProductId(product.id)}
+                                />
+                                <label className="form-check-label" htmlFor={`product-${product.id}`}>
+                                    {product.name}
+                                </label>
+                            </div>
+                        ))}
+                    </form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowProductModal(false)}>
+                        Скасувати
+                    </Button>
+                    <Button variant="primary" onClick={confirmSetProduct}>
+                        Підтвердити
+                    </Button>
+                </Modal.Footer>
+            </Modal>
             {/* Offcanvas for mobile filters */}
             <Offcanvas
                 show={showFilterOffcanvas}
@@ -232,6 +327,22 @@ const ContainersTable = () => {
                         Ні
                     </Button>
                     <Button variant="danger" onClick={confirmDelete}>
+                        Так
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+            <Modal show={showConfirmClearModal} onHide={() => setShowConfirmClearModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Підтвердження очищення</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>Ви впевнені, що хочете очистити продукт з цього контейнера?</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowConfirmClearModal(false)}>
+                        Ні
+                    </Button>
+                    <Button variant="danger" onClick={confirmClearProduct}>
                         Так
                     </Button>
                 </Modal.Footer>

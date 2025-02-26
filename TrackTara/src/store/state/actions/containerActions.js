@@ -2,6 +2,7 @@ import { getAll, deleteTareSlice, setProduct, clearProduct, setLoading, setError
 import { getAllContainers, deleteContainer, setProductToContainer, clearProductFromTare } from '../../../utils/services/ContainerService';
 import { getContainerTypeNameById } from '../../../utils/services/ContainerTypesService';
 
+//
 export const fetchContainers = () => async (dispatch) => {
     dispatch(setLoading(true));
     try {
