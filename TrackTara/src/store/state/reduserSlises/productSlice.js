@@ -1,76 +1,65 @@
-import { createSlice } from "@reduxjs/toolkit";
+// src/store/slices/productSlice.js
+import { createSlice } from '@reduxjs/toolkit';
+import { fetchProducts, fetchProductById, addProduct, deleteProduct } from '../actions/productActions';
 
 const initialState = {
-  productList: [],
-  product : null,
-  productWithoutImagesForEdit: null,
-  imagesForEdit: [],
+  products: [],
+  product: null,
+  status: 'idle',
+  error: null,
 };
 
-export const productSlice = createSlice({
-  name: "product",
+const productSlice = createSlice({
+  name: 'products',
   initialState,
-  reducers: {
-    getAll: (state, action) => {
-      state.productList = action.payload;
-    },
-
-    getFilterProducts: (state, action) => {
-        state.productList = action.payload;
-    },
-
-    getProductsByCategory: (state, action) => {
-      state.productList = action.payload;
-    },
-
-    getProduct: (state, action) => {
-      state.product = action.payload;
-    },
-
-    getProductForEdit: (state, action) => {
-      const { images, ...rest } = action.payload;
-      state.productWithoutImagesForEdit = rest;
-      state.imagesForEdit = images || [];
-    },
-
-    updateImageForProduct: (state, action) => {
-        state.imagesForEdit = action.payload || [];
-    },
-
-    updateImage: (state, action) => {
-      state.imagesForEdit = action.payload;
-    },
-
-    addProduct: (state, action) => {
-      state.productList = [...state.productList, action.payload];
-    },
-
-    deleteProductReduser: (state, action) => {
-      state.productList = state.productList.filter(
-        (m) => m.id !== action.payload.id
-      );
-    },
-
-    updateProductReducer: (state, action) => {
-      const index = state.productList.findIndex(
-        (m) => m.id === action.payload.id
-      );
-      if (index !== -1) {
-        state.productList[index] = action.payload;
-      }
-    },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+        .addCase(fetchProducts.pending, (state) => {
+          state.status = 'loading';
+        })
+        .addCase(fetchProducts.fulfilled, (state, action) => {
+          state.status = 'succeeded';
+          state.products = action.payload;
+        })
+        .addCase(fetchProducts.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.error.message;
+        })
+        .addCase(fetchProductById.pending, (state) => {
+          state.status = 'loading';
+        })
+        .addCase(fetchProductById.fulfilled, (state, action) => {
+          state.status = 'succeeded';
+          state.product = action.payload;
+        })
+        .addCase(fetchProductById.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.error.message;
+        })
+        .addCase(addProduct.pending, (state) => {
+          state.status = 'loading';
+        })
+        .addCase(addProduct.fulfilled, (state, action) => {
+          state.status = 'succeeded';
+          state.products.push(action.payload);
+        })
+        .addCase(addProduct.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.error.message;
+        })
+        .addCase(deleteProduct.pending, (state) => {
+          state.status = 'loading';
+        })
+        .addCase(deleteProduct.fulfilled, (state, action) => {
+          state.status = 'succeeded';
+          state.products = state.products.filter((product) => product.id !== action.payload.id);
+        })
+        .addCase(deleteProduct.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.error.message;
+        });
   },
 });
 
-export const {
-  getAll,
-  getFilterProducts,
-  addProduct,
-  deleteProductReduser,
-  updateProductReducer,
-  getProductsByCategory,
-  getProduct,
-  getProductForEdit,
-  updateImageForProduct,
-} = productSlice.actions;
 export default productSlice.reducer;

@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Modal, Form, Card, Container } from 'react-bootstrap';
 import Loader from '../../../../components/common/loader/Loader.jsx';
 import { getContainerById, deleteContainer, setProductToContainer, clearProductFromTare } from '../../../../utils/services/ContainerService.js';
-import { getAllProducts } from '../../../../utils/services/ProductService';
 import { getAllContainerTypes } from '../../../../utils/services/ContainerTypesService.js';
 
 const ContainerDetailPage = () => {
