@@ -142,7 +142,7 @@ const ContainersTable = () => {
                                     <td>{typeNames[container.typeId] || 'Loading...'}</td>
                                     <td>{container.volume}</td>
                                     <td>
-                                        {container.containerId ? 'тут буде назва продукту' : 'Так'}
+                                        {container.isEmpty ? 'Так' : 'тут буде назва продукту'}
                                     </td>
                                     <td>
                                         <Button

@@ -1,6 +1,5 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import UserImage from "./components/UserImage";
 import UserProfileForm from "./components/UserProfileForm";
 
 const MyProfilePage = () => {

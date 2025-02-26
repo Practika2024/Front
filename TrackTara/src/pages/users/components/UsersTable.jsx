@@ -7,7 +7,6 @@ const UsersTable = () => {
   const userList = useSelector((state) => state.users.userList);
   const roleList = useSelector((state) => state.role.roleList);
 
-  const renderCount = useRenderCount();
 
   return (
     <>
@@ -28,7 +27,6 @@ const UsersTable = () => {
           ))}
         </tbody>
       </table>
-      <h5>UsersTable render count: {renderCount}</h5>
     </>
   );
 };
