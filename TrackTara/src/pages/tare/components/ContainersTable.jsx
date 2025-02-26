@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
-import { Table, Button, Row, Col, Offcanvas, Form, Pagination } from 'react-bootstrap';
+import { Table, Button, Modal,Row, Col, Offcanvas, Pagination } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchContainers } from '../../../store/state/actions/containerActions';
 import { fetchContainerTypes, fetchContainerTypeNameById } from '../../../store/state/actions/containerTypeActions';
 import ContainerFilterForm from './ContainerFilterForm.jsx';
 import { deleteContainer } from '../../../utils/services/ContainerService.js';
 import { Link, useNavigate } from 'react-router-dom';
-
+import { fetchProducts } from '../../../store/state/actions/productActions';
 const ContainersTable = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const containers = useSelector(state => state.containers?.containers || []);
-    const containerTypes = useSelector(state => state.containerTypes?.types || []);
+    const products = useSelector(state => state.product?.products || []);
 
     const [selectedContainerId, setSelectedContainerId] = useState(null);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -27,6 +27,7 @@ const ContainersTable = () => {
     useEffect(() => {
         dispatch(fetchContainers());
         dispatch(fetchContainerTypes());
+        dispatch(fetchProducts());
     }, [dispatch]);
 
     useEffect(() => {
@@ -53,20 +54,16 @@ const ContainersTable = () => {
     };
 
     const confirmDelete = async () => {
-        if (confirmText === 'Видалити') {
-            try {
-                await deleteContainer(selectedContainerId);
-                setFilteredContainers(prev =>
-                    prev.filter(container => container.id !== selectedContainerId)
-                );
-                setShowConfirmModal(false);
-                setConfirmText('');
-            } catch (error) {
-                console.error('Error deleting container:', error);
-            }
+        try {
+            await deleteContainer(selectedContainerId);
+            setFilteredContainers(prev =>
+                prev.filter(container => container.id !== selectedContainerId)
+            );
+            setShowConfirmModal(false);
+        } catch (error) {
+            console.error('Error deleting container:', error);
         }
     };
-
     const handleFilter = (filters) => {
         const { uniqueCode, name, minVolume, maxVolume, type, isEmpty } = filters;
         setFilteredContainers(
@@ -142,7 +139,7 @@ const ContainersTable = () => {
                                     <td>{typeNames[container.typeId] || 'Loading...'}</td>
                                     <td>{container.volume}</td>
                                     <td>
-                                        {container.isEmpty ? 'Так' : 'тут буде назва продукту'}
+                                        {container.isEmpty ? 'Так' : (products.find(p => p.id === container.productId)?.name || 'Невідомий продукт')}
                                     </td>
                                     <td>
                                         <Button
@@ -170,6 +167,7 @@ const ContainersTable = () => {
                                                 height="20"
                                             />
                                         </Button>
+
                                         <Button
                                             title={`Деталі контейнера`}
                                             variant="link"
@@ -222,7 +220,24 @@ const ContainersTable = () => {
                     <ContainerFilterForm onFilter={handleFilter} />
                 </Offcanvas.Body>
             </Offcanvas>
+            <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Підтвердження видалення</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>Ви впевнені, що хочете видалити цей контейнер?</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>
+                        Ні
+                    </Button>
+                    <Button variant="danger" onClick={confirmDelete}>
+                        Так
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
+
     );
 };
 
