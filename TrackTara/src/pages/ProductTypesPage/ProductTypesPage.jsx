@@ -33,7 +33,7 @@ const ProductTypesPage = () => {
         <Container className="mt-5">
             <Row className="mb-4 text-center">
                 <Col>
-                    <h1>Product Types</h1>
+                    <h1>Типи продуктів</h1>
                 </Col>
             </Row>
 
@@ -41,11 +41,11 @@ const ProductTypesPage = () => {
                 <Col md={8}>
                     <Card className="mb-4 shadow-sm">
                         <Card.Body>
-                            <Card.Title>Product Types List</Card.Title>
+                            <Card.Title>Список типів продуктів</Card.Title>
                             <Table striped bordered hover>
                                 <thead>
                                 <tr>
-                                    <th>Name</th>
+                                    <th>Назва</th>
                                     <th></th>
                                 </tr>
                                 </thead>
@@ -77,10 +77,10 @@ const ProductTypesPage = () => {
                 <Col md={4}>
                     <Card className="mb-4 shadow-sm">
                         <Card.Body>
-                            <Card.Title>Add New Product Type</Card.Title>
+                            <Card.Title>Додати новий тип продукту</Card.Title>
                             <Form onSubmit={handleAddProductType}>
                                 <Form.Group controlId="formNewTypeName">
-                                    <Form.Label>Type Name</Form.Label>
+                                    <Form.Label>Назва типу</Form.Label>
                                     <Form.Control
                                         type="text"
                                         value={newTypeName}
@@ -88,7 +88,7 @@ const ProductTypesPage = () => {
                                         required
                                     />
                                 </Form.Group>
-                                <Button variant="primary" type="submit" className="mt-3">Add</Button>
+                                <Button variant="primary" type="submit" className="mt-3">Додати</Button>
                             </Form>
                         </Card.Body>
                     </Card>

@@ -14,7 +14,7 @@ const ProductsPage = () => {
             />
         </button>
       </Link>
-      <h1>Products</h1>
+      <h1>Продукти</h1>
       <ProductsList />
     </div>
   );

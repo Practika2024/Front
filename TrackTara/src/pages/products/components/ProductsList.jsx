@@ -47,10 +47,10 @@ const ProductsList = () => {
             <table className="table table-striped">
                 <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Manufacture Date</th>
-                    <th>Actions</th>
+                    <th>Назва</th>
+                    <th>Опис</th>
+                    <th>Дата виробництва</th>
+                    <th>Дії</th>
                 </tr>
                 </thead>
                 <tbody>

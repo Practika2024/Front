@@ -28,23 +28,23 @@ const ProductDetail = () => {
         <div className="container mt-5">
             <Card>
                 <Card.Header>
-                    <h2>Product Detail</h2>
+                    <h2>Деталі продукту</h2>
                 </Card.Header>
                 <Card.Body>
                     {product && (
                         <div>
                             <Card.Title>{product.name}</Card.Title>
                             <Card.Text>
-                                <strong>Description:</strong> {product.description}
+                                <strong>Опис:</strong> {product.description}
                             </Card.Text>
                             <Card.Text>
-                                <strong>Manufacture Date:</strong> {product.manufactureDate}
+                                <strong>Дата виробництва:</strong> {product.manufactureDate}
                             </Card.Text>
                             <Button variant="primary" onClick={() => navigate(`/products/update/${product.id}`)}>
-                                Edit
+                                Змінити
                             </Button>
                             <Button variant="secondary" className="ms-2" onClick={() => navigate('/products')}>
-                                Back to List
+                                Назад до списку
                             </Button>
                         </div>
                     )}
