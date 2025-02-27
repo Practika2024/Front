@@ -71,9 +71,9 @@ const ViewContainerTypes = () => {
                                         <td>
                                             <Button
                                                 title={`Видалити тип контейнера`}
-                                                variant="link"
+                                                variant="outline-secondary"
                                                 onClick={() => handleDelete(type.id)}
-                                                className="p-0 border-4"
+                                                className="p-1 border-0"
                                             >
                                                 <img
                                                     src="/Icons for functions/free-icon-recycle-bin-3156999.png"

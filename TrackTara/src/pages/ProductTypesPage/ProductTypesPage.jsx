@@ -56,9 +56,9 @@ const ProductTypesPage = () => {
                                         <td>
                                             <Button
                                                 title={`Видалити тип продукту`}
-                                                variant="link"
+                                                variant="outline-secondary"
                                                 onClick={() => handleDeleteProductType(type.id)}
-                                                className="p-0 border-4"
+                                                className="p-1 border-0"
                                             >
                                                 <img
                                                     src="/Icons for functions/free-icon-recycle-bin-3156999.png"

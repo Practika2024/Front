@@ -183,9 +183,9 @@ const ContainersTable = () => {
                                     <td>
                                         <Button
                                             title={`Редагувати контейнер `}
-                                            variant="link"
+                                            variant="outline-secondary"
                                             onClick={() => navigate(`/tare/update/${container.id}`)}
-                                            className="p-0 border-4"
+                                            className="p-0 border-0"
                                         >
 
                                             <img
@@ -199,9 +199,9 @@ const ContainersTable = () => {
                                         {container.isEmpty ? (
                                             <Button
                                                 title={`Set Product`}
-                                                variant="link"
+                                                variant="outline-secondary"
                                                 onClick={() => handleSetProduct(container.id)}
-                                                className="p-0 border-4"
+                                                className="p-1 border-0"
                                             >
                                                 <img
                                                     src="/Icons for functions/free-icon-import-7234396.png"
@@ -212,10 +212,10 @@ const ContainersTable = () => {
                                         ) : (
                                             <>
                                                 <Button
-                                                    title={`Clear Product`}
-                                                    variant="link"
+                                                    title="Clear Product"
+                                                    variant="outline-secondary"
                                                     onClick={() => handleClearProduct(container.id)}
-                                                    className="p-0 border-4"
+                                                    className="p-1 border-0"
                                                 >
                                                     <img
                                                         src="/Icons for functions/free-icon-package-1666995.png"
@@ -229,9 +229,9 @@ const ContainersTable = () => {
                                         )}
                                         <Button
                                             title={`Видалити контейнер `}
-                                            variant="link"
+                                            variant="outline-secondary"
                                             onClick={() => handleDelete(container.id)}
-                                            className="p-15 border-4"
+                                            className="p-15 border-0"
                                         >
                                             <img
                                                 src="/Icons for functions/free-icon-recycle-bin-3156999.png"

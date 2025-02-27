@@ -105,16 +105,16 @@ const ContainerDetailPage = () => {
                         <strong>Вміст:</strong> {container.isEmpty ? 'Порожній' : (products.find(p => p.id === container.productId)?.name || 'Невідомий продукт')}<br />
                         <strong>Нотатки:</strong> {container.notes || 'Немає'}
                     </Card.Text>
-                    <Button title={`Редагувати контейнер `} variant="link" onClick={handleUpdate} className="p-0 border-4">
+                    <Button title={`Редагувати контейнер `} variant="outline-secondary" onClick={handleUpdate} className="p-1 border-0">
                         <img src="/Icons for functions/free-icon-edit-3597088.png" alt="Edit" height="20" />
                     </Button>
-                    <Button title={`Видалити контейн��р `} variant="link" onClick={handleDelete} className="p-0 border-4">
+                    <Button title={`Видалити контейн��р `} variant="outline-secondary" onClick={handleDelete} className="p-1 border-0">
                         <img src="/Icons for functions/free-icon-recycle-bin-3156999.png" alt="Delete" height="20" />
                     </Button>
-                    <Button title={`Додати продукт `} variant="link" onClick={() => setShowModal(true)} className="p-0 border-4">
+                    <Button title={`Додати продукт `} variant="outline-secondary" onClick={() => setShowModal(true)} className="p-1 border-0">
                         <img src="/Icons for functions/free-icon-import-7234396.png" alt="Add Product" height="20" />
                     </Button>
-                    <Button variant="link" onClick={handleClearProduct} className="p-0 border-4">
+                    <Button variant="outline-secondary" onClick={handleClearProduct} className="p-1 border-0">
                         <img src="/Icons for functions/free-icon-package-1666995.png" alt="Clear Product" height="20" />
                     </Button>
 
