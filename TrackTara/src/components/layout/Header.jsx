@@ -83,16 +83,6 @@ const Header = memo(() => {
                       style={{ zIndex: 1050 }}
                   >
                     <li>
-                      <Link className="dropdown-item" to="/profile">
-                        Мій профіль
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="/settings">
-                        Налаштування
-                      </Link>
-                    </li>
-                    <li>
                       <button className="dropdown-item" onClick={logoutHandler}>
                         Вихід
                       </button>

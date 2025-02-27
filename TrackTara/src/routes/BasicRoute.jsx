@@ -84,7 +84,7 @@ const BasicRoute = memo(() => {
                         path="/productType"
                         element=
                             {
-                                <ProtectedRoute allowedRoles={["Operator"]}>
+                                <ProtectedRoute allowedRoles={["Administrator"]}>
                                     <ProductTypesPage/>
                                 </ProtectedRoute>
                             }
@@ -120,7 +120,7 @@ const BasicRoute = memo(() => {
                         path="/container/containerTypes"
                         element=
                             {
-                                <ProtectedRoute allowedRoles={["Operator"]}>
+                                <ProtectedRoute allowedRoles={["Administrator"]}>
                                     <ViewContainerTypes/>
                                 </ProtectedRoute>
                             }
