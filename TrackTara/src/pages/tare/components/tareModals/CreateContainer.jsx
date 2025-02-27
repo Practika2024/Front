@@ -107,6 +107,7 @@ const CreateContainer = () => {
                         value={volume}
                         onChange={(e) => setVolume(e.target.value)}
                         required
+                        min="1" // Add this line to set the minimum value to 1
                     />
                 </div>
                 <div className="mb-3">
