@@ -60,7 +60,7 @@ const ProductsList = () => {
                         <td>{product.description}</td>
                         <td>{product.manufactureDate}</td>
                         <td>
-                            <Link to={`/product/detail/${product.id}`} className="btn btn-info btn-sm">
+                            <Link   title={`Деталі продукту`} to={`/product/detail/${product.id}`} className="btn btn-info btn-sm">
                                 <img
                                     src="/Icons for functions/free-icon-info-1445402.png"
                                     alt="Details"
@@ -68,6 +68,7 @@ const ProductsList = () => {
                                 />
                             </Link>
                             <button
+                                title={`Видалити продукт`}
                                 className="btn btn-danger btn-sm ms-2"
                                 onClick={() => handleDelete(product.id)}
                             >

@@ -219,7 +219,7 @@ const ContainersTable = () => {
                                         </Button>
                                         {container.isEmpty ? (
                                             <Button
-                                                title={`Set Product`}
+                                                title={`Додати продукт`}
                                                 variant="link"
                                                 onClick={() => handleSetProduct(container.id)}
                                                 className="p-0 border-4"
@@ -233,7 +233,7 @@ const ContainersTable = () => {
                                         ) : (
                                             <>
                                                 <Button
-                                                    title={`Clear Product`}
+                                                    title={`Видалити продукт`}
                                                     variant="link"
                                                     onClick={() => handleClearProduct(container.id)}
                                                     className="p-0 border-4"
@@ -270,13 +270,13 @@ const ContainersTable = () => {
             </Row>
             <Modal show={showProductModal} onHide={() => setShowProductModal(false)}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Choose a Product</Modal.Title>
+                    <Modal.Title>Виберіть продукт</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <p>Select a product to add to the container:</p>
+                    <p>Виберіть продукт для додавання в контейнер:</p>
                     <input
                         type="text"
-                        placeholder="Search by product name"
+                        placeholder="Пошук продукту за назвою"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="form-control mb-3"
@@ -301,10 +301,10 @@ const ContainersTable = () => {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowProductModal(false)}>
-                        Cancel
+                        Скасувати
                     </Button>
                     <Button variant="primary" onClick={confirmSetProduct}>
-                        Confirm
+                        Підтвердити
                     </Button>
                 </Modal.Footer>
             </Modal>
