@@ -55,6 +55,7 @@ const ProductTypesPage = () => {
                                         <td>{type.name}</td>
                                         <td>
                                             <Button
+                                                title={`Видалити тип продукту`}
                                                 variant="link"
                                                 onClick={() => handleDeleteProductType(type.id)}
                                                 className="p-0 border-4"

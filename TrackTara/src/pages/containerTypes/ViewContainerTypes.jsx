@@ -70,6 +70,7 @@ const ViewContainerTypes = () => {
                                         <td>{type.name}</td>
                                         <td>
                                             <Button
+                                                title={`Видалити тип контейнера`}
                                                 variant="link"
                                                 onClick={() => handleDelete(type.id)}
                                                 className="p-0 border-4"
