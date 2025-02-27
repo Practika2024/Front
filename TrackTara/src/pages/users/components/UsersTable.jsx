@@ -13,7 +13,6 @@ const UsersTable = () => {
       <table className="table">
         <thead>
           <tr>
-            <th>ID</th>
             <th>Ім&#39;я</th>
             <th>Email</th>
             <th>Ролі</th>

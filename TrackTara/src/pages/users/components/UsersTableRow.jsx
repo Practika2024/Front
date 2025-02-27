@@ -40,7 +40,6 @@ const UsersTableRow = React.memo(
     return (
       <>
         <tr>
-          <td>{user.id}</td>
           <td>{user.name}</td>
           <td>{user.email}</td>
           <td>
