@@ -4,13 +4,17 @@ import { Button, Modal, Form, Card, Container } from 'react-bootstrap';
 import Loader from '../../../../components/common/loader/Loader.jsx';
 import { getContainerById, deleteContainer, setProductToContainer, clearProductFromTare } from '../../../../utils/services/ContainerService.js';
 import { getAllContainerTypes } from '../../../../utils/services/ContainerTypesService.js';
+import { fetchProducts } from '../../../../store/state/actions/productActions.js';
+import { useDispatch, useSelector } from 'react-redux';
 
 const ContainerDetailPage = () => {
     const { containerId } = useParams();
     const [container, setContainer] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
-    const [products, setProducts] = useState([]);
+    const products = useSelector(state => state.product?.products || []);
+    const dispatch = useDispatch();
+
     const [selectedProductId, setSelectedProductId] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [containerTypes, setContainerTypes] = useState([]);
@@ -31,15 +35,6 @@ const ContainerDetailPage = () => {
             }
         };
 
-        const fetchProducts = async () => {
-            try {
-                const products = await getAllProducts();
-                setProducts(products);
-            } catch (error) {
-                console.error('Error fetching products:', error);
-            }
-        };
-
         const fetchContainerTypes = async () => {
             try {
                 const types = await getAllContainerTypes();
@@ -50,9 +45,9 @@ const ContainerDetailPage = () => {
         };
 
         fetchContainer();
-        fetchProducts();
+        dispatch(fetchProducts());
         fetchContainerTypes();
-    }, [containerId]);
+    }, [containerId, dispatch]);
 
     const getTypeName = (typeId) => {
         const type = containerTypes.find((containerType) => containerType.id === typeId);
@@ -107,13 +102,13 @@ const ContainerDetailPage = () => {
                     <Card.Text>
                         <strong>Тип:</strong> {getTypeName(container.typeId)}<br />
                         <strong>Об'єм (л):</strong> {container.volume}<br />
-                        <strong>Чи порожній:</strong> {container.containerId ? 'тут буде назва продукту' : 'Так'}<br />
+                        <strong>Вміст:</strong> {container.isEmpty ? 'Порожній' : (products.find(p => p.id === container.productId)?.name || 'Невідомий продукт')}<br />
                         <strong>Нотатки:</strong> {container.notes || 'Немає'}
                     </Card.Text>
                     <Button title={`Редагувати контейнер `} variant="link" onClick={handleUpdate} className="p-0 border-4">
                         <img src="/Icons for functions/free-icon-edit-3597088.png" alt="Edit" height="20" />
                     </Button>
-                    <Button title={`Видалити контейнер `} variant="link" onClick={handleDelete} className="p-0 border-4">
+                    <Button title={`Видалити контейн��р `} variant="link" onClick={handleDelete} className="p-0 border-4">
                         <img src="/Icons for functions/free-icon-recycle-bin-3156999.png" alt="Delete" height="20" />
                     </Button>
                     <Button title={`Додати продукт `} variant="link" onClick={() => setShowModal(true)} className="p-0 border-4">

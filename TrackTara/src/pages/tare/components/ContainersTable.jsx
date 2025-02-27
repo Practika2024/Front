@@ -164,7 +164,7 @@ const ContainersTable = () => {
                                 <th onClick={() => handleSort('name')}>Ім&apos;я</th>
                                 <th onClick={() => handleSort('typeId')}>Тип</th>
                                 <th onClick={() => handleSort('volume')}>Об&apos;єм(л)</th>
-                                <th>Чи порожній</th>
+                                <th>Вміст</th>
                                 <th>Дії</th>
                             </tr>
                             </thead>
@@ -176,7 +176,7 @@ const ContainersTable = () => {
                                     <td>{typeNames[container.typeId] || 'Loading...'}</td>
                                     <td>{container.volume}</td>
                                     <td>
-                                        {container.isEmpty ? 'Так' : (products.find(p => p.id === container.productId)?.name || 'Невідомий продукт')}
+                                        {container.isEmpty ? 'Порожній' : (products.find(p => p.id === container.productId)?.name || 'Невідомий продукт')}
                                     </td>
                                     <td>
                                         <Button
