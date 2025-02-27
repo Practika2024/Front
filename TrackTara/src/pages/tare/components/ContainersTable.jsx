@@ -7,7 +7,7 @@ import { fetchContainerTypes, fetchContainerTypeNameById } from '../../../store/
 import ContainerFilterForm from './ContainerFilterForm.jsx';
 import { deleteContainer } from '../../../utils/services/ContainerService.js';
 import { Link, useNavigate } from 'react-router-dom';
-
+import Select from 'react-select';
 import { fetchProducts } from '../../../store/state/actions/productActions';
 const ContainersTable = () => {
     const dispatch = useDispatch();
@@ -164,19 +164,21 @@ const ContainersTable = () => {
                                 <th onClick={() => handleSort('name')}>Ім&apos;я</th>
                                 <th onClick={() => handleSort('typeId')}>Тип</th>
                                 <th onClick={() => handleSort('volume')}>Об&apos;єм(л)</th>
-                                <th>Чи порожній</th>
+                                <th>Вміст</th>
                                 <th>Дії</th>
                             </tr>
                             </thead>
                             <tbody>
                             {currentItems.map(container => (
                                 <tr key={container.id}>
-                                    <td>{container.uniqueCode}</td>
+                                    <td>
+                                        <a href={`/tare/detail/${container.id}`}>{container.uniqueCode}</a>
+                                    </td>
                                     <td>{container.name}</td>
                                     <td>{typeNames[container.typeId] || 'Loading...'}</td>
                                     <td>{container.volume}</td>
                                     <td>
-                                        {container.isEmpty ? 'Так' : (products.find(p => p.id === container.productId)?.name || 'Невідомий продукт')}
+                                        {container.isEmpty ? 'Порожній' : (products.find(p => p.id === container.productId)?.name || 'Невідомий продукт')}
                                     </td>
                                     <td>
                                         <Button
@@ -192,34 +194,11 @@ const ContainersTable = () => {
                                                 height="20"
                                             />
                                         </Button>
-                                        <Button
-                                            title={`Видалити контейнер `}
-                                            variant="link"
-                                            onClick={() => handleDelete(container.id)}
-                                            className="p-0 border-4"
-                                        >
-                                            <img
-                                                src="/Icons for functions/free-icon-recycle-bin-3156999.png"
-                                                alt="Delete"
-                                                height="20"
-                                            />
-                                        </Button>
 
-                                        <Button
-                                            title={`Деталі контейнера`}
-                                            variant="link"
-                                            onClick={() => navigate(`/tare/detail/${container.id}`)}
-                                            className="p-0 border-4"
-                                        >
-                                            <img
-                                                src="/Icons for functions/free-icon-info-1445402.png"
-                                                alt="Details"
-                                                height="20"
-                                            />
-                                        </Button>
+
                                         {container.isEmpty ? (
                                             <Button
-                                                title={`Додати продукт`}
+                                                title={`Set Product`}
                                                 variant="link"
                                                 onClick={() => handleSetProduct(container.id)}
                                                 className="p-0 border-4"
@@ -233,7 +212,7 @@ const ContainersTable = () => {
                                         ) : (
                                             <>
                                                 <Button
-                                                    title={`Видалити продукт`}
+                                                    title={`Clear Product`}
                                                     variant="link"
                                                     onClick={() => handleClearProduct(container.id)}
                                                     className="p-0 border-4"
@@ -244,8 +223,22 @@ const ContainersTable = () => {
                                                         height="20"
                                                     />
                                                 </Button>
+
                                             </>
+
                                         )}
+                                        <Button
+                                            title={`Видалити контейнер `}
+                                            variant="link"
+                                            onClick={() => handleDelete(container.id)}
+                                            className="p-15 border-4"
+                                        >
+                                            <img
+                                                src="/Icons for functions/free-icon-recycle-bin-3156999.png"
+                                                alt="Delete"
+                                                height="20"
+                                            />
+                                        </Button>
                                     </td>
                                 </tr>
                             ))}
@@ -270,41 +263,23 @@ const ContainersTable = () => {
             </Row>
             <Modal show={showProductModal} onHide={() => setShowProductModal(false)}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Виберіть продукт</Modal.Title>
+                    <Modal.Title>Choose a Product</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <p>Виберіть продукт для додавання в контейнер:</p>
-                    <input
-                        type="text"
-                        placeholder="Пошук продукту за назвою"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="form-control mb-3"
+                    <p>Select a product to add to the container:</p>
+                    <Select
+                        options={products.map(product => ({ value: product.id, label: product.name }))}
+                        onChange={(selectedOption) => setSelectedProductId(selectedOption.value)}
+                        placeholder="Search by product name"
+                        isClearable
                     />
-                    <form>
-                        {filteredProducts.map(product => (
-                            <div key={product.id} className="form-check">
-                                <input
-                                    className="form-check-input"
-                                    type="radio"
-                                    name="product"
-                                    id={`product-${product.id}`}
-                                    value={product.id}
-                                    onChange={() => setSelectedProductId(product.id)}
-                                />
-                                <label className="form-check-label" htmlFor={`product-${product.id}`}>
-                                    {product.name}
-                                </label>
-                            </div>
-                        ))}
-                    </form>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowProductModal(false)}>
-                        Скасувати
+                        Cancel
                     </Button>
                     <Button variant="primary" onClick={confirmSetProduct}>
-                        Підтвердити
+                        Confirm
                     </Button>
                 </Modal.Footer>
             </Modal>
