@@ -12,8 +12,14 @@ const getAuthHeaders = () => {
     };
 };
 
-export const createContainer = async (tareData) => {
-    await axios.post(`${API_URL}/add`, tareData, getAuthHeaders());
+export const createContainer = async (containerData) => {
+    try {
+        const response = await axios.post(`${API_URL}/add`, containerData, getAuthHeaders());
+        return response.data;
+    } catch (error) {
+        console.error('Error creating container:', error);
+        throw error;
+    }
 };
 
 export const getAllContainers = async () => {

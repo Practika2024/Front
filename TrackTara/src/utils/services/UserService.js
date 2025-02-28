@@ -19,7 +19,7 @@ export class UserService {
   }
 
   static async changeRoles(userId, roles) {
-    return await this.httpClient.put(`update-roles/${userId}`, roles);
+    return await this.httpClient.put(`update-role/${userId}`, roles);
   }
 
   static async uploadImage(userId, file) {
