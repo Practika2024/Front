@@ -21,6 +21,7 @@ const ContainerDetailPage = () => {
     const [selectedProductId, setSelectedProductId] = useState('');
     const [showAddProductModal, setShowAddProductModal] = useState(false);
     const [showRemoveProductModal, setShowRemoveProductModal] = useState(false);
+    const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
     const [containerTypes, setContainerTypes] = useState([]);
     const navigate = useNavigate();
 
@@ -54,6 +55,16 @@ const ContainerDetailPage = () => {
         fetchContainerHistory();
     }, [containerId, dispatch]);
 
+    const fetchContainerData = async () => {
+        try {
+            const tare = await getContainerById(containerId);
+            setContainer(tare);
+        } catch (error) {
+            console.error('Error fetching container:', error);
+            setError(true);
+        }
+    };
+
     const fetchContainerHistory = () => {
         dispatch(fetchAllContainerHistories(containerId));
     };
@@ -71,6 +82,14 @@ const ContainerDetailPage = () => {
     const handleUpdate = () => navigate(`/tare/update/${containerId}`);
 
     const handleDelete = async () => {
+        if (!container.isEmpty) {
+            alert('Cannot delete a container that contains a product.');
+            return;
+        }
+        setShowConfirmDeleteModal(true);
+    };
+
+    const confirmDelete = async () => {
         try {
             await deleteContainer(containerId);
             navigate('/tare');
@@ -84,6 +103,7 @@ const ContainerDetailPage = () => {
         try {
             await setProductToContainer(containerId, selectedProductId);
             setShowAddProductModal(false);
+            fetchContainerData();
             fetchContainerHistory();
         } catch (error) {
             console.error('Error adding product to container:', error);
@@ -94,6 +114,7 @@ const ContainerDetailPage = () => {
         try {
             await clearProductFromTare(containerId);
             setShowRemoveProductModal(false);
+            fetchContainerData();
             fetchContainerHistory();
         } catch (error) {
             console.error('Error clearing products from container:', error);
@@ -130,12 +151,15 @@ const ContainerDetailPage = () => {
                             <Button title={`Видалити контейнер `} variant="outline-secondary" onClick={handleDelete} className="p-1 border-0">
                                 <img src="/Icons for functions/free-icon-recycle-bin-3156999.png" alt="Delete" height="20" />
                             </Button>
-                            <Button title={`Додати продукт `} variant="outline-secondary" onClick={() => setShowAddProductModal(true)} className="p-1 border-0">
-                                <img src="/Icons for functions/free-icon-import-7234396.png" alt="Add Product" height="20" />
-                            </Button>
-                            <Button variant="outline-secondary" onClick={() => setShowRemoveProductModal(true)} className="p-1 border-0">
-                                <img src="/Icons for functions/free-icon-package-1666995.png" alt="Clear Product" height="20" />
-                            </Button>
+                            {container.isEmpty ? (
+                                <Button title={`Додати продукт `} variant="outline-secondary" onClick={() => setShowAddProductModal(true)} className="p-1 border-0">
+                                    <img src="/Icons for functions/free-icon-import-7234396.png" alt="Add Product" height="20" />
+                                </Button>
+                            ) : (
+                                <Button variant="outline-secondary" onClick={() => setShowRemoveProductModal(true)} className="p-1 border-0">
+                                    <img src="/Icons for functions/free-icon-package-1666995.png" alt="Clear Product" height="20" />
+                                </Button>
+                            )}
                         </Card.Body>
                     </Card>
                 </Col>
@@ -208,6 +232,23 @@ const ContainerDetailPage = () => {
                     </Button>
                     <Button variant="primary" onClick={handleClearProduct}>
                         Remove Product
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal show={showConfirmDeleteModal} onHide={() => setShowConfirmDeleteModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Deletion</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>Are you sure you want to delete this container?</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowConfirmDeleteModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="danger" onClick={confirmDelete}>
+                        Delete
                     </Button>
                 </Modal.Footer>
             </Modal>
