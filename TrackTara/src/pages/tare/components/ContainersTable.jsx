@@ -35,22 +35,15 @@ const ContainersTable = () => {
     const filteredProducts = products.filter(product =>
         product.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
-    const confirmClearProduct = () => {
-        dispatch(removeProductFromContainer(selectedContainerId)).then(() => {
-            setFilteredContainers(prevContainers =>
-                prevContainers.map(container =>
-                    container.id === selectedContainerId ? { ...container, productId: null, isEmpty: true } : container
-                )
-            );
-            setShowConfirmClearModal(false);
-        });
-    };
+
     useEffect(() => {
         dispatch(fetchContainers());
         dispatch(fetchContainerTypes());
         dispatch(fetchProducts());
     }, [dispatch]);
-
+    const fetchContainerData = () => {
+        dispatch(fetchContainers());
+    };
     useEffect(() => {
         setFilteredContainers(containers);
     }, [containers]);
@@ -58,14 +51,17 @@ const ContainersTable = () => {
         setSelectedContainerId(id);
         setShowProductModal(true);
     };
+    const confirmClearProduct = () => {
+        dispatch(removeProductFromContainer(selectedContainerId)).then(() => {
+            fetchContainerData();
+            setShowConfirmClearModal(false);
+        });
+    };
+
     const confirmSetProduct = () => {
         if (selectedProductId) {
             dispatch(addProductToContainer(selectedContainerId, selectedProductId)).then(() => {
-                setFilteredContainers(prevContainers =>
-                    prevContainers.map(container =>
-                        container.id === selectedContainerId ? { ...container, productId: selectedProductId, isEmpty: false } : container
-                    )
-                );
+                fetchContainerData();
                 setShowProductModal(false);
                 setSelectedProductId(null);
             });
@@ -86,6 +82,11 @@ const ContainersTable = () => {
     }, [containers, dispatch]);
 
     const handleDelete = (id) => {
+        const container = containers.find(container => container.id === id);
+        if (container && !container.isEmpty) {
+            alert("Спочатку вам потрібно вийняти продукт");
+            return;
+        }
         setSelectedContainerId(id);
         setShowConfirmModal(true);
     };
