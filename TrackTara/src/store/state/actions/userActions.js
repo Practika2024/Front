@@ -128,7 +128,16 @@ export const uploadImage = (userId, file) => async (dispatch) => {
     return { success: false, message: errorMessage };
   }
 };
-
+export const createUser = (model) => async (dispatch) => {
+  try {
+    const response = await UserService.createUser(model);
+    dispatch(getUsers()); // Refresh the user list after creating a new user
+    return { success: true, message: "User created successfully" };
+  } catch (error) {
+    const errorMessage = error.response?.data;
+    return { success: false, message: errorMessage };
+  }
+};
 export const updateUser = (userId, model) => async (dispatch) => {
   try {
     const response = await UserService.updateUser(userId, model);

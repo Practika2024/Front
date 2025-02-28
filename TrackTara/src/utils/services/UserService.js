@@ -45,4 +45,16 @@ export class UserService {
   static async removeFavoriteProduct(userId, productId) {
     return await this.httpClient.put(`favorite-product-remove/${userId}/${productId}`);
   }
+
+  static async createUser(model) {
+    this.setAuthorizationToken(localStorage.getItem("accessToken"));
+    try {
+      return await this.httpClient.post("create", model);
+    } catch (error) {
+      if (error.response && error.response.status === 409) {
+        return { success: false, message: "User already exists." };
+      }
+      throw error;
+    }
+  }
 }
