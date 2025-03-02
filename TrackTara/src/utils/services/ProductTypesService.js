@@ -1,7 +1,7 @@
 // src/utils/services/ProductTypesService.js
 import axios from 'axios';
-
-const API_URL = 'http://localhost:5081/products-type';
+import  REMOTE_HOST_NAME  from "../../env/index";
+const API_URL = REMOTE_HOST_NAME + 'products-type';
 
 const getAuthHeaders = () => {
     const token = localStorage.getItem('accessToken');

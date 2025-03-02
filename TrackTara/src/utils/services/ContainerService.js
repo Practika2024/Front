@@ -1,7 +1,7 @@
 // src/utils/services/ContainerService.js
 import axios from 'axios';
-
-const API_URL = 'http://localhost:5081/containers';
+import  REMOTE_HOST_NAME  from "../../env/index";
+const API_URL = REMOTE_HOST_NAME + 'containers';
 
 const getAuthHeaders = () => {
     const token = localStorage.getItem('accessToken');

@@ -3,6 +3,7 @@ import { jwtDecode } from "jwt-decode";
 import { store } from "../../store/store";
 import { authUser } from "./../../store/state/reduserSlises/userSlice";
 import { logoutUser } from "../../store/state/actions/userActions";
+import  REMOTE_HOST_NAME from "../../env/index";
 
 let isRefreshing = false;
 let failedQueue = [];
@@ -37,7 +38,8 @@ export const refreshToken = async (originalRequest, setAuthorizationToken) => {
     const accessToken = localStorage.getItem("accessToken");
 
     const { data } = await axios.post(
-      "http://localhost:5081/account/refresh-token",
+      {REMOTE_HOST_NAME} +
+      "account/refresh-token",
       { refreshToken, accessToken }
     );
 

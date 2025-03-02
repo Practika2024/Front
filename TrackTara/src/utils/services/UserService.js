@@ -1,8 +1,9 @@
 import HttpClient from '../http/HttpClient';
+import  REMOTE_HOST_NAME  from "../../env/index";
 
 export class UserService {
   static httpClient = new HttpClient({
-    baseURL: "http://localhost:5081/users",
+    baseURL: REMOTE_HOST_NAME + "users",
   });
 
   static setAuthorizationToken(token) {
