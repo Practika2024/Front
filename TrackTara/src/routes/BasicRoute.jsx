@@ -5,7 +5,6 @@ import Layout from "../components/layout/Layout";
 import Login from "../pages/auth/login/Login";
 import Register from "../pages/auth/register/Register";
 import HomePage from "../pages/home/HomePage";
-import MyProfilePage from "../pages/myProfile/MyProfilePage";
 import ProductPage from "../pages/products/ProductsPage";
 import UsersPage from "../pages/users/UsersPage";
 import ProtectedRoute from "./ProtectedRoute";
@@ -44,15 +43,7 @@ const BasicRoute = memo(() => {
                             </ProtectedRoute>
                         }
                     />
-
-                    <Route
-                        path="/profile"
-                        element={
-                            <ProtectedRoute allowedRoles={["Operator"]}>
-                                <MyProfilePage/>
-                            </ProtectedRoute>
-                        }
-                    />
+                    
                     <Route
                         path="/tare"
                         element=
