@@ -172,9 +172,9 @@ const ContainerDetailPage = () => {
                                     <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Product</th>
-                                        <th>Start Date</th>
-                                        <th>End Date</th>
+                                        <th>Продукти</th>
+                                        <th>Дата заповнення</th>
+                                        <th>Дата очищення</th>
                                     </tr>
                                     </thead>
                                     <tbody>

@@ -8,7 +8,7 @@ const ProductsPage = () => {
       <Link to={`/product/add`}>
         <button className="btn btn-primary float-end">
             <img
-                src="public/Icons for functions/free-icon-plus-3303893.png"
+                src="/Icons for functions/free-icon-plus-3303893.png"
                 alt="Create New Container"
                 height="20"
             />

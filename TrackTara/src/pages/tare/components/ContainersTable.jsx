@@ -141,7 +141,7 @@ const ContainersTable = () => {
             <div className="text-end mb-3">
                 <Link  title={`Додати контейнер `} to="/tare/create" className="btn btn-primary">
                     <img
-                        src="public/Icons for functions/free-icon-plus-3303893.png"
+                        src="/Icons for functions/free-icon-plus-3303893.png"
                         alt="Create New Container"
                         height="20"
                     />

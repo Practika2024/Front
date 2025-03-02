@@ -38,7 +38,7 @@ const ProductDetail = () => {
                                 <strong>Опис:</strong> {product.description}
                             </Card.Text>
                             <Card.Text>
-                                <strong>Дата виробництва:</strong> {product.manufactureDate}
+                                <strong>Дата виробництва:</strong>{new Date(product.manufactureDate).toLocaleString()}
                             </Card.Text>
                             <Button variant="primary" onClick={() => navigate(`/products/update/${product.id}`)}>
                                 Змінити

@@ -46,37 +46,28 @@ const Header = memo(() => {
 
           {/* Блок іконок, який буде адаптивним */}
           <div className="icon-block d-flex align-items-center">
-            <Link to="/favoriteProducts" className="text-reset me-3">
-              <Badge color="error" badgeContent={favoriteProducts.length}>
-                <Favorite />
-              </Badge>
-            </Link>
-
-            <Link to="/cartItems" className="text-reset me-3">
-              <Badge color="error" badgeContent={userCartItems.length}>
-                <ShoppingCart />
-              </Badge>
-            </Link>
+            
 
             {isAuthenticated ? (
                 <div className="dropdown">
                   <a
-                      className="dropdown-toggle d-flex align-items-center hidden-arrow"
-                      href="#"
-                      id="navbarDropdownMenuAvatar"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
+                    className="dropdown-toggle d-flex align-items-center hidden-arrow"
+                    href="#"
+                    id="navbarDropdownMenuAvatar"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    style={{
+                      marginLeft: "5%",
+                      textDecoration: "none",
+                      color: "black",
+                      fontWeight: "bold",
+                      borderBottom: "2px solid black",
+                    }}
                   >
-                    <img
-                        src={userImage(currentUser?.image)}
-                        className="rounded-circle"
-                        height="25"
-                        width="25"
-                        alt="User Avatar"
-                        loading="lazy"
-                    />
+                    {currentUser.email}
                   </a>
+
                   <ul
                       className="dropdown-menu dropdown-menu-end"
                       aria-labelledby="navbarDropdownMenuAvatar"
