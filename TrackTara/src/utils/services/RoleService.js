@@ -1,8 +1,9 @@
 import HttpClient from "../http/HttpClient";
+import  REMOTE_HOST_NAME  from "../../env/index";
 
 export class RoleService {
   static httpClient = new HttpClient({
-    baseURL: "http://localhost:5081/roles",
+    baseURL: REMOTE_HOST_NAME + "roles",
   });
 
   static setAuthorizationToken(token) {
