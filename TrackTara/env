@@ -1,2 +1,2 @@
 #  VITE_REACT_APP_BASE_URL=http://localhost:5081/
-VITE_REACT_APP_BASE_URL=http://72.145.0.186:5001/
+VITE_REACT_APP_BASE_URL=http://softstream-project.northeurope.cloudapp.azure.com:5001/
