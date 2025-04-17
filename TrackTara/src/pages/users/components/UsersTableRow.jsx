@@ -64,15 +64,6 @@ const UsersTableRow = React.memo(
                         </Select>
                     </td>
                     <td>
-                        <img
-                            height="50"
-                            width="50"
-                            alt="User Avatar"
-                            loading="lazy"
-                            src={userAvatar}
-                        />
-                    </td>
-                    <td>
                         <Button
                             variant="contained"
                             color="error"

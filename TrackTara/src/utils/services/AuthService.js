@@ -1,8 +1,8 @@
 import HttpClient from "../http/HttpClient";
-
+import  REMOTE_HOST_NAME  from "../../env/index";
 export class AuthService {
   static httpClient = new HttpClient({
-    baseURL: "http://localhost:5081/account",
+    baseURL: REMOTE_HOST_NAME + "account",
   });
 
   static setAuthorizationToken(token) {
@@ -13,6 +13,8 @@ export class AuthService {
     return await this.httpClient.post("signin", model);
   }
   static async externalLogin(model) {
+    console.log(this.httpClient);
+    
     return await this.httpClient.post("externalLogin", model);
   }
 

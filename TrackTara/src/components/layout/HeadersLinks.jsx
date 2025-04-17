@@ -8,7 +8,7 @@ const HeadersLinks = () => {
 
     return (
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
-            <a className="navbar-brand d-flex align-items-center" href="#">
+            <Link className="navbar-brand d-flex align-items-center" to="/">
                 <img
                     src="/image-removebg-preview.png"
                     height="50"
@@ -16,7 +16,7 @@ const HeadersLinks = () => {
                     loading="lazy"
                 />
                 <h5 className="navbar-title fs-5 ms-3 mb-0">TaraTrack</h5>
-            </a>
+            </Link>
             <ul className="navbar-nav ms-auto mb-2 mb-lg-0 gap-3">
                 <li className="nav-item">
                     <Link className="nav-link fs-5" to="/">Головна</Link>

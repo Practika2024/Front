@@ -31,7 +31,6 @@ const UsersTable = () => {
             <th>Ім&#39;я</th>
             <th>Email</th>
             <th>Ролі</th>
-            <th>Аватар</th>
             <th>Дії</th>
           </tr>
           </thead>
