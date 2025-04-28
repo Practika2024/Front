@@ -35,18 +35,6 @@ export class UserService {
     return await this.httpClient.put(`update/${userId}`, model);
   }
 
-  static async getFavoriteProducts(userId) {
-    return await this.httpClient.get(`get-all-favorite-products/${userId}`);
-  }
-
-  static async addFavoriteProduct(userId, productId) {
-    return await this.httpClient.put(`favorite-product-add/${userId}/${productId}`);
-  }
-
-  static async removeFavoriteProduct(userId, productId) {
-    return await this.httpClient.put(`favorite-product-remove/${userId}/${productId}`);
-  }
-
   static async createUser(model) {
     this.setAuthorizationToken(localStorage.getItem("accessToken"));
     try {

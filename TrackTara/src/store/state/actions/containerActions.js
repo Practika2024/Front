@@ -7,7 +7,7 @@ export const fetchContainers = () => async (dispatch) => {
     dispatch(setLoading(true));
     try {
         const response = await getAllContainers();
-        dispatch(getAll(response));
+        dispatch(getAll(response.payload));
     } catch (error) {
         dispatch(setError(error.message));
     } finally {

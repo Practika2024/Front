@@ -13,8 +13,6 @@ const Header = memo(() => {
   const isAuthenticated = useSelector((store) => store.user.isAuthenticated);
   const logoutUser = useActions().logoutUser;
   const navigate = useNavigate();
-  const favoriteProducts = useSelector((state) => state.user.favoriteProducts);
-  const cartItems = useSelector((state) => state.cartItem.cartItemList);
 
   const logoutHandler = () => {
     logoutUser();
@@ -22,7 +20,6 @@ const Header = memo(() => {
   };
 
   const userId = currentUser?.id;
-  const userCartItems = cartItems.filter((item) => item.userId === userId);
 
   return (
       <nav className="navbar navbar-expand-lg navbar-light bg-light">

@@ -11,7 +11,7 @@ export const fetchProductTypes = () => async (dispatch) => {
     dispatch(setLoading(true));
     try {
         const productTypes = await getAllProductTypes();
-        dispatch(getAll(productTypes));
+        dispatch(getAll(productTypes.payload));
     } catch (error) {
         dispatch(setError(error.toString()));
     } finally {
@@ -22,7 +22,7 @@ export const fetchProductTypes = () => async (dispatch) => {
 export const createProductType = (productType) => async (dispatch) => {
     try {
         const response = await addProductType(productType);
-        dispatch(addType(response));
+        dispatch(addType(response.payload));
     } catch (error) {
         dispatch(setError(error.message));
     }
@@ -31,7 +31,7 @@ export const createProductType = (productType) => async (dispatch) => {
 export const modifyProductType = (id, productType) => async (dispatch) => {
     try {
         const response = await updateProductType(id, productType);
-        dispatch(updateType(response));
+        dispatch(updateType(response.payload));
     } catch (error) {
         dispatch(setError(error.message));
     }

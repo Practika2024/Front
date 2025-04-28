@@ -4,20 +4,21 @@ import { ProductService } from '../../../utils/services/ProductService';
 
 export const fetchProducts = createAsyncThunk('products/fetchAll', async () => {
   const response = await ProductService.getAll();
-  return response;
+  return response.payload;
 });
 
 export const fetchProductById = createAsyncThunk('products/fetchById', async (id) => {
   const response = await ProductService.getById(id);
-  return response;
+  return response.payload;
 });
 
 export const addProduct = createAsyncThunk('products/add', async (product) => {
+  debugger
   const response = await ProductService.addProduct(product);
-  return response;
+  return response.payload;
 });
 
 export const deleteProduct = createAsyncThunk('products/delete', async (id) => {
   const response = await ProductService.deleteProduct(id);
-  return response;
+  return response.payload;
 });

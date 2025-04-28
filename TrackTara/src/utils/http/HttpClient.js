@@ -1,7 +1,5 @@
 import axios from "axios";
-import {
-  setIsLoading
-} from "../../store/state/actions/appSettingActions";
+import { setIsLoading } from "../../store/state/actions/appSettingActions";
 import { store } from "../../store/store";
 
 export default class HttpClient {
@@ -74,8 +72,6 @@ export default class HttpClient {
     try {
       const response = await this.axiosInstance.request(config);
       return response.data;
-    } catch (error) {
-      return Promise.reject(error);
     } finally {
       setIsLoading(false)(store.dispatch);
     }

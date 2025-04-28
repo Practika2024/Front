@@ -1,5 +1,6 @@
 import { getRoles } from "./../reduserSlises/roleSlice";
 import { RoleService } from "../../../utils/services/RoleService";
+import { toast } from "react-toastify";
 
 export const getRolesData = () => async (dispatch) => {
   try {
@@ -9,6 +10,6 @@ export const getRolesData = () => async (dispatch) => {
 
     return { success: true, message: "get roles success" };
   } catch (error) {
-    return { success: false, message: "get roles error" };
+    toast.error(errorMessage)
   }
 };

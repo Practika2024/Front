@@ -14,6 +14,7 @@ const getAuthHeaders = () => {
 
 export const createContainer = async (containerData) => {
     try {
+        debugger
         const response = await axios.post(`${API_URL}/add`, containerData, getAuthHeaders());
         return response.data;
     } catch (error) {

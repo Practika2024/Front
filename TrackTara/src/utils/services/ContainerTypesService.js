@@ -26,7 +26,7 @@ export const createContainerType = async (typeData) => {
 
 export const getContainerTypeNameById = async (id) => {
     const containerTypes = await getAllContainerTypes();
-    const type = containerTypes.find(type => type.id === id);
+    const type = containerTypes.payload.find(type => type.id === id);
     return type ? type.name : 'Unknown';
 };
 

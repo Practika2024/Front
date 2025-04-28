@@ -7,11 +7,11 @@ import manufacturerReducer from '../store/state/reduserSlises/manufacturerSlice'
 import productReducer from '../store/state/reduserSlises/productSlice';
 import appSettingSlice from '../store/state/reduserSlises/appSettingSlice';
 import roleReducer from '../store/state/reduserSlises/roleSlice';
-import cartItemReducer from '../store/state/reduserSlises/cartItemSlice';
 import filtersReducer from '../store/state/reduserSlises/filtersSlice';
 import containersReducer from '../store/state/reduserSlises/containerSlice';
 import productTypeReducer from '../store/state/reduserSlises/productTypeSlice';
 import containerHistoryReducer from '../store/state/reduserSlises/containerHistorySlice';
+
 export const rootReducer = combineReducers({
     user: userReducer,
     containerHistory: containerHistoryReducer,
@@ -23,7 +23,6 @@ export const rootReducer = combineReducers({
     users: usersReducer,
     filters: filtersReducer,
     containers: containersReducer,
-    cartItem: cartItemReducer,
     productTypes: productTypeReducer,
 });
 

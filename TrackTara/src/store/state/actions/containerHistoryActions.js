@@ -7,7 +7,7 @@ export const fetchAllContainerHistories = createAsyncThunk(
     async (containerId, { rejectWithValue }) => {
         try {
             const data = await getAllContainerHistories(containerId);
-            return data;
+            return data.payload;
         } catch (error) {
             return rejectWithValue(error.response.data);
         }
@@ -19,7 +19,7 @@ export const fetchContainerHistoryById = createAsyncThunk(
     async (containerHistoryId, { rejectWithValue }) => {
         try {
             const data = await getContainerHistoryById(containerHistoryId);
-            return data;
+            return data.payload;
         } catch (error) {
             return rejectWithValue(error.response.data);
         }
