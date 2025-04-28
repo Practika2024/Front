@@ -6,7 +6,7 @@ export const getRolesData = () => async (dispatch) => {
   try {
     const response = await RoleService.getRoles();
 
-    dispatch(getRoles(response));
+    dispatch(getRoles(response.payload));
 
     return { success: true, message: "get roles success" };
   } catch (error) {

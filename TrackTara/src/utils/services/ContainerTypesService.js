@@ -15,12 +15,12 @@ const getAuthHeaders = () => {
 
 export const getAllContainerTypes = async () => {
     const response = await axios.get(`${API_URL}/get-all`, getAuthHeaders());
-    return response.data;
+    return response.data.payload;
 };
 
 export const createContainerType = async (typeData) => {
     const response = await axios.post(`${API_URL}/add`, typeData, getAuthHeaders());
-    return response.data; // Повертаємо створений об'єкт
+    return response.data.payload; // Повертаємо створений об'єкт
 };
 
 

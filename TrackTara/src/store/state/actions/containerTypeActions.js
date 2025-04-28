@@ -4,14 +4,15 @@ import {
     getContainerTypeNameById, updateContainerType
 } from '../../../utils/services/ContainerTypesService';
 import { getAll, setLoading, setError } from '../reduserSlises/containerTypeSlice.js';
+import {addType, deleteType, updateType} from "../reduserSlises/productTypeSlice.js";
 
 
 export const fetchContainerTypes = () => async (dispatch) => {
     dispatch(setLoading(true));
     try {
         const containerTypes = await getAllContainerTypes();
-        console.log('Fetched container types:', containerTypes.payload);
-        dispatch(getAll(containerTypes.payload));
+        console.log('Fetched container types:', containerTypes);
+        dispatch(getAll(containerTypes));
     } catch (error) {
         dispatch(setError(error.toString()));
     } finally {
