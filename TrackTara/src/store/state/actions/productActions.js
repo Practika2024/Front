@@ -31,3 +31,8 @@ export const uploadProductImages = async (productId, imagesFiles) => {
   const response = await ProductService.uploadProductImages(productId, imagesFiles);
   return response;
 };
+
+export const updateProductImages = async (productId, imagesFiles) => {
+  const response = await ProductService.updateProductImages(productId, imagesFiles);
+  return response;
+};

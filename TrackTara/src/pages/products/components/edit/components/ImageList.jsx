@@ -3,21 +3,19 @@ import { useSelector } from "react-redux";
 import NoImageProduct from "../../../../../assets/images/noImageProduct.png";
 import ImageItem from "./ImageItem";
 
-const ImageList = () => {
+const ImageList = ({ onRemove, imagesToDelete }) => {
   const images = useSelector((state) => state.product.product.images);
+
+  const visibleImages = images.filter((image) => !imagesToDelete.includes(image.id));
+
   return (
     <div>
-      {images.length === 0 ? (
-        <img
-          height="200"
-          alt="Product Image"
-          loading="lazy"
-          src={NoImageProduct}
-        />
+      {visibleImages.length === 0 ? (
+        <img height="200" alt="Product Image" src={NoImageProduct} />
       ) : (
         <div className="d-flex gap-3 flex-wrap">
-          {images.map((image) => (
-            <ImageItem key={image.id} image={image} />
+          {visibleImages.map((image) => (
+            <ImageItem key={image.id} image={image} onRemove={onRemove} />
           ))}
         </div>
       )}
