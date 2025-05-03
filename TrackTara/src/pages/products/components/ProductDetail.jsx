@@ -40,7 +40,7 @@ const ProductDetail = () => {
                             <Card.Text>
                                 <strong>Дата виробництва:</strong> {new Date(product.manufactureDate).toISOString().split('T')[0]}
                             </Card.Text>
-                            <Button variant="primary" onClick={() => navigate(`/products/update/${product.id}`)}>
+                            <Button variant="primary" onClick={() => navigate(`/product/update/${product.id}`)}>
                                 Змінити
                             </Button>
                             <Button variant="secondary" className="ms-2" onClick={() => navigate('/products')}>

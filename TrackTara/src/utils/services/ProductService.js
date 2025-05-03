@@ -4,11 +4,21 @@ import  REMOTE_HOST_NAME  from "../../env/index";
 
 const API_URL = REMOTE_HOST_NAME + 'products';
 
-const getAuthHeaders = () => {
+const getAuthHeaders = () => {  
   const token = localStorage.getItem('accessToken');
   return {
     headers: {
       Authorization: `Bearer ${token}`
+    }
+  };
+};
+
+const getAuthHeadersMultiPart = () => {  
+  const token = localStorage.getItem('accessToken');
+  return {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data"
     }
   };
 };
@@ -30,4 +40,12 @@ export const ProductService = {
     const response = await axios.delete(`${API_URL}/delete/${id}`, getAuthHeaders());
     return response.data;
   },
+  deleteProductImage: async ({productId, imageId}) => {
+    const response = await axios.put(`${API_URL}/delete-image/${productId}?productImageId=${imageId}`, {}, getAuthHeaders());
+    return response.data;
+  },
+  uploadProductImages: async (productId, imagesFiles) => {    
+    const response = await axios.put(`${API_URL}/upload-images/${productId}`, imagesFiles, getAuthHeadersMultiPart());
+    return response.data;
+  }
 };
