@@ -43,6 +43,10 @@ const HeadersLinks = () => {
                         <li className="nav-item">
                             <Link className="nav-link fs-5" to="/users">Користувачі</Link>
                         </li>
+                        <li className="nav-item">
+                            <Link className="nav-link fs-5" to="/approval-requests">Підтвердження</Link>
+                        </li>
+
                     </>
                 ) : null}
             </ul>

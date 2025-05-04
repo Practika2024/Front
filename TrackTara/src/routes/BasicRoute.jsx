@@ -16,6 +16,7 @@ import ViewContainerTypes from "../pages/containerTypes/ViewContainerTypes.jsx";
 import ProductDetail from "../pages/products/components/ProductDetail.jsx";
 import CreateProduct from "../pages/products/components/modals/CreateProduct.jsx";
 import ProductTypesPage from "../pages/ProductTypesPage/ProductTypesPage.jsx"; // Import TareDetailPage
+import ApprovalRequestsPage from "../pages/users/components/usersModals/ApprovalRequestsPage.jsx"; // Import TareDetailPage
 
 // eslint-disable-next-line react/display-name
 const BasicRoute = memo(() => {
@@ -43,7 +44,14 @@ const BasicRoute = memo(() => {
                             </ProtectedRoute>
                         }
                     />
-                    
+                    <Route
+                        path="/approval-requests"
+                        element={
+                            <ProtectedRoute allowedRoles={["Administrator"]}>
+                                <ApprovalRequestsPage />
+                            </ProtectedRoute>
+                        }
+                    />
                     <Route
                         path="/tare"
                         element=
