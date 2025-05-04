@@ -17,7 +17,9 @@ import ProductDetail from "../pages/products/components/ProductDetail.jsx";
 import CreateProduct from "../pages/products/components/modals/CreateProduct.jsx";
 import ProductTypesPage from "../pages/ProductTypesPage/ProductTypesPage.jsx"; // Import TareDetailPage
 import ApprovalRequestsPage from "../pages/users/components/usersModals/ApprovalRequestsPage.jsx"; // Import TareDetailPage
+import EmailConfirmationPage from "../pages/users/components/usersModals/EmailConfirmationPage";
 
+// Add this route
 // eslint-disable-next-line react/display-name
 const BasicRoute = memo(() => {
     return (
@@ -44,6 +46,8 @@ const BasicRoute = memo(() => {
                             </ProtectedRoute>
                         }
                     />
+                    <Route path="/email-confirmation" element={<EmailConfirmationPage />} />
+
                     <Route
                         path="/approval-requests"
                         element={

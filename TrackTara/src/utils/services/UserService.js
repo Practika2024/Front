@@ -58,6 +58,16 @@ export class UserService {
       throw error;
     }
   }
+  static async sendEmailConfirmation() {
+    try {
+      this.setAuthorizationToken(localStorage.getItem("accessToken"));
+      const response = await this.httpClient.post("send-email-confirmation");
+      return response;
+    } catch (error) {
+      console.error("Error in sendEmailConfirmation:", error);
+      throw error;
+    }
+  }
 
   static async approveUser(userId) {
     this.setAuthorizationToken(localStorage.getItem("accessToken"));
