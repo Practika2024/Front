@@ -64,12 +64,19 @@ const Header = memo(() => {
                   >
                     {currentUser.email}
                   </a>
-
                   <ul
                       className="dropdown-menu dropdown-menu-end"
                       aria-labelledby="navbarDropdownMenuAvatar"
                       style={{ zIndex: 1050 }}
                   >
+                    <li>
+                      <button
+                          className="dropdown-item"
+                          onClick={() => navigate("/email-confirmation")}
+                      >
+                        Підтвердити Email
+                      </button>
+                    </li>
                     <li>
                       <button className="dropdown-item" onClick={logoutHandler}>
                         Вихід

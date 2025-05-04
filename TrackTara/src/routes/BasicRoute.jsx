@@ -17,7 +17,10 @@ import ProductDetail from "../pages/products/components/ProductDetail.jsx";
 import CreateProduct from "../pages/products/components/modals/CreateProduct.jsx";
 import ProductTypesPage from "../pages/ProductTypesPage/ProductTypesPage.jsx"; // Import TareDetailPage
 import ProductEdit from "../pages/products/components/edit/ProductEdit.jsx";
+import ApprovalRequestsPage from "../pages/users/components/usersModals/ApprovalRequestsPage.jsx"; // Import TareDetailPage
+import EmailConfirmationPage from "../pages/users/components/usersModals/EmailConfirmationPage";
 
+// Add this route
 // eslint-disable-next-line react/display-name
 const BasicRoute = memo(() => {
   return (
@@ -36,10 +39,30 @@ const BasicRoute = memo(() => {
             />
           </Route>
           <Route
+            path="/product/detail/:productId"
+            element={
+              <ProtectedRoute allowedRoles={["Operator"]}>
+                <ProductDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/users"
             element={
               <ProtectedRoute allowedRoles={["Administrator"]}>
                 <UsersPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/email-confirmation"
+            element={<EmailConfirmationPage />}
+          />
+          <Route
+            path="/approval-requests"
+            element={
+              <ProtectedRoute allowedRoles={["Administrator"]}>
+                <ApprovalRequestsPage />
               </ProtectedRoute>
             }
           />
@@ -64,14 +87,6 @@ const BasicRoute = memo(() => {
             element={
               <ProtectedRoute allowedRoles={["Operator"]}>
                 <CreateProduct />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/product/update/:productId"
-            element={
-              <ProtectedRoute allowedRoles={["Operator", "Administrator"]}>
-                <ProductEdit />
               </ProtectedRoute>
             }
           />
