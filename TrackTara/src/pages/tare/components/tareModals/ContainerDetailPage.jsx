@@ -49,7 +49,10 @@ const ContainerDetailPage = () => {
           getAllContainerTypes(),
         ]);
 
-        setContainer(tare);
+        console.log("📦 Повний об'єкт контейнера:", tare);
+        console.log("📦 Отримані типи контейнерів:", types);
+
+        setContainer(tare.payload);
         setContainerTypes(types);
         dispatch(fetchProducts());
         dispatch(fetchAllContainerHistories(containerId));
@@ -74,8 +77,23 @@ const ContainerDetailPage = () => {
     }
   };
 
-  const getTypeName = (typeId) => containerTypes.find((type) => type.id === typeId)?.name || "Unknown Type";
-  const getProductName = (productId) => products.find((product) => product.id === productId)?.name || "Unknown";
+  const getTypeName = (typeIdRaw) => {
+    const typeId = String(typeIdRaw ?? "").trim();
+    console.log("↪️ Отриманий typeId:", `"${typeId}"`);
+    console.log("📦 containerTypes:", containerTypes.map((t) => `"${t.id}"`));
+
+    if (!typeId || !Array.isArray(containerTypes)) return "Unknown Type";
+
+    const match = containerTypes.find((type) => String(type.id).trim() === typeId);
+    if (!match) {
+      console.warn("⚠️ Не знайдено відповідного типу для typeId:", `"${typeId}"`);
+    }
+
+    return match ? match.name : "Unknown Type";
+  };
+
+  const getProductName = (productId) =>
+      products.find((product) => product.id === productId)?.name || "Unknown";
 
   const handleUpdate = () => navigate(`/tare/update/${containerId}`);
 
@@ -124,9 +142,7 @@ const ContainerDetailPage = () => {
   return (
       <Container className="mt-5">
         <div className="d-flex justify-content-start mb-4">
-          <Button variant="secondary" onClick={() => navigate("/tare")}>
-            ← Назад
-          </Button>
+          <Button variant="secondary" onClick={() => navigate("/tare")}>← Назад</Button>
         </div>
 
         <h2 className="text-center mb-4">Деталі контейнера</h2>
@@ -136,65 +152,27 @@ const ContainerDetailPage = () => {
               <Card.Body>
                 <Card.Title>{container.name}</Card.Title>
                 <Card.Text>
-                  <strong>Тип:</strong> {getTypeName(container.typeId)}
-                  <br />
-                  <strong>Об'єм (л):</strong> {container.volume}
-                  <br />
+                  <strong>Тип:</strong> {getTypeName(container.typeId || container.type?.id)}<br />
+                  <strong>Об'єм (л):</strong> {container.volume}<br />
                   <strong>Вміст:</strong>{" "}
                   {container.isEmpty
                       ? "Порожній"
-                      : getProductName(container.productId) || "Невідомий продукт"}
-                  <br />
+                      : getProductName(container.productId)}<br />
                   <strong>Нотатки:</strong> {container.notes || "Немає"}
                 </Card.Text>
-                <Button
-                    title={`Редагувати контейнер `}
-                    variant="outline-secondary"
-                    onClick={handleUpdate}
-                    className="p-1 border-0"
-                >
-                  <img
-                      src="/Icons for functions/free-icon-edit-3597088.png"
-                      alt="Edit"
-                      height="20"
-                  />
+                <Button title="Редагувати контейнер" variant="outline-secondary" onClick={handleUpdate} className="p-1 border-0">
+                  <img src="/Icons for functions/free-icon-edit-3597088.png" alt="Edit" height="20" />
                 </Button>
-                <Button
-                    title={`Видалити контейнер `}
-                    variant="outline-secondary"
-                    onClick={handleDelete}
-                    className="p-1 border-0"
-                >
-                  <img
-                      src="/Icons for functions/free-icon-recycle-bin-3156999.png"
-                      alt="Delete"
-                      height="20"
-                  />
+                <Button title="Видалити контейнер" variant="outline-secondary" onClick={handleDelete} className="p-1 border-0">
+                  <img src="/Icons for functions/free-icon-recycle-bin-3156999.png" alt="Delete" height="20" />
                 </Button>
                 {container.isEmpty ? (
-                    <Button
-                        title={`Додати продукт `}
-                        variant="outline-secondary"
-                        onClick={() => setShowAddProductModal(true)}
-                        className="p-1 border-0"
-                    >
-                      <img
-                          src="/Icons for functions/free-icon-import-7234396.png"
-                          alt="Add Product"
-                          height="20"
-                      />
+                    <Button title="Додати продукт" variant="outline-secondary" onClick={() => setShowAddProductModal(true)} className="p-1 border-0">
+                      <img src="/Icons for functions/free-icon-import-7234396.png" alt="Add Product" height="20" />
                     </Button>
                 ) : (
-                    <Button
-                        variant="outline-secondary"
-                        onClick={() => setShowRemoveProductModal(true)}
-                        className="p-1 border-0"
-                    >
-                      <img
-                          src="/Icons for functions/free-icon-package-1666995.png"
-                          alt="Clear Product"
-                          height="20"
-                      />
+                    <Button title="Очистити контейнер" variant="outline-secondary" onClick={() => setShowRemoveProductModal(true)} className="p-1 border-0">
+                      <img src="/Icons for functions/free-icon-package-1666995.png" alt="Clear Product" height="20" />
                     </Button>
                 )}
               </Card.Body>
@@ -234,7 +212,7 @@ const ContainerDetailPage = () => {
           </Col>
         </Row>
 
-        {/* Modals */}
+        {/* Модалки */}
         <Modal show={showAddProductModal} onHide={() => setShowAddProductModal(false)}>
           <Modal.Header closeButton>
             <Modal.Title>Виберіть продукт</Modal.Title>
