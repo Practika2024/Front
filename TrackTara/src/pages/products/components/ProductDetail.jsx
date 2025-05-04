@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchProductById } from '../../../store/state/actions/productActions';
-import { useParams } from 'react-router-dom';
-import { Card, Button } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProductById } from "../../../store/state/actions/productActions";
+import { useParams } from "react-router-dom";
+import { Card, Button, Carousel } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 const ProductDetail = () => {
     const { productId } = useParams();
@@ -16,11 +16,11 @@ const ProductDetail = () => {
         dispatch(fetchProductById(productId));
     }, [dispatch, productId]);
 
-    if (status === 'loading') {
+    if (status === "loading") {
         return <div>Loading...</div>;
     }
 
-    if (status === 'failed') {
+    if (status === "failed") {
         return <div>Error loading product</div>;
     }
 
@@ -33,17 +33,61 @@ const ProductDetail = () => {
                 <Card.Body>
                     {product && (
                         <div>
-                            <Card.Title>{product.name}</Card.Title>
+                            {/* Carousel for images */}
+                            {product.images && product.images.length > 0 && (
+                                <Carousel
+                                    indicators={false}
+                                    nextIcon={
+                                        <span
+                                            aria-hidden="true"
+                                            className="carousel-control-next-icon"
+                                            style={{ filter: "invert(1)" }}
+                                        />
+                                    }
+                                    prevIcon={
+                                        <span
+                                            aria-hidden="true"
+                                            className="carousel-control-prev-icon"
+                                            style={{ filter: "invert(1)" }}
+                                        />
+                                    }
+                                >
+                                    {product.images.map((image) => (
+                                        <Carousel.Item key={image.id}>
+                                            <img
+                                                className="d-block w-100"
+                                                src={image.filePath}
+                                                alt="Product"
+                                                style={{
+                                                    maxHeight: "300px",
+                                                    objectFit: "contain",
+                                                }}
+                                            />
+                                        </Carousel.Item>
+                                    ))}
+                                </Carousel>
+                            )}
+
+                            <Card.Title className="mt-3">{product.name}</Card.Title>
                             <Card.Text>
                                 <strong>Опис:</strong> {product.description}
                             </Card.Text>
                             <Card.Text>
-                                <strong>Дата виробництва:</strong> {new Date(product.manufactureDate).toISOString().split('T')[0]}
+                                <strong>Дата виробництва:</strong>{" "}
+                                {new Date(product.manufactureDate).toISOString().split("T")[0]}
                             </Card.Text>
-                            <Button variant="primary" onClick={() => navigate(`/product/update/${product.id}`)}>
+
+                            <Button
+                                variant="primary"
+                                onClick={() => navigate(`/product/update/${product.id}`)}
+                            >
                                 Змінити
                             </Button>
-                            <Button variant="secondary" className="ms-2" onClick={() => navigate('/products')}>
+                            <Button
+                                variant="secondary"
+                                className="ms-2"
+                                onClick={() => navigate("/products")}
+                            >
                                 Назад до списку
                             </Button>
                         </div>
