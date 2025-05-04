@@ -1,6 +1,7 @@
 import axios from "axios";
 import { setIsLoading } from "../../store/state/actions/appSettingActions";
 import { store } from "../../store/store";
+import {refreshToken} from "./tokenService.js";
 
 export default class HttpClient {
   constructor(configs) {
@@ -17,35 +18,35 @@ export default class HttpClient {
     });
 
     this.axiosInstance.interceptors.response.use(
-      (response) => response,
-      async (error) => {
-        const originalRequest = error.config;
+        (response) => response,
+        async (error) => {
+          const originalRequest = error.config;
 
-        if (error.response?.status === 401 && !originalRequest._retry) {
-          originalRequest._retry = true;
+          if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
 
-          try {
-            const token = await refreshToken(
-              originalRequest,
-              this.setAuthorizationToken.bind(this)
-            );
-            originalRequest.headers["Authorization"] = `Bearer ${token}`;
-            return this.axiosInstance(originalRequest);
-          } catch (refreshError) {
-            return Promise.reject(refreshError);
+            try {
+              const token = await refreshToken(
+                  originalRequest,
+                  this.setAuthorizationToken.bind(this)
+              );
+              originalRequest.headers["Authorization"] = `Bearer ${token}`;
+              return this.axiosInstance(originalRequest);
+            } catch (refreshError) {
+              return Promise.reject(refreshError);
+            }
           }
-        }
 
-        return Promise.reject(error);
-      }
+          return Promise.reject(error);
+        }
     );
   }
 
   setAuthorizationToken(token) {
     if (token) {
       this.axiosInstance.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${token}`;
+          "Authorization"
+          ] = `Bearer ${token}`;
     } else {
       delete this.axiosInstance.defaults.headers.common["Authorization"];
     }
@@ -65,6 +66,10 @@ export default class HttpClient {
 
   async delete(url, config = {}) {
     return this.request({ method: "DELETE", url, ...config });
+  }
+
+  async patch(url, data, config = {}) {
+    return this.request({ method: "PATCH", url, data, ...config });
   }
 
   async request(config) {

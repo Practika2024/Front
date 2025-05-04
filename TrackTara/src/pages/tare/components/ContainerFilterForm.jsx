@@ -27,7 +27,6 @@ const ContainerFilterForm = ({ onFilter }) => {
     }, []);
 
     useEffect(() => {
-        console.log('Fetched container types:', containerTypes);
     }, [containerTypes]);
 
     const handleTypeChange = (id) => {

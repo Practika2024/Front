@@ -11,7 +11,6 @@ export const fetchContainerTypes = () => async (dispatch) => {
     dispatch(setLoading(true));
     try {
         const containerTypes = await getAllContainerTypes();
-        console.log('Fetched container types:', containerTypes);
         dispatch(getAll(containerTypes));
     } catch (error) {
         dispatch(setError(error.toString()));
