@@ -39,10 +39,10 @@ const BasicRoute = memo(() => {
             />
           </Route>
           <Route
-            path="/product/detail/:productId"
+            path="/product/update/:productId"
             element={
-              <ProtectedRoute allowedRoles={["Operator"]}>
-                <ProductDetail />
+              <ProtectedRoute allowedRoles={["Operator", "Administrator"]}>
+                <ProductEdit />
               </ProtectedRoute>
             }
           />
