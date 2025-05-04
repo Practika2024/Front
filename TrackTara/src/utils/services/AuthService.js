@@ -1,5 +1,6 @@
 import HttpClient from "../http/HttpClient";
 import REMOTE_HOST_NAME from "../../env/index";
+
 export class AuthService {
   static httpClient = new HttpClient({
     baseURL: REMOTE_HOST_NAME + "account",
@@ -14,7 +15,6 @@ export class AuthService {
   }
 
   static async externalLogin(model) {
-    console.log(this.httpClient);
     return await this.httpClient.post("externalLogin", model);
   }
 
@@ -30,7 +30,26 @@ export class AuthService {
     }
   }
 
-  static async refreshToken(model) {
-    return await this.httpClient.post("refresh-token", model);
+  static async refreshToken() {
+    try {
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (!refreshToken) {
+        throw new Error("Refresh token is missing");
+      }
+
+      const response = await this.httpClient.post("refresh-token", { refreshToken });
+      const { accessToken, refreshToken: newRefreshToken } = response.data;
+
+      // Зберігаємо нові токени
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", newRefreshToken);
+
+      this.setAuthorizationToken(accessToken);
+
+      return accessToken;
+    } catch (error) {
+      console.error("Error refreshing token:", error);
+      throw error;
+    }
   }
 }
