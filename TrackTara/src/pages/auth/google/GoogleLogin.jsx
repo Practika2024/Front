@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useSelector } from "react-redux";
-import useActions from "../../../hooks/useActions";
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
+import useActions from "../../../hooks/useActions";
 
 const GoogleLogin = () => {
 
@@ -61,7 +60,7 @@ const GoogleLogin = () => {
   useEffect(() => {
     if (googleApiLoaded) {
       const clientId =
-        "219955824362-0rhvb42q1827djp1m7ao56921c6ivn9o.apps.googleusercontent.com";
+        "386281927653-0gb0qgp2jid305ra217ekq1166oqu5ln.apps.googleusercontent.com";
 
       window.google.accounts.id.initialize({
         client_id: clientId,

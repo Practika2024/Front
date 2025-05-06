@@ -22,9 +22,14 @@ export const externalLoginUser = (model) => async (dispatch) => {
   try {
     const response = await AuthService.externalLogin(model);
     await AuthByToken(response.payload)(dispatch);
+
+    if(!response.payload) {
+      return { success: false, message: response.message };
+    }
+
     return { success: true, message: "You login successfuly!" };
   } catch (error) {
-    const errorMessage = error.response?.data;
+    const errorMessage = error.response?.data.message;
     toast.error(errorMessage);
   }
 };
