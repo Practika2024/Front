@@ -3,7 +3,7 @@ import { jwtDecode } from "jwt-decode";
 import { store } from "../../store/store";
 import { authUser } from "./../../store/state/reduserSlises/userSlice";
 import { logoutUser } from "../../store/state/actions/userActions";
-import  REMOTE_HOST_NAME from "../../env/index";
+import REMOTE_HOST_NAME from "../../env/index";
 
 let isRefreshing = false;
 let failedQueue = [];
@@ -38,22 +38,23 @@ export const refreshToken = async (originalRequest, setAuthorizationToken) => {
     const accessToken = localStorage.getItem("accessToken");
 
     const { data } = await axios.post(
-      {REMOTE_HOST_NAME} +
-      "account/refresh-token",
+      `${REMOTE_HOST_NAME}account/refresh-token`,
       { refreshToken, accessToken }
     );
 
-    if (data) {
-      localStorage.setItem("accessToken", data.accessToken);
-      localStorage.setItem("refreshToken", data.refreshToken);
+    const tokens = data.payload;
 
-      setAuthorizationToken(data.accessToken);
+    if (tokens) {
+      localStorage.setItem("accessToken", tokens.accessToken);
+      localStorage.setItem("refreshToken", tokens.refreshToken);
 
-      const user = jwtDecode(data.accessToken);
+      setAuthorizationToken(tokens.accessToken);
+
+      const user = jwtDecode(tokens.accessToken);
       store.dispatch(authUser(user));
 
-      processQueue(null, data.accessToken);
-      return data.accessToken;
+      processQueue(null, tokens.accessToken);
+      return tokens.accessToken;
     } else {
       throw new Error("Failed to refresh tokens");
     }
