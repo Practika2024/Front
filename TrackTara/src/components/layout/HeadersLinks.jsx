@@ -1,10 +1,28 @@
-import React, { memo } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { isEmailConfirmed } from "../../store/state/actions/userActions";
 
 const HeadersLinks = () => {
     const user = useSelector((state) => state.user.currentUser);
     const userRoles = user ? (Array.isArray(user.role) ? user.role : [user.role]) : [];
+    const [emailConfirmed, setEmailConfirmed] = useState(false);
+    const dispatch = useDispatch();
+    const currentUser = useSelector((store) => store.user.currentUser);
+    const userId = currentUser?.id;
+
+    useEffect(() => {
+        const checkEmailStatus = async () => {
+            if (userId) {
+                const confirmed = await isEmailConfirmed(userId); // ← ДОДАНИЙ ВИКЛИК
+                console.log("Email підтверджений:", confirmed);
+                setEmailConfirmed(confirmed);
+            }
+        };
+
+        checkEmailStatus();
+    }, [userId]);
+
 
     return (
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
@@ -46,7 +64,6 @@ const HeadersLinks = () => {
                         <li className="nav-item">
                             <Link className="nav-link fs-5" to="/approval-requests">Підтвердження</Link>
                         </li>
-
                     </>
                 ) : null}
             </ul>

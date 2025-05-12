@@ -26,7 +26,10 @@ export const deleteProductImage = async ({productId, imageId}) => {
   const response = await ProductService.deleteProductImage({productId, imageId});
   return response;
 };
-
+export const updateProduct = createAsyncThunk('products/update', async (product) => {
+  const response = await ProductService.updateProduct(product);
+  return response;
+});
 export const uploadProductImages = async (productId, imagesFiles) => {  
   const response = await ProductService.uploadProductImages(productId, imagesFiles);
   return response;

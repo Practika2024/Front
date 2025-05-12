@@ -48,6 +48,15 @@ export const ProductService = {
     const response = await axios.put(`${API_URL}/upload-images/${productId}`, imagesFiles, getAuthHeadersMultiPart());
     return response.data;
   },
+  updateProduct: async (product) => {
+    const response = await axios.put(`${API_URL}/update/${product.id}`, {
+      name: product.name,
+      typeId: product.typeId,
+      description: product.description,
+      manufactureDate: product.manufactureDate,
+    }, getAuthHeaders());
+    return response.data;
+  },
   updateProductImages: async (productId, imagesFiles) => {
     const response = await axios.put(`${API_URL}/update-images/${productId}`, imagesFiles, getAuthHeadersMultiPart());
     return response.data;

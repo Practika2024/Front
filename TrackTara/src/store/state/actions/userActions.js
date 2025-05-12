@@ -33,6 +33,16 @@ export const externalLoginUser = (model) => async (dispatch) => {
     toast.error(errorMessage);
   }
 };
+export const isEmailConfirmed = (userId) => async () => {
+  try {
+    const response = await UserService.getUserById(userId);
+    return response?.payload?.emailConfirmed === true; // Explicitly checks for true
+  } catch (error) {
+    const errorMessage = error.response?.data;
+    toast.error(errorMessage || "Failed to fetch user data");
+    return false;
+  }
+};
 
 export const AuthByToken = (tokens) => async (dispatch) => {
   if (tokens) {

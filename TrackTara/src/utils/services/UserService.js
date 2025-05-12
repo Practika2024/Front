@@ -68,6 +68,10 @@ export class UserService {
       throw error;
     }
   }
+  static async getUserById(userId) {
+    this.setAuthorizationToken(localStorage.getItem("accessToken"));
+    return await this.httpClient.get(`get-by-id/${userId}`);
+  }
 
   static async approveUser(userId) {
     this.setAuthorizationToken(localStorage.getItem("accessToken"));

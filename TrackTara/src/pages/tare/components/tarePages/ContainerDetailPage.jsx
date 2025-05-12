@@ -21,7 +21,8 @@ import {
 import { getAllContainerTypes } from "../../../../utils/services/ContainerTypesService.js";
 import { fetchProducts } from "../../../../store/state/actions/productActions.js";
 import { fetchAllContainerHistories } from "../../../../store/state/actions/containerHistoryActions.js";
-
+import { addReminder } from "../../../../store/state/actions/reminderActions";
+import { Form } from "react-bootstrap";
 const ContainerDetailPage = () => {
   const { containerId } = useParams();
   const navigate = useNavigate();
@@ -38,6 +39,8 @@ const ContainerDetailPage = () => {
 
   const products = useSelector((state) => state.product?.products || []);
   const containerHistory = useSelector((state) => state.containerHistory?.histories || []);
+  const [showReminderModal, setShowReminderModal] = useState(false);
+  const [reminderForm, setReminderForm] = useState({ title: "", dueDate: "", type: "" });
 
   useEffect(() => {
     if (!containerId) return;
@@ -74,6 +77,26 @@ const ContainerDetailPage = () => {
       dispatch(fetchAllContainerHistories(containerId));
     } catch (error) {
       console.error("Error refreshing container:", error);
+    }
+  };
+  const handleOpenReminderModal = (containerId) => {
+    setSelectedContainerId(containerId);
+    setReminderForm({ title: "", dueDate: "", type: "" });
+    setShowReminderModal(true);
+  };
+  const handleCreateReminder = async () => {
+    try {
+      const payload = {
+        title: reminderForm.title,
+        dueDate: new Date(reminderForm.dueDate).toISOString(), // ISO формат
+        type: parseInt(reminderForm.type) // число
+      };
+
+      await dispatch(addReminder(selectedContainerId, payload));
+      setShowReminderModal(false);
+      refreshData();
+    } catch (err) {
+      console.error("Failed to add reminder:", err);
     }
   };
 
@@ -166,6 +189,9 @@ const ContainerDetailPage = () => {
                 <Button title="Видалити контейнер" variant="outline-secondary" onClick={handleDelete} className="p-1 border-0">
                   <img src="/Icons for functions/free-icon-recycle-bin-3156999.png" alt="Delete" height="20" />
                 </Button>
+                <Button variant="outline-secondary" onClick={() => handleOpenReminderModal(container.id)} className="p-1 border-0">
+                  <img src="/Icons for functions/free-icon-remainder-3156999.png" alt="Reminder" height="20" />
+                </Button>
                 {container.isEmpty ? (
                     <Button title="Додати продукт" variant="outline-secondary" onClick={() => setShowAddProductModal(true)} className="p-1 border-0">
                       <img src="/Icons for functions/free-icon-import-7234396.png" alt="Add Product" height="20" />
@@ -230,7 +256,41 @@ const ContainerDetailPage = () => {
             <Button variant="primary" onClick={handleAddProduct} disabled={!selectedProductId}>Додати продукт</Button>
           </Modal.Footer>
         </Modal>
-
+        <Modal show={showReminderModal} onHide={() => setShowReminderModal(false)}>
+          <Modal.Header closeButton><Modal.Title>Створити нагадування</Modal.Title></Modal.Header>
+          <Modal.Body>
+            <Form>
+              <Form.Group className="mb-3">
+                <Form.Label>Назва</Form.Label>
+                <Form.Control
+                    type="text"
+                    value={reminderForm.title}
+                    onChange={(e) => setReminderForm({ ...reminderForm, title: e.target.value })}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Дата</Form.Label>
+                <Form.Control
+                    type="datetime-local"
+                    value={reminderForm.dueDate}
+                    onChange={(e) => setReminderForm({ ...reminderForm, dueDate: e.target.value })}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Тип</Form.Label>
+                <Form.Control
+                    type="text"
+                    value={reminderForm.type}
+                    onChange={(e) => setReminderForm({ ...reminderForm, type: e.target.value })}
+                />
+              </Form.Group>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowReminderModal(false)}>Скасувати</Button>
+            <Button variant="primary" onClick={handleCreateReminder}>Зберегти</Button>
+          </Modal.Footer>
+        </Modal>
         <Modal show={showRemoveProductModal} onHide={() => setShowRemoveProductModal(false)}>
           <Modal.Header closeButton>
             <Modal.Title>Видалення продукту</Modal.Title>

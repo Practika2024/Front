@@ -7,7 +7,8 @@ import { getAllContainerTypes } from "../../../utils/services/ContainerTypesServ
 import { fetchContainers, addProductToContainer, removeProductFromContainer } from "../../../store/state/actions/containerActions";
 import { fetchContainerTypes } from "../../../store/state/actions/containerTypeActions";
 import { fetchProducts } from "../../../store/state/actions/productActions";
-
+import { addReminder } from "../../../store/state/actions/reminderActions";
+import { Form } from "react-bootstrap";
 import ContainerFilterForm from "./ContainerFilterForm.jsx";
 import { deleteContainer } from "../../../utils/services/ContainerService.js";
 
@@ -36,6 +37,8 @@ const ContainersTable = () => {
 
   const itemsPerPage = 10;
 
+  const [showReminderModal, setShowReminderModal] = useState(false);
+  const [reminderForm, setReminderForm] = useState({ title: "", dueDate: "", type: "" });
   // Завантаження даних при монтуванні
   useEffect(() => {
     dispatch(fetchContainers());
@@ -123,6 +126,26 @@ const ContainersTable = () => {
       setShowConfirmClearModal(false);
     });
   };
+  const handleOpenReminderModal = (containerId) => {
+    setSelectedContainerId(containerId);
+    setReminderForm({ title: "", dueDate: "", type: "" });
+    setShowReminderModal(true);
+  };
+  const handleCreateReminder = async () => {
+    try {
+      const payload = {
+        title: reminderForm.title,
+        dueDate: new Date(reminderForm.dueDate).toISOString(), // ISO формат
+        type: parseInt(reminderForm.type) // число
+      };
+
+      await dispatch(addReminder(selectedContainerId, payload));
+      setShowReminderModal(false);
+      refreshData();
+    } catch (err) {
+      console.error("Failed to add reminder:", err);
+    }
+  };
 
   const handleFilter = (filters) => {
     const { uniqueCode, name, minVolume, maxVolume, type, isEmpty } = filters;
@@ -196,20 +219,23 @@ const ContainersTable = () => {
                               products.find((p) => p.id === container.productId)?.name || "Невідомий продукт"}
                         </td>
                         <td>
-                          <Button variant="outline-secondary" onClick={() => navigate(`/tare/update/${container.id}`)} className="p-0 border-0">
+                          <Button variant="outline-secondary" title="Edit" onClick={() => navigate(`/tare/update/${container.id}`)} className="p-0 border-0">
                             <img src="/Icons for functions/free-icon-edit-3597088.png" alt="Edit" height="20" />
                           </Button>
                           {container.isEmpty ? (
-                              <Button variant="outline-secondary" onClick={() => handleSetProduct(container.id)} className="p-1 border-0">
+                              <Button variant="outline-secondary" title="Set Product" onClick={() => handleSetProduct(container.id)} className="p-1 border-0">
                                 <img src="/Icons for functions/free-icon-import-7234396.png" alt="Set Product" height="20" />
                               </Button>
                           ) : (
-                              <Button variant="outline-secondary" onClick={() => handleClearProduct(container.id)} className="p-1 border-0">
+                              <Button variant="outline-secondary" title="Clear Product" onClick={() => handleClearProduct(container.id)} className="p-1 border-0">
                                 <img src="/Icons for functions/free-icon-package-1666995.png" alt="Clear Product" height="20" />
                               </Button>
                           )}
-                          <Button variant="outline-secondary" onClick={() => handleDelete(container.id)} className="p-1 border-0">
+                          <Button variant="outline-secondary" title="Delete" onClick={() => handleDelete(container.id)} className="p-1 border-0">
                             <img src="/Icons for functions/free-icon-recycle-bin-3156999.png" alt="Delete" height="20" />
+                          </Button>
+                          <Button variant="outline-secondary" title="Reminder" onClick={() => handleOpenReminderModal(container.id)} className="p-1 border-0">
+                            <img src="/Icons for functions/free-icon-remainder-3156999.png" alt="Reminder" height="20" />
                           </Button>
                         </td>
                       </tr>
@@ -233,6 +259,41 @@ const ContainersTable = () => {
         </Row>
 
         {/* Модалки */}
+        <Modal show={showReminderModal} onHide={() => setShowReminderModal(false)}>
+          <Modal.Header closeButton><Modal.Title>Створити нагадування</Modal.Title></Modal.Header>
+          <Modal.Body>
+            <Form>
+              <Form.Group className="mb-3">
+                <Form.Label>Назва</Form.Label>
+                <Form.Control
+                    type="text"
+                    value={reminderForm.title}
+                    onChange={(e) => setReminderForm({ ...reminderForm, title: e.target.value })}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Дата</Form.Label>
+                <Form.Control
+                    type="datetime-local"
+                    value={reminderForm.dueDate}
+                    onChange={(e) => setReminderForm({ ...reminderForm, dueDate: e.target.value })}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Тип</Form.Label>
+                <Form.Control
+                    type="text"
+                    value={reminderForm.type}
+                    onChange={(e) => setReminderForm({ ...reminderForm, type: e.target.value })}
+                />
+              </Form.Group>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowReminderModal(false)}>Скасувати</Button>
+            <Button variant="primary" onClick={handleCreateReminder}>Зберегти</Button>
+          </Modal.Footer>
+        </Modal>
         <Modal show={showProductModal} onHide={() => setShowProductModal(false)}>
           <Modal.Header closeButton><Modal.Title>Виберіть продукт</Modal.Title></Modal.Header>
           <Modal.Body>
