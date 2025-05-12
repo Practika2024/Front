@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import Select from "react-select";
-import { Table, Button, Modal, Row, Col, Offcanvas, Pagination } from "react-bootstrap";
+import { Table, Button, Offcanvas, Pagination, Row, Col } from "react-bootstrap";
+
 import { getAllContainerTypes } from "../../../utils/services/ContainerTypesService";
 import { fetchContainers, addProductToContainer, removeProductFromContainer } from "../../../store/state/actions/containerActions";
 import { fetchContainerTypes } from "../../../store/state/actions/containerTypeActions";
 import { fetchProducts } from "../../../store/state/actions/productActions";
 import { addReminder } from "../../../store/state/actions/reminderActions";
-import { Form } from "react-bootstrap";
 import ContainerFilterForm from "./ContainerFilterForm.jsx";
 import { deleteContainer } from "../../../utils/services/ContainerService.js";
+import ConfirmDeleteModal from "./tareModals/ConfirmDeleteModal";
+import ConfirmClearProductModal from "./tareModals/ConfirmClearModal";
+import ProductSelectModal from "./tareModals/ProductSelectModal";
+import ReminderModal from "./tareModals/ContainerReminderModal.jsx";
 
 const ContainersTable = () => {
   const dispatch = useDispatch();
@@ -22,24 +25,22 @@ const ContainersTable = () => {
   const [filteredContainers, setFilteredContainers] = useState([]);
   const [typeNames, setTypeNames] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
-
   const [sortConfig, setSortConfig] = useState({ key: "name", direction: "ascending" });
 
   const [showProductModal, setShowProductModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showConfirmClearModal, setShowConfirmClearModal] = useState(false);
   const [showFilterOffcanvas, setShowFilterOffcanvas] = useState(false);
+  const [showReminderModal, setShowReminderModal] = useState(false);
 
   const [selectedContainerId, setSelectedContainerId] = useState(null);
   const [selectedProductId, setSelectedProductId] = useState(null);
+  const [reminderForm, setReminderForm] = useState({ title: "", dueDate: "", type: "" });
   const [searchQuery, setSearchQuery] = useState("");
   const [containerTypes, setContainerTypes] = useState([]);
 
   const itemsPerPage = 10;
 
-  const [showReminderModal, setShowReminderModal] = useState(false);
-  const [reminderForm, setReminderForm] = useState({ title: "", dueDate: "", type: "" });
-  // Завантаження даних при монтуванні
   useEffect(() => {
     dispatch(fetchContainers());
     dispatch(fetchContainerTypes()).then((res) => {
@@ -53,28 +54,18 @@ const ContainersTable = () => {
     });
     dispatch(fetchProducts());
   }, [dispatch]);
-  useEffect(() => {
-    const fetchContainerTypes = async () => {
-      try {
-        const types = await getAllContainerTypes();
-        setContainerTypes(types);
-      } catch (error) {
-        console.error("Error fetching container types:", error);
-      }
-    };
 
-    fetchContainerTypes();
+  useEffect(() => {
+    getAllContainerTypes().then(setContainerTypes).catch(console.error);
   }, []);
+
   useEffect(() => {
     setFilteredContainers(containers);
   }, [containers]);
 
-  // Хелпери
   const refreshData = () => dispatch(fetchContainers());
-  const getTypeNameById = (typeId) => {
-    const type = containerTypes.find((t) => t.id === typeId);
-    return type ? type.name : "Unknown Type";
-  };
+  const getTypeNameById = (typeId) => containerTypes.find((t) => t.id === typeId)?.name || "Unknown Type";
+
   const handleSort = (key) => {
     setSortConfig((prev) => ({
       key,
@@ -85,7 +76,6 @@ const ContainersTable = () => {
   const handleDelete = (id) => {
     const container = containers.find((c) => c.id === id);
     if (container && !container.isEmpty) return alert("Спочатку потрібно очистити контейнер");
-
     setSelectedContainerId(id);
     setShowConfirmModal(true);
   };
@@ -126,19 +116,20 @@ const ContainersTable = () => {
       setShowConfirmClearModal(false);
     });
   };
+
   const handleOpenReminderModal = (containerId) => {
     setSelectedContainerId(containerId);
     setReminderForm({ title: "", dueDate: "", type: "" });
     setShowReminderModal(true);
   };
+
   const handleCreateReminder = async () => {
     try {
       const payload = {
         title: reminderForm.title,
-        dueDate: new Date(reminderForm.dueDate).toISOString(), // ISO формат
-        type: parseInt(reminderForm.type) // число
+        dueDate: new Date(reminderForm.dueDate).toISOString(),
+        type: parseInt(reminderForm.type),
       };
-
       await dispatch(addReminder(selectedContainerId, payload));
       setShowReminderModal(false);
       refreshData();
@@ -161,7 +152,6 @@ const ContainersTable = () => {
     );
   };
 
-  // Пагінація та сортування
   const sortedContainers = [...filteredContainers].sort((a, b) => {
     if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === "ascending" ? -1 : 1;
     if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === "ascending" ? 1 : -1;
@@ -171,9 +161,6 @@ const ContainersTable = () => {
   const indexOfFirstItem = (currentPage - 1) * itemsPerPage;
   const currentItems = sortedContainers.slice(indexOfFirstItem, indexOfFirstItem + itemsPerPage);
 
-  const filteredProducts = products.filter((product) => product.name.toLowerCase().includes(searchQuery.toLowerCase()));
-
-  // Рендер
   return (
       <div className="container mt-5">
         <h2 className="mb-4">Список контейнерів</h2>
@@ -215,8 +202,9 @@ const ContainersTable = () => {
                         <td>{getTypeNameById(container.typeId)}</td>
                         <td>{container.volume}</td>
                         <td>
-                          {container.isEmpty ? "Порожній" :
-                              products.find((p) => p.id === container.productId)?.name || "Невідомий продукт"}
+                          {container.isEmpty
+                              ? "Порожній"
+                              : products.find((p) => p.id === container.productId)?.name || "Невідомий продукт"}
                         </td>
                         <td>
                           <Button variant="outline-secondary" title="Edit" onClick={() => navigate(`/tare/update/${container.id}`)} className="p-0 border-0">
@@ -258,75 +246,38 @@ const ContainersTable = () => {
           </Col>
         </Row>
 
-        {/* Модалки */}
-        <Modal show={showReminderModal} onHide={() => setShowReminderModal(false)}>
-          <Modal.Header closeButton><Modal.Title>Створити нагадування</Modal.Title></Modal.Header>
-          <Modal.Body>
-            <Form>
-              <Form.Group className="mb-3">
-                <Form.Label>Назва</Form.Label>
-                <Form.Control
-                    type="text"
-                    value={reminderForm.title}
-                    onChange={(e) => setReminderForm({ ...reminderForm, title: e.target.value })}
-                />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Дата</Form.Label>
-                <Form.Control
-                    type="datetime-local"
-                    value={reminderForm.dueDate}
-                    onChange={(e) => setReminderForm({ ...reminderForm, dueDate: e.target.value })}
-                />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Тип</Form.Label>
-                <Form.Control
-                    type="text"
-                    value={reminderForm.type}
-                    onChange={(e) => setReminderForm({ ...reminderForm, type: e.target.value })}
-                />
-              </Form.Group>
-            </Form>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowReminderModal(false)}>Скасувати</Button>
-            <Button variant="primary" onClick={handleCreateReminder}>Зберегти</Button>
-          </Modal.Footer>
-        </Modal>
-        <Modal show={showProductModal} onHide={() => setShowProductModal(false)}>
-          <Modal.Header closeButton><Modal.Title>Виберіть продукт</Modal.Title></Modal.Header>
-          <Modal.Body>
-            <Select
-                options={products.map((p) => ({ value: p.id, label: p.name }))}
-                onChange={(opt) => setSelectedProductId(opt?.value)}
-                placeholder="Пошук за назвою"
-                isClearable
-            />
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowProductModal(false)}>Скасувати</Button>
-            <Button variant="primary" onClick={confirmSetProduct}>Підтвердити</Button>
-          </Modal.Footer>
-        </Modal>
+        {/* Модальні компоненти */}
+        <ProductSelectModal
+            show={showProductModal}
+            onClose={() => setShowProductModal(false)}
+            onConfirm={confirmSetProduct}
+            products={products}
+            selectedProductId={selectedProductId}
+            setSelectedProductId={setSelectedProductId}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+        />
 
-        <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
-          <Modal.Header closeButton><Modal.Title>Підтвердження видалення</Modal.Title></Modal.Header>
-          <Modal.Body>Ви впевнені, що хочете видалити контейнер?</Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>Ні</Button>
-            <Button variant="danger" onClick={confirmDelete}>Так</Button>
-          </Modal.Footer>
-        </Modal>
 
-        <Modal show={showConfirmClearModal} onHide={() => setShowConfirmClearModal(false)}>
-          <Modal.Header closeButton><Modal.Title>Підтвердження очищення</Modal.Title></Modal.Header>
-          <Modal.Body>Очистити продукт з контейнера?</Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowConfirmClearModal(false)}>Ні</Button>
-            <Button variant="danger" onClick={confirmClearProduct}>Так</Button>
-          </Modal.Footer>
-        </Modal>
+        <ConfirmDeleteModal
+            show={showConfirmModal}
+            onClose={() => setShowConfirmModal(false)}
+            onConfirm={confirmDelete}
+        />
+
+        <ConfirmClearProductModal
+            show={showConfirmClearModal}
+            onClose={() => setShowConfirmClearModal(false)}
+            onConfirm={confirmClearProduct}
+        />
+
+        <ReminderModal
+            show={showReminderModal}
+            onHide={() => setShowReminderModal(false)}
+            form={reminderForm}
+            setForm={setReminderForm}
+            onSubmit={handleCreateReminder}
+        />
 
         <Offcanvas show={showFilterOffcanvas} onHide={() => setShowFilterOffcanvas(false)} placement="start">
           <Offcanvas.Header>
