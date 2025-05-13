@@ -4,10 +4,11 @@ import {
   fetchProducts,
   deleteProduct,
 } from "../../../store/state/actions/productActions";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const ProductsList = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const products = useSelector((state) => state.product.products);
   const status = useSelector((state) => state.product.status);
   const [showModal, setShowModal] = useState(false);
@@ -27,7 +28,7 @@ const ProductsList = () => {
           ...prevState,
           [hoveredProductId]: (prevState[hoveredProductId] + 1) % products.find((p) => p.id === hoveredProductId).images.length,
         }));
-      }, 2000); // Change image every 2 seconds
+      }, 2000);
     }
     return () => clearInterval(interval);
   }, [hoveredProductId, products]);
@@ -48,17 +49,9 @@ const ProductsList = () => {
     setProductToDelete(null);
   };
 
-  if (status === "loading") {
-    return <div>Loading...</div>;
-  }
-
-  if (status === "failed") {
-    return <div>Error loading products</div>;
-  }
-
-  if (!Array.isArray(products) || products.length === 0) {
-    return <div>No products available</div>;
-  }
+  if (status === "loading") return <div>Loading...</div>;
+  if (status === "failed") return <div>Error loading products</div>;
+  if (!Array.isArray(products) || products.length === 0) return <div>No products available</div>;
 
   return (
       <div className="table-responsive">
@@ -69,7 +62,7 @@ const ProductsList = () => {
             <th>Назва</th>
             <th>Опис</th>
             <th>Дата виробництва</th>
-            <th>Видалити</th>
+            <th>Дії</th>
           </tr>
           </thead>
           <tbody>
@@ -101,21 +94,23 @@ const ProductsList = () => {
                   )}
                 </td>
                 <td>
-                  <Link
-                      title={`Деталі продукту`}
-                      to={`/product/detail/${product.id}`}
-                  >
+                  <Link title={`Деталі продукту`} to={`/product/detail/${product.id}`}>
                     {product.name}
                   </Link>
                 </td>
                 <td>{product.description}</td>
-                <td>
-                  {new Date(product.manufactureDate).toISOString().split("T")[0]}
-                </td>
+                <td>{new Date(product.manufactureDate).toISOString().split("T")[0]}</td>
                 <td>
                   <button
+                      title={`Редагувати продукт`}
+                      className="btn btn-primary btn-sm me-2"
+                      onClick={() => navigate(`/product/update/${product.id}`)}
+                  >
+                    Змінити
+                  </button>
+                  <button
                       title={`Видалити продукт`}
-                      className="btn btn-danger btn-sm ms-2"
+                      className="btn btn-danger btn-sm"
                       onClick={() => handleDelete(product.id)}
                   >
                     <img
@@ -135,7 +130,7 @@ const ProductsList = () => {
               <div className="modal-dialog">
                 <div className="modal-content">
                   <div className="modal-header">
-                    <h5 className="modal-title">Confirm Deletion</h5>
+                    <h5 className="modal-title">Підтвердження видалення</h5>
                     <button
                         type="button"
                         className="btn-close"
@@ -143,7 +138,7 @@ const ProductsList = () => {
                     ></button>
                   </div>
                   <div className="modal-body">
-                    <p>Are you sure you want to delete this product?</p>
+                    <p>Ви дійсно хочете видалити цей продукт?</p>
                   </div>
                   <div className="modal-footer">
                     <button
@@ -151,13 +146,13 @@ const ProductsList = () => {
                         className="btn btn-secondary"
                         onClick={cancelDelete}
                     >
-                      No
+                      Ні
                     </button>
                     <button
                         className="btn btn-danger"
                         onClick={confirmDelete}
                     >
-                      Yes
+                      Так
                     </button>
                   </div>
                 </div>

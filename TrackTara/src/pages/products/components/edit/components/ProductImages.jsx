@@ -8,7 +8,7 @@ import {
 import ImageList from "./ImageList";
 
 const ProductImages = ({ shouldNavigate = false }) => {
-  const product = useSelector((state) => state.product.product);
+  const product = useSelector((state) => state.product?.product);
   const dispatch = useDispatch();
 
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -23,8 +23,8 @@ const ProductImages = ({ shouldNavigate = false }) => {
   }, []);
 
   const handleUpdateImages = useCallback(async () => {
-    if (!product?.id) {
-      toast.error("Product ID is missing.");
+    if (!product || !product.id) {
+      toast.error("Product not loaded or missing ID.");
       return;
     }
 
@@ -52,7 +52,12 @@ const ProductImages = ({ shouldNavigate = false }) => {
     } catch (err) {
       toast.error("Server error during image update.");
     }
-  }, [product.id, selectedFiles, imagesToDelete, dispatch]);
+  }, [product, selectedFiles, imagesToDelete, dispatch]);
+
+  // 💡 Додано перевірку: поки продукт не завантажено — нічого не рендеримо
+  if (!product || !product.id) {
+    return <div>Завантаження даних продукту...</div>;
+  }
 
   return (
       <div className="d-flex flex-column align-items-center gap-3">
