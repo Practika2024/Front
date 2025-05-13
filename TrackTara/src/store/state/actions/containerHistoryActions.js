@@ -7,9 +7,11 @@ export const fetchAllContainerHistories = createAsyncThunk(
     async (containerId, { rejectWithValue }) => {
         try {
             const data = await getAllContainerHistories(containerId);
-            return data.payload;
+            console.log("API Response:", data); // Логування для перевірки
+            return data;
         } catch (error) {
-            return rejectWithValue(error.response.data);
+            console.error("API Error:", error.response?.data || error.message);
+            return rejectWithValue(error.response?.data || error.message);
         }
     }
 );

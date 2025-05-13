@@ -36,12 +36,14 @@ const ContainerDetailPage = () => {
   const [showAddProductModal, setShowAddProductModal] = useState(false);
   const [showRemoveProductModal, setShowRemoveProductModal] = useState(false);
   const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
-
+  const [selectedContainerId, setSelectedContainerId] = useState(null);
   const products = useSelector((state) => state.product?.products || []);
   const containerHistory = useSelector((state) => state.containerHistory?.histories || []);
   const [showReminderModal, setShowReminderModal] = useState(false);
   const [reminderForm, setReminderForm] = useState({ title: "", dueDate: "", type: "" });
-
+  useEffect(() => {
+    console.log("Container History:", containerHistory); // Debugging
+  }, [containerHistory]);
   useEffect(() => {
     if (!containerId) return;
 
@@ -52,8 +54,6 @@ const ContainerDetailPage = () => {
           getAllContainerTypes(),
         ]);
 
-        console.log("📦 Повний об'єкт контейнера:", tare);
-        console.log("📦 Отримані типи контейнерів:", types);
 
         setContainer(tare.payload);
         setContainerTypes(types);
@@ -102,8 +102,6 @@ const ContainerDetailPage = () => {
 
   const getTypeName = (typeIdRaw) => {
     const typeId = String(typeIdRaw ?? "").trim();
-    console.log("↪️ Отриманий typeId:", `"${typeId}"`);
-    console.log("📦 containerTypes:", containerTypes.map((t) => `"${t.id}"`));
 
     if (!typeId || !Array.isArray(containerTypes)) return "Unknown Type";
 
@@ -219,7 +217,7 @@ const ContainerDetailPage = () => {
             <Card>
               <Card.Body>
                 <Card.Title>Історія контейнера</Card.Title>
-                {containerHistory.length > 0 ? (
+                {containerHistory && containerHistory.length > 0 ? (
                     <Table striped bordered hover>
                       <thead>
                       <tr>
@@ -235,7 +233,7 @@ const ContainerDetailPage = () => {
                             <td>{index + 1}</td>
                             <td>{getProductName(history.productId)}</td>
                             <td>{new Date(history.startDate).toLocaleString()}</td>
-                            <td>{history.endDate ? new Date(history.endDate).toLocaleString() : ""}</td>
+                            <td>{history.endDate ? new Date(history.endDate).toLocaleString() : "—"}</td>
                           </tr>
                       ))}
                       </tbody>
