@@ -172,8 +172,18 @@ const ContainerDetailPage = () => {
         <Row>
           <Col md={4}>
             <Card>
-              <Card.Body>
-                <Card.Title>{container.name}</Card.Title>
+                <Card.Body>
+                  {container.filePath && (
+                      <div className="text-center mb-3">
+                        <img
+                            src={container.filePath}
+                            alt="Фото контейнера"
+                            style={{ maxWidth: "100%", maxHeight: "150px", objectFit: "contain", borderRadius: "8px" }}
+                        />
+                      </div>
+                  )}
+
+                  <Card.Title>{container.name}</Card.Title>
                 <Card.Text>
                   <strong>Тип:</strong> {getTypeName(container.typeId || container.type?.id)}<br />
                   <strong>Об'єм (л):</strong> {container.volume}<br />

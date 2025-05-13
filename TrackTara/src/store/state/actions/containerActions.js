@@ -1,6 +1,7 @@
 import { getAll, deleteTareSlice, setProduct, clearProduct, setLoading, setError } from '../reduserSlises/containerSlice';
 import { getAllContainers, deleteContainer, setProductToContainer, clearProductFromTare } from '../../../utils/services/ContainerService';
 import { getContainerTypeNameById } from '../../../utils/services/ContainerTypesService';
+import { updateContainerImage } from '../../../utils/services/ContainerService';
 
 //
 export const fetchContainers = () => async (dispatch) => {
@@ -8,6 +9,17 @@ export const fetchContainers = () => async (dispatch) => {
     try {
         const response = await getAllContainers();
         dispatch(getAll(response.payload));
+    } catch (error) {
+        dispatch(setError(error.message));
+    } finally {
+        dispatch(setLoading(false));
+    }
+};
+export const updateContainerImageAction = (containerId, file) => async (dispatch) => {
+    dispatch(setLoading(true));
+    try {
+        const response = await updateContainerImage(containerId, file);
+        console.log('Container image updated successfully:', response);
     } catch (error) {
         dispatch(setError(error.message));
     } finally {

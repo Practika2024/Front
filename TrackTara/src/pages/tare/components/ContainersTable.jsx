@@ -191,6 +191,7 @@ const ContainersTable = () => {
                     <th onClick={() => handleSort("typeId")}>Тип</th>
                     <th onClick={() => handleSort("volume")}>Об'єм (л)</th>
                     <th>Вміст</th>
+                    <th>Зображення</th>
                     <th>Дії</th>
                   </tr>
                   </thead>
@@ -206,6 +207,18 @@ const ContainersTable = () => {
                               ? "Порожній"
                               : products.find((p) => p.id === container.productId)?.name || "Невідомий продукт"}
                         </td>
+                        <td>
+                          {container.filePath ? (
+                              <img
+                                  src={container.filePath}
+                                  alt={container.name}
+                                  style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "4px" }}
+                              />
+                          ) : (
+                              "Немає фото"
+                          )}
+                        </td>
+
                         <td>
                           <Button variant="outline-secondary" title="Edit" onClick={() => navigate(`/tare/update/${container.id}`)} className="p-0 border-0">
                             <img src="/Icons for functions/free-icon-edit-3597088.png" alt="Edit" height="20" />
@@ -246,7 +259,6 @@ const ContainersTable = () => {
           </Col>
         </Row>
 
-        {/* Модальні компоненти */}
         <ProductSelectModal
             show={showProductModal}
             onClose={() => setShowProductModal(false)}
@@ -257,7 +269,6 @@ const ContainersTable = () => {
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
         />
-
 
         <ConfirmDeleteModal
             show={showConfirmModal}

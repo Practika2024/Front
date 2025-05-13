@@ -82,4 +82,14 @@ export class UserService {
     this.setAuthorizationToken(localStorage.getItem("accessToken"));
     return await this.httpClient.delete(`reject/${userId}`);
   }
+  static async getUserByToken() {
+    this.setAuthorizationToken(localStorage.getItem("accessToken"));
+    try {
+      const response = await this.httpClient.get("get-by-token");
+      return response; // Return the user data
+    } catch (error) {
+      console.error("Error in getUserByToken:", error);
+      throw error; // Handle errors appropriately
+    }
+  }
 }

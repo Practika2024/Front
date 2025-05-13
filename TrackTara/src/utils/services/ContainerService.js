@@ -31,7 +31,29 @@ export const getContainerById = async (id) => {
     const response = await axios.get(`${API_URL}/get-by-id/${id}`, getAuthHeaders());
     return response.data;
 };
+export const updateContainerImage = async (containerId, file) => {
+    try {
+        const formData = new FormData();
+        formData.append("file", file);
 
+        const response = await axios.put(
+            `${API_URL}/update-image/${containerId}`,
+            formData,
+            {
+                ...getAuthHeaders(),
+                headers: {
+                    ...getAuthHeaders().headers,
+                    "Content-Type": "multipart/form-data",
+                },
+            }
+        );
+
+        return response.data;
+    } catch (error) {
+        console.error("Error updating container image:", error.response ? error.response.data : error.message);
+        throw error;
+    }
+};
 export const deleteContainer = async (id) => {
     await axios.delete(`${API_URL}/delete/${id}`, getAuthHeaders());
 };

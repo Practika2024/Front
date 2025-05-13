@@ -33,9 +33,9 @@ export const externalLoginUser = (model) => async (dispatch) => {
     toast.error(errorMessage);
   }
 };
-export const isEmailConfirmed = (userId) => async () => {
+export const isEmailConfirmed = () => async () => {
   try {
-    const response = await UserService.getUserById(userId);
+    const response = await UserService.getUserByToken();
     return response?.payload?.emailConfirmed === true; // Explicitly checks for true
   } catch (error) {
     const errorMessage = error.response?.data;
