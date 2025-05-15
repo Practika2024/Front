@@ -21,7 +21,7 @@ export const fetchContainerHistoryById = createAsyncThunk(
     async (containerHistoryId, { rejectWithValue }) => {
         try {
             const data = await getContainerHistoryById(containerHistoryId);
-            return data.payload;
+            return data;
         } catch (error) {
             return rejectWithValue(error.response.data);
         }
