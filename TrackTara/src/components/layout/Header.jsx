@@ -49,15 +49,15 @@ const Header = memo(() => {
           </IconButton>
         </div>
         <HeadersLinks hideLinksOnMobile />
-      </div>
+          </div>
       <div className="header-right">
-        {isAuthenticated ? (
-          <div className="dropdown">
+            {isAuthenticated ? (
+                <div className="dropdown">
             <button
               className="dropdown-toggle user-btn"
-              id="navbarDropdownMenuAvatar"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
+                      id="navbarDropdownMenuAvatar"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
             >
               <Avatar sx={{ width: 32, height: 32, bgcolor: '#1976d2', marginRight: 1 }}>
                 {currentUser.email?.[0]?.toUpperCase() || '?'}
@@ -65,20 +65,20 @@ const Header = memo(() => {
               <span className="user-email">{currentUser.email}</span>
             </button>
             <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
-              {!emailConfirmed && (
-                <li>
+                    {!emailConfirmed && (
+                        <li>
                   <button className="dropdown-item" onClick={() => navigate("/email-confirmation")}>Підтвердити Email</button>
-                </li>
-              )}
-              <li>
+                        </li>
+                    )}
+                    <li>
                 <button className="dropdown-item" onClick={logoutHandler}>Вихід</button>
-              </li>
-            </ul>
-          </div>
-        ) : (
+                    </li>
+                  </ul>
+                </div>
+            ) : (
           <Link to="/login" className="btn btn-outline-primary">Вхід/Реєстрація</Link>
-        )}
-      </div>
+            )}
+          </div>
       {/* Drawer для мобільного меню */}
       <Drawer anchor="left" open={drawerOpen} onClose={handleDrawerClose}>
         <div style={{ width: 260, padding: 16 }} onClick={handleDrawerClose}>
