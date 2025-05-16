@@ -9,6 +9,15 @@ import { Provider } from "react-redux";
 import { AuthByToken } from "./store/state/actions/userActions";
 import { ToastContainer } from "react-toastify";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#1976d2',
+    },
+  },
+});
 
 if (localStorage.accessToken && localStorage.refreshToken) {
   AuthByToken({
@@ -19,20 +28,22 @@ if (localStorage.accessToken && localStorage.refreshToken) {
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <ToastContainer
-      position="top-right"
-      autoClose={2000}
-      hideProgressBar
-      newestOnTop={false}
-      closeOnClick
-      rtl={false}
-      pauseOnFocusLoss={false}
-      draggable={false}
-      pauseOnHover={false}
-      theme="light"
-    />
-    <Provider store={store}>
-      <App />
-    </Provider>
+    <ThemeProvider theme={theme}>
+      <ToastContainer
+        position="top-right"
+        autoClose={2000}
+        hideProgressBar
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable={false}
+        pauseOnHover={false}
+        theme="light"
+      />
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </ThemeProvider>
   </StrictMode>
 );
