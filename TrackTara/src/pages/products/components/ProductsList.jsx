@@ -49,117 +49,76 @@ const ProductsList = () => {
     setProductToDelete(null);
   };
 
-  if (status === "loading") return <div>Loading...</div>;
-  if (status === "failed") return <div>Error loading products</div>;
-  if (!Array.isArray(products) || products.length === 0) return <div>No products available</div>;
+  if (status === "loading") return <div className="table-empty-state">Завантаження...</div>;
+  if (status === "failed") return <div className="table-empty-state text-danger">Помилка завантаження продуктів</div>;
+  if (!Array.isArray(products) || products.length === 0) return <div className="table-empty-state">Продукти відсутні</div>;
 
   return (
-      <div className="table-responsive">
-        <table className="table table-striped">
-          <thead>
+    <div className="table-responsive">
+      <table className="custom-table">
+        <thead>
           <tr>
-            <th>Фото</th>
-            <th>Назва</th>
-            <th>Опис</th>
-            <th>Дата виробництва</th>
-            <th>Дії</th>
+            <th className="text-start">Назва</th>
+            <th className="text-start">Опис</th>
+            <th className="text-start">Дата виробництва</th>
+            <th className="text-center" style={{ width: '120px' }}>Дії</th>
           </tr>
-          </thead>
-          <tbody>
+        </thead>
+        <tbody>
           {products.map((product) => (
-              <tr key={product.id}>
-                <td>
-                  {product.images && product.images.length > 0 && (
-                      <div
-                          onMouseEnter={() => {
-                            setHoveredProductId(product.id);
-                            setCurrentImageIndex((prevState) => ({
-                              ...prevState,
-                              [product.id]: 0,
-                            }));
-                          }}
-                          onMouseLeave={() => setHoveredProductId(null)}
-                      >
-                        <img
-                            src={product.images[currentImageIndex[product.id] || 0].filePath}
-                            alt={product.name}
-                            style={{
-                              width: "50px",
-                              height: "50px",
-                              objectFit: "cover",
-                              transition: "opacity 0.5s ease-in-out",
-                            }}
-                        />
-                      </div>
-                  )}
-                </td>
-                <td>
-                  <Link title={`Деталі продукту`} to={`/product/detail/${product.id}`}>
-                    {product.name}
-                  </Link>
-                </td>
-                <td>{product.description}</td>
-                <td>{new Date(product.manufactureDate).toISOString().split("T")[0]}</td>
-                <td>
-                  <button
-                      title={`Редагувати продукт`}
-                      className="btn btn-primary btn-sm me-2"
-                      onClick={() => navigate(`/product/update/${product.id}`)}
-                  >
-                    Змінити
-                  </button>
-                  <button
-                      title={`Видалити продукт`}
-                      className="btn btn-danger btn-sm"
-                      onClick={() => handleDelete(product.id)}
-                  >
-                    <img
-                        src="/Icons for functions/free-icon-recycle-bin-3156999.png"
-                        alt="Delete"
-                        height="20"
-                    />
-                  </button>
-                </td>
-              </tr>
+            <tr key={product.id}>
+              <td className="text-start">
+                <Link to={`/product/detail/${product.id}`} className="table-link">
+                  {product.name}
+                </Link>
+              </td>
+              <td className="text-start">{product.description}</td>
+              <td className="text-start">{new Date(product.manufactureDate).toISOString().split("T")[0]}</td>
+              <td className="text-center">
+                <button
+                  className="table-action-btn"
+                  title="Редагувати продукт"
+                  onClick={() => navigate(`/product/update/${product.id}`)}
+                >
+                  <img src="/Icons for functions/free-icon-edit-3597088.png" alt="Edit" />
+                </button>
+                <button
+                  className="table-action-btn"
+                  title="Видалити продукт"
+                  onClick={() => handleDelete(product.id)}
+                >
+                  <img src="/Icons for functions/free-icon-recycle-bin-3156999.png" alt="Delete" />
+                </button>
+              </td>
+            </tr>
           ))}
-          </tbody>
-        </table>
+        </tbody>
+      </table>
 
-        {showModal && (
-            <div className="modal show d-block" tabIndex="-1">
-              <div className="modal-dialog">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <h5 className="modal-title">Підтвердження видалення</h5>
-                    <button
-                        type="button"
-                        className="btn-close"
-                        onClick={cancelDelete}
-                    ></button>
-                  </div>
-                  <div className="modal-body">
-                    <p>Ви дійсно хочете видалити цей продукт?</p>
-                  </div>
-                  <div className="modal-footer">
-                    <button
-                        type="button"
-                        className="btn btn-secondary"
-                        onClick={cancelDelete}
-                    >
-                      Ні
-                    </button>
-                    <button
-                        className="btn btn-danger"
-                        onClick={confirmDelete}
-                    >
-                      Так
-                    </button>
-                  </div>
-                </div>
+      {showModal && (
+        <div className="modal show d-block" tabIndex="-1">
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Підтвердження видалення</h5>
+                <button type="button" className="btn-close" onClick={cancelDelete}></button>
+              </div>
+              <div className="modal-body">
+                <p>Ви дійсно хочете видалити цей продукт?</p>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={cancelDelete}>
+                  Скасувати
+                </button>
+                <button className="btn btn-danger" onClick={confirmDelete}>
+                  Видалити
+                </button>
               </div>
             </div>
-        )}
-      </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

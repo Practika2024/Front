@@ -1,8 +1,6 @@
 import React, { useCallback, useState, useMemo } from "react";
-import { Select, MenuItem, Button } from "@mui/material";
-import userImage from "../../../hooks/userImage";
+import { Select, MenuItem } from "@mui/material";
 import DeleteUserModal from "./usersModals/DeleteUserModal";
-import { useRenderCount } from "../../../hooks/useRenderCount";
 import useActions from "../../../hooks/useActions";
 import { toast } from "react-toastify";
 import isEqual from "lodash/isEqual";
@@ -12,7 +10,6 @@ const UsersTableRow = React.memo(
     ({ user, roleList }) => {
         const [showDeleteModal, setShowDeleteModal] = useState(false);
         const { changeRoles, getUsers } = useActions();
-        const renderCount = useRenderCount();
         const [selectedRole, setSelectedRole] = useState(user.role || '');
 
         const closeModal = useCallback(() => {
@@ -30,47 +27,56 @@ const UsersTableRow = React.memo(
                     if (result.success) {
                         await getUsers();
                         setSelectedRole(newRole);
-                        toast.success("User role updated successfully.");
+                        toast.success("Роль користувача успішно оновлено");
                     } else {
-                        toast.error(result.message || "Failed to update role.");
+                        toast.error(result.message || "Не вдалося оновити роль");
                     }
                 } catch (error) {
-                    toast.error("Failed to change roles.");
+                    toast.error("Не вдалося змінити роль");
                 }
             },
             [user.id, selectedRole, changeRoles, getUsers]
         );
 
-        const userAvatar = useMemo(() => userImage(user.image?.filePath), [user.image]);
-        const roleOptions = useMemo(() => roleList.length ? roleList : [{ name: "No Roles Available" }], [roleList]);
+        const roleOptions = useMemo(() => roleList.length ? roleList : [{ name: "Немає доступних ролей" }], [roleList]);
 
         return (
             <>
                 <tr>
-                    <td>{user.name}</td>
-                    <td>{user.email}</td>
-                    <td>
+                    <td className="text-center">{user.name}</td>
+                    <td className="text-center">{user.email}</td>
+                    <td className="text-center">
                         <Select
                             value={selectedRole}
                             onChange={handleRoleChange}
                             displayEmpty
-                            inputProps={{ 'aria-label': 'Role' }}
+                            size="small"
+                            sx={{
+                                minWidth: 150,
+                                '& .MuiSelect-select': {
+                                    py: 1,
+                                    fontSize: '14px'
+                                }
+                            }}
                         >
                             {roleOptions.map((role) => (
-                                <MenuItem key={role.name} value={role.name} disabled={role.name === "No Roles Available"}>
+                                <MenuItem key={role.name} value={role.name} disabled={role.name === "Немає доступних ролей"}>
                                     {role.name}
                                 </MenuItem>
                             ))}
                         </Select>
                     </td>
-                    <td>
-                        <Button
-                            variant="contained"
-                            color="error"
+                    <td className="text-center">
+                        <button
+                            className="table-action-btn"
+                            title="Видалити користувача"
                             onClick={() => setShowDeleteModal(true)}
                         >
-                            Delete
-                        </Button>
+                            <img
+                                src="/Icons for functions/free-icon-recycle-bin-3156999.png"
+                                alt="Delete"
+                            />
+                        </button>
                     </td>
                 </tr>
                 <DeleteUserModal
@@ -98,10 +104,7 @@ UsersTableRow.propTypes = {
             PropTypes.shape({
                 name: PropTypes.string.isRequired
             })
-        ),
-        image: PropTypes.shape({
-            filePath: PropTypes.string
-        })
+        )
     }).isRequired,
     roleList: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string.isRequired

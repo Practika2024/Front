@@ -181,9 +181,9 @@ const ContainersTable = () => {
             </Button>
 
             {filteredContainers.length === 0 ? (
-                <div className="alert alert-warning">Контейнери відсутні</div>
+                <div className="table-empty-state">Контейнери відсутні</div>
             ) : (
-                <Table striped bordered hover responsive>
+                <table className="custom-table">
                   <thead>
                   <tr>
                     <th onClick={() => handleSort("uniqueCode")}>Код</th>
@@ -220,42 +220,62 @@ const ContainersTable = () => {
                         </td>
 
                         <td>
-                          <Button variant="outline-secondary" title="Edit" onClick={() => navigate(`/tare/update/${container.id}`)} className="p-0 border-0">
-                            <img src="/Icons for functions/free-icon-edit-3597088.png" alt="Edit" height="20" />
-                          </Button>
+                          <button
+                              className="table-action-btn"
+                              title="Редагувати"
+                              onClick={() => navigate(`/tare/update/${container.id}`)}
+                          >
+                            <img src="/Icons for functions/free-icon-edit-3597088.png" alt="Edit" />
+                          </button>
                           {container.isEmpty ? (
-                              <Button variant="outline-secondary" title="Set Product" onClick={() => handleSetProduct(container.id)} className="p-1 border-0">
-                                <img src="/Icons for functions/free-icon-import-7234396.png" alt="Set Product" height="20" />
-                              </Button>
+                              <button
+                                  className="table-action-btn"
+                                  title="Встановити продукт"
+                                  onClick={() => handleSetProduct(container.id)}
+                              >
+                                <img src="/Icons for functions/free-icon-import-7234396.png" alt="Set Product" />
+                              </button>
                           ) : (
-                              <Button variant="outline-secondary" title="Clear Product" onClick={() => handleClearProduct(container.id)} className="p-1 border-0">
-                                <img src="/Icons for functions/free-icon-package-1666995.png" alt="Clear Product" height="20" />
-                              </Button>
+                              <button
+                                  className="table-action-btn"
+                                  title="Очистити продукт"
+                                  onClick={() => handleClearProduct(container.id)}
+                              >
+                                <img src="/Icons for functions/free-icon-package-1666995.png" alt="Clear Product" />
+                              </button>
                           )}
-                          <Button variant="outline-secondary" title="Delete" onClick={() => handleDelete(container.id)} className="p-1 border-0">
-                            <img src="/Icons for functions/free-icon-recycle-bin-3156999.png" alt="Delete" height="20" />
-                          </Button>
-                          <Button variant="outline-secondary" title="Reminder" onClick={() => handleOpenReminderModal(container.id)} className="p-1 border-0">
-                            <img src="/Icons for functions/free-icon-remainder-3156999.png" alt="Reminder" height="20" />
-                          </Button>
+                          <button
+                              className="table-action-btn"
+                              title="Видалити"
+                              onClick={() => handleDelete(container.id)}
+                          >
+                            <img src="/Icons for functions/free-icon-recycle-bin-3156999.png" alt="Delete" />
+                          </button>
+                          <button
+                              className="table-action-btn"
+                              title="Нагадування"
+                              onClick={() => handleOpenReminderModal(container.id)}
+                          >
+                            <img src="/Icons for functions/free-icon-remainder-3156999.png" alt="Reminder" />
+                          </button>
                         </td>
                       </tr>
                   ))}
                   </tbody>
-                </Table>
+                </table>
             )}
 
-            <Pagination>
+            <div className="custom-pagination">
               {Array.from({ length: Math.ceil(filteredContainers.length / itemsPerPage) }, (_, index) => (
-                  <Pagination.Item
+                  <div
                       key={index + 1}
-                      active={index + 1 === currentPage}
+                      className={`page-item ${index + 1 === currentPage ? 'active' : ''}`}
                       onClick={() => setCurrentPage(index + 1)}
                   >
-                    {index + 1}
-                  </Pagination.Item>
+                    <span className="page-link">{index + 1}</span>
+                  </div>
               ))}
-            </Pagination>
+            </div>
           </Col>
         </Row>
 

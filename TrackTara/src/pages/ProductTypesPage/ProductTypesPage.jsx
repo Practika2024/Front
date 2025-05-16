@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Button, Form, Table } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Form } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProductTypes, createProductType, modifyProductType, removeProductType } from '../../store/state/actions/productTypeActions';
 
@@ -26,77 +26,80 @@ const ProductTypesPage = () => {
         dispatch(removeProductType(id));
     };
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
+    if (loading) return <div className="table-empty-state">Завантаження...</div>;
+    if (error) return <div className="table-empty-state text-danger">Помилка: {error}</div>;
 
     return (
-        <Container className="mt-5">
-            <Row className="mb-4 text-center">
+        <Container className="mt-4">
+            <Row className="mb-4">
                 <Col>
-                    <h1>Типи продуктів</h1>
+                    <h2>Типи продуктів</h2>
                 </Col>
             </Row>
 
             <Row>
                 <Col md={8}>
-                    <Card className="mb-4 shadow-sm">
+                    <Card className="shadow-sm">
                         <Card.Body>
-                            <Card.Title>Список типів продуктів</Card.Title>
-                            <Table striped bordered hover>
-                                <thead>
-                                <tr>
-                                    <th>Назва</th>
-                                    <th></th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {productTypes.map((type) => (
-                                    <tr key={type.id}>
-                                        <td>{type.name}</td>
-                                        <td>
-                                            <Button
-                                                title={`Видалити тип продукту`}
-                                                variant="outline-secondary"
-                                                onClick={() => handleDeleteProductType(type.id)}
-                                                className="p-1 border-0"
-                                            >
-                                                <img
-                                                    src="/Icons for functions/free-icon-recycle-bin-3156999.png"
-                                                    alt="Delete"
-                                                    height="20"
-                                                />
-                                            </Button>
-                                        </td>
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </Table>
+                            <Card.Title className="mb-4">Список типів продуктів</Card.Title>
+
+                            {productTypes.length === 0 ? (
+                                <div className="table-empty-state">Типи продуктів відсутні</div>
+                            ) : (
+                                <table className="custom-table">
+                                    <thead>
+                                        <tr>
+                                            <th className="text-start">Назва</th>
+                                            <th className="text-center" style={{ width: '100px' }}>Дії</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {productTypes.map((type) => (
+                                            <tr key={type.id}>
+                                                <td className="text-start">{type.name}</td>
+                                                <td className="text-center">
+                                                    <button
+                                                        className="table-action-btn"
+                                                        title="Видалити тип продукту"
+                                                        onClick={() => handleDeleteProductType(type.id)}
+                                                    >
+                                                        <img
+                                                            src="/Icons for functions/free-icon-recycle-bin-3156999.png"
+                                                            alt="Delete"
+                                                        />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
                         </Card.Body>
                     </Card>
                 </Col>
 
                 <Col md={4}>
-                    <Card className="mb-4 shadow-sm">
+                    <Card className="shadow-sm">
                         <Card.Body>
-                            <Card.Title>Додати новий тип продукту</Card.Title>
+                            <Card.Title className="mb-3">Додати тип продукту</Card.Title>
                             <Form onSubmit={handleAddProductType}>
-                                <Form.Group controlId="formNewTypeName">
-                                    <Form.Label>Назва типу</Form.Label>
+                                <Form.Group>
                                     <Form.Control
                                         type="text"
+                                        placeholder="Введіть назву типу"
                                         value={newTypeName}
                                         onChange={(e) => setNewTypeName(e.target.value)}
-                                        required
+                                        className="mb-3"
                                     />
+                                    <Button type="submit" variant="primary" className="w-100">
+                                        Додати
+                                    </Button>
                                 </Form.Group>
-                                <Button variant="primary" type="submit" className="mt-3">Додати</Button>
                             </Form>
                         </Card.Body>
                     </Card>
                 </Col>
             </Row>
-
-            {error && <div className="error">Error: {error.message}</div>}
         </Container>
     );
 };

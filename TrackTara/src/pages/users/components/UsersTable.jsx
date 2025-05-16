@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import UsersTableRow from './UsersTableRow';
 import RegisterUserModal from './usersModals/RegisterUserModal.jsx';
 import { getUsers } from '../../../store/state/actions/userActions';
+import { Button } from 'react-bootstrap';
 
 const UsersTable = () => {
   const userList = useSelector((state) => state.users.userList);
@@ -22,25 +23,35 @@ const UsersTable = () => {
   };
 
   return (
-      <>
-        <button onClick={handleOpenModal}>Create User</button>
-        <RegisterUserModal open={isModalOpen} onClose={handleCloseModal} />
-        <table className="table">
+    <div className="container mt-4">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <Button variant="primary" onClick={handleOpenModal}>
+          Додати користувача
+        </Button>
+      </div>
+
+      {userList.length === 0 ? (
+        <div className="table-empty-state">Користувачі відсутні</div>
+      ) : (
+        <table className="custom-table">
           <thead>
-          <tr>
-            <th>Ім&#39;я</th>
-            <th>Email</th>
-            <th>Ролі</th>
-            <th>Дії</th>
-          </tr>
+            <tr>
+              <th className="text-center">Ім'я</th>
+              <th className="text-center">Email</th>
+              <th className="text-center">Ролі</th>
+              <th className="text-center" style={{ width: '100px' }}>Дії</th>
+            </tr>
           </thead>
           <tbody>
-          {userList.map((user) => (
+            {userList.map((user) => (
               <UsersTableRow key={user.id} user={user} roleList={roleList} />
-          ))}
+            ))}
           </tbody>
         </table>
-      </>
+      )}
+
+      <RegisterUserModal open={isModalOpen} onClose={handleCloseModal} />
+    </div>
   );
 };
 
