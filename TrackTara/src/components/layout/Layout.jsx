@@ -1,6 +1,6 @@
 import React, { memo } from "react";
 import { Outlet } from "react-router-dom";
-import Header from "./Header";
+import Navbar from "./Header";
 import Footer from "./Footer";
 import "./layout.css";
 import AppSettingsHandler from "./AppSettingsHandler";
@@ -9,13 +9,13 @@ const Layout = memo(() => {
   return (
     <>
       <AppSettingsHandler />
-      <div className="wrapper">
-        <Header />
-        <div className="containerLayout">
+      <div className="navbar-container">
+        <Navbar />
+        <main className="main-content">
           <Outlet />
-        </div>
-        <Footer />
+        </main>
       </div>
+      <Footer />
     </>
   );
 });

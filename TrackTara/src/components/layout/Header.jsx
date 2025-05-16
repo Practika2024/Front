@@ -1,20 +1,30 @@
 import React, { memo, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import HeadersLinks from "./HeadersLinks";
 import useActions from "../../hooks/useActions";
 import { isEmailConfirmed } from "../../store/state/actions/userActions";
-import { Avatar, IconButton, Drawer } from "@mui/material";
+import { IconButton } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
+import { FaSun, FaMoon } from 'react-icons/fa';
 import './layout.css';
 
-const Header = memo(() => {
+const Navbar = memo(() => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { logoutUser } = useActions();
   const currentUser = useSelector((store) => store.user.currentUser);
   const isAuthenticated = useSelector((store) => store.user.isAuthenticated);
   const [emailConfirmed, setEmailConfirmed] = useState(true);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+
+  const userRoles = currentUser ? (Array.isArray(currentUser.role) ? currentUser.role : [currentUser.role]) : [];
+
+  useEffect(() => {
+    document.body.classList.remove('theme-light', 'theme-dark');
+    document.body.classList.add(`theme-${theme}`);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   useEffect(() => {
     const checkEmailConfirmation = async () => {
@@ -35,58 +45,111 @@ const Header = memo(() => {
     navigate("/");
   };
 
-  // Відкриття/закриття сайдбару
-  const handleDrawerOpen = () => setDrawerOpen(true);
-  const handleDrawerClose = () => setDrawerOpen(false);
+  const toggleNavbar = () => setIsOpen(!isOpen);
+  const toggleTheme = () => setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+
+  const isActive = (path) => {
+    if (path === "/") return location.pathname === "/";
+    return location.pathname.startsWith(path);
+  };
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
-    <header className="custom-header shadow-sm">
-      <div className="header-left">
-        {/* Бургер-іконка для мобільного меню */}
-        <div className="burger-menu">
-          <IconButton onClick={handleDrawerOpen} className="burger-btn" size="large">
-            <MenuIcon fontSize="inherit" />
+    <>
+      <button className="navbar-toggle" onClick={toggleNavbar}>
+        <MenuIcon />
+      </button>
+      <div className={`navbar ${isOpen ? 'open' : ''}`}>
+        <div className="navbar-theme-toggle" style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: '0 24px 12px 24px'}}>
+          <IconButton aria-label="Змінити тему" onClick={toggleTheme} size="small">
+            {theme === 'light' ? <FaMoon size={20} /> : <FaSun size={20} />}
           </IconButton>
         </div>
-        <HeadersLinks hideLinksOnMobile />
+        <Link to="/" className="navbar-brand">
+          <img src="/image-removebg-preview.png" alt="TrackTara Logo" />
+          <h5>TrackTara</h5>
+        </Link>
+        <nav>
+          <div className="navbar-section">
+            <div className="navbar-section-title">Основне</div>
+            <ul className="navbar-nav">
+              <li className="navbar-item">
+                <Link to="/" className={`navbar-link ${isActive('/') ? 'active' : ''}`}>
+                  Головна
+                </Link>
+              </li>
+            </ul>
           </div>
-      <div className="header-right">
-            {isAuthenticated ? (
-                <div className="dropdown">
-            <button
-              className="dropdown-toggle user-btn"
-                      id="navbarDropdownMenuAvatar"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
-            >
-              <Avatar sx={{ width: 32, height: 32, bgcolor: '#1976d2', marginRight: 1 }}>
-                {currentUser.email?.[0]?.toUpperCase() || '?'}
-              </Avatar>
-              <span className="user-email">{currentUser.email}</span>
-            </button>
-            <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
-                    {!emailConfirmed && (
-                        <li>
-                  <button className="dropdown-item" onClick={() => navigate("/email-confirmation")}>Підтвердити Email</button>
-                        </li>
-                    )}
-                    <li>
-                <button className="dropdown-item" onClick={logoutHandler}>Вихід</button>
-                    </li>
-                  </ul>
-                </div>
-            ) : (
-          <Link to="/login" className="btn btn-outline-primary">Вхід/Реєстрація</Link>
+          {(userRoles.includes("Operator") || userRoles.includes("Administrator")) && (
+            <div className="navbar-section">
+              <div className="navbar-section-title">Управління</div>
+              <ul className="navbar-nav">
+                <li className="navbar-item">
+                  <Link to="/tare" className={`navbar-link ${isActive('/tare') ? 'active' : ''}`}>
+                    Контейнери
+                  </Link>
+                </li>
+                <li className="navbar-item">
+                  <Link to="/products" className={`navbar-link ${isActive('/products') ? 'active' : ''}`}>
+                    Продукти
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          )}
+          {userRoles.includes("Administrator") && (
+            <div className="navbar-section">
+              <div className="navbar-section-title">Адміністрування</div>
+              <ul className="navbar-nav">
+                <li className="navbar-item">
+                  <Link to="/productType" className={`navbar-link ${isActive('/productType') ? 'active' : ''}`}>
+                    Типи продуктів
+                  </Link>
+                </li>
+                <li className="navbar-item">
+                  <Link to="/container/containerTypes" className={`navbar-link ${isActive('/container/containerTypes') ? 'active' : ''}`}>
+                    Типи контейнерів
+                  </Link>
+                </li>
+                <li className="navbar-item">
+                  <Link to="/users" className={`navbar-link ${isActive('/users') ? 'active' : ''}`}>
+                    Користувачі
+                  </Link>
+                </li>
+                <li className="navbar-item">
+                  <Link to="/approval-requests" className={`navbar-link ${isActive('/approval-requests') ? 'active' : ''}`}>
+                    Підтвердження
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          )}
+        </nav>
+        <div className="navbar-footer">
+          <div className="user-section">
+            <span className="user-email">{currentUser.email}</span>
+            {!emailConfirmed && (
+              <button 
+                className="navbar-link" 
+                onClick={() => navigate("/email-confirmation")}
+                style={{ color: '#dc3545' }}
+              >
+                <i className="fas fa-envelope"></i>
+                Підтвердити Email
+              </button>
             )}
+            <button className="logout-btn" onClick={logoutHandler}>
+              <i className="fas fa-sign-out-alt"></i>
+              Вихід
+            </button>
           </div>
-      {/* Drawer для мобільного меню */}
-      <Drawer anchor="left" open={drawerOpen} onClose={handleDrawerClose}>
-        <div style={{ width: 260, padding: 16 }} onClick={handleDrawerClose}>
-          <HeadersLinks isSidebar />
         </div>
-      </Drawer>
-    </header>
+      </div>
+    </>
   );
 });
 
-export default Header;
+export default Navbar;
