@@ -19,6 +19,7 @@ const ProductSelectModal = ({
                     onChange={(opt) => setSelectedProductId(opt?.value)}
                     placeholder="Пошук за назвою"
                     isClearable
+                    classNamePrefix="select"
                 />
             </Modal.Body>
             <Modal.Footer>

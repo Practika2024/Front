@@ -1066,3 +1066,543 @@ body, html {
   color: #f7f9fb !important;
   border: 1px solid #333a45 !important;
 }
+
+/* Стилі для CRUD сторінок */
+.form-control, .form-select {
+  background-color: var(--color-bg-navbar) !important;
+  color: var(--color-main-text) !important;
+  border-color: var(--color-navbar-border) !important;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--color-navbar-link-active) !important;
+  box-shadow: 0 0 0 0.2rem rgba(25, 118, 210, 0.25) !important;
+}
+
+.form-label {
+  color: var(--color-main-text) !important;
+}
+
+.form-text {
+  color: var(--color-secondary-text) !important;
+}
+
+/* Стилі для карток на CRUD сторінках */
+.card {
+  background-color: var(--color-bg-navbar) !important;
+  border-color: var(--color-navbar-border) !important;
+}
+
+.card-header {
+  background-color: var(--color-bg-navbar) !important;
+  border-bottom-color: var(--color-navbar-border) !important;
+  color: var(--color-main-text) !important;
+}
+
+.card-footer {
+  background-color: var(--color-bg-navbar) !important;
+  border-top-color: var(--color-navbar-border) !important;
+}
+
+/* Стилі для кнопок на CRUD сторінках */
+.btn-secondary {
+  background-color: var(--color-secondary-text) !important;
+  border-color: var(--color-secondary-text) !important;
+  color: var(--color-bg-navbar) !important;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-secondary-text) !important;
+  border-color: var(--color-secondary-text) !important;
+  opacity: 0.9;
+}
+
+.btn-danger {
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  color: #fff !important;
+}
+
+.btn-danger:hover {
+  background-color: #c82333 !important;
+  border-color: #bd2130 !important;
+}
+
+/* Стилі для алертів */
+.alert {
+  background-color: var(--color-bg-navbar) !important;
+  border-color: var(--color-navbar-border) !important;
+  color: var(--color-main-text) !important;
+}
+
+.alert-success {
+  border-left: 4px solid #28a745 !important;
+}
+
+.alert-danger {
+  border-left: 4px solid #dc3545 !important;
+}
+
+.alert-warning {
+  border-left: 4px solid #ffc107 !important;
+}
+
+.alert-info {
+  border-left: 4px solid #17a2b8 !important;
+}
+
+/* Стилі для модальних вікон */
+.modal-content {
+  background-color: var(--color-bg-navbar) !important;
+  border-color: var(--color-navbar-border) !important;
+  color: var(--color-main-text) !important;
+}
+
+.modal-header {
+  background-color: var(--color-bg-navbar) !important;
+  border-bottom-color: var(--color-navbar-border) !important;
+  color: var(--color-main-text) !important;
+}
+
+.modal-title {
+  color: var(--color-main-text) !important;
+  font-weight: 600 !important;
+}
+
+.modal-body {
+  background-color: var(--color-bg-navbar) !important;
+  color: var(--color-main-text) !important;
+  padding: 1.5rem !important;
+}
+
+.modal-footer {
+  background-color: var(--color-bg-navbar) !important;
+  border-top-color: var(--color-navbar-border) !important;
+  padding: 1rem !important;
+}
+
+.modal .btn-close {
+  color: var(--color-main-text) !important;
+  opacity: 0.7 !important;
+  transition: opacity 0.2s !important;
+}
+
+.modal .btn-close:hover {
+  opacity: 1 !important;
+}
+
+.modal .btn-secondary {
+  background-color: var(--color-secondary-text) !important;
+  border-color: var(--color-secondary-text) !important;
+  color: var(--color-bg-navbar) !important;
+}
+
+.modal .btn-secondary:hover {
+  opacity: 0.9 !important;
+  transform: translateY(-1px) !important;
+}
+
+.modal .btn-danger {
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  color: #fff !important;
+}
+
+.modal .btn-danger:hover {
+  background-color: #c82333 !important;
+  border-color: #bd2130 !important;
+  transform: translateY(-1px) !important;
+}
+
+.modal .btn-primary {
+  background-color: var(--color-btn-primary) !important;
+  border-color: var(--color-btn-primary) !important;
+  color: var(--color-btn-primary-text) !important;
+}
+
+.modal .btn-primary:hover {
+  opacity: 0.9 !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Стилі для інпутів з помилками */
+.is-invalid {
+  border-color: #dc3545 !important;
+}
+
+.invalid-feedback {
+  color: #dc3545 !important;
+}
+
+/* Стилі для випадаючих списків */
+.dropdown-menu {
+  background-color: var(--color-bg-navbar) !important;
+  border-color: var(--color-navbar-border) !important;
+}
+
+.dropdown-item {
+  color: var(--color-main-text) !important;
+}
+
+.dropdown-item:hover {
+  background-color: var(--color-navbar-link-bg-hover) !important;
+  color: var(--color-navbar-link-hover) !important;
+}
+
+.dropdown-divider {
+  border-top-color: var(--color-navbar-border) !important;
+}
+
+/* Стилі для підказок */
+.tooltip {
+  background-color: var(--color-bg-navbar) !important;
+  border-color: var(--color-navbar-border) !important;
+  color: var(--color-main-text) !important;
+}
+
+/* Стилі для чекбоксів та радіо кнопок */
+.form-check-input {
+  background-color: var(--color-bg-navbar) !important;
+  border-color: var(--color-navbar-border) !important;
+}
+
+.form-check-input:checked {
+  background-color: var(--color-navbar-link-active) !important;
+  border-color: var(--color-navbar-link-active) !important;
+}
+
+.form-check-label {
+  color: var(--color-main-text) !important;
+}
+
+/* Стилі для пошуку та фільтрів */
+.search-input, .filter-input {
+  background-color: var(--color-bg-navbar) !important;
+  color: var(--color-main-text) !important;
+  border-color: var(--color-navbar-border) !important;
+}
+
+.search-input::placeholder, .filter-input::placeholder {
+  color: var(--color-secondary-text) !important;
+}
+
+/* Стилі для пагінації на CRUD сторінках */
+.pagination .page-link {
+  background-color: var(--color-bg-navbar) !important;
+  border-color: var(--color-navbar-border) !important;
+  color: var(--color-main-text) !important;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: var(--color-navbar-link-active) !important;
+  border-color: var(--color-navbar-link-active) !important;
+  color: var(--color-btn-primary-text) !important;
+}
+
+.pagination .page-link:hover {
+  background-color: var(--color-navbar-link-bg-hover) !important;
+  color: var(--color-navbar-link-hover) !important;
+}
+
+/* Стилі для таблиць на CRUD сторінках */
+.table-responsive {
+  background-color: var(--color-bg-navbar) !important;
+  border-color: var(--color-navbar-border) !important;
+}
+
+.table th {
+  background-color: var(--color-table-header-bg) !important;
+  color: var(--color-table-header-text) !important;
+  border-bottom-color: var(--color-table-border) !important;
+}
+
+.table td {
+  color: var(--color-main-text) !important;
+  border-bottom-color: var(--color-table-border) !important;
+}
+
+.table tbody tr:hover {
+  background-color: var(--color-table-row-hover) !important;
+}
+
+/* Стилі для порожнього стану */
+.empty-state {
+  color: var(--color-secondary-text) !important;
+  background-color: var(--color-bg-navbar) !important;
+  border-color: var(--color-navbar-border) !important;
+}
+
+/* Стилі для завантаження файлів */
+.custom-file-input {
+  background-color: var(--color-bg-navbar) !important;
+  color: var(--color-main-text) !important;
+  border-color: var(--color-navbar-border) !important;
+}
+
+.custom-file-label {
+  background-color: var(--color-bg-navbar) !important;
+  color: var(--color-main-text) !important;
+  border-color: var(--color-navbar-border) !important;
+}
+
+/* Стилі для селектів з пошуком */
+.select2-container--default .select2-selection--single {
+  background-color: var(--color-bg-navbar) !important;
+  border-color: var(--color-navbar-border) !important;
+  color: var(--color-main-text) !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  color: var(--color-main-text) !important;
+}
+
+.select2-dropdown {
+  background-color: var(--color-bg-navbar) !important;
+  border-color: var(--color-navbar-border) !important;
+}
+
+.select2-container--default .select2-results__option {
+  color: var(--color-main-text) !important;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+  background-color: var(--color-navbar-link-bg-hover) !important;
+  color: var(--color-navbar-link-hover) !important;
+}
+
+/* Стилі для моделей контейнерів */
+.container-modal {
+  background-color: var(--color-bg-navbar) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+.container-modal .modal-header {
+  background-color: var(--color-bg-navbar) !important;
+  border-bottom: 1px solid var(--color-navbar-border) !important;
+  padding: 16px 24px !important;
+}
+
+.container-modal .modal-title {
+  color: var(--color-main-text) !important;
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+}
+
+.container-modal .modal-body {
+  background-color: var(--color-bg-navbar) !important;
+  color: var(--color-main-text) !important;
+  padding: 24px !important;
+}
+
+.container-modal .modal-footer {
+  background-color: var(--color-bg-navbar) !important;
+  border-top: 1px solid var(--color-navbar-border) !important;
+  padding: 16px 24px !important;
+}
+
+/* Стилі для форм в моделях контейнерів */
+.container-modal .form-group {
+  margin-bottom: 1.5rem !important;
+}
+
+.container-modal .form-label {
+  color: var(--color-main-text) !important;
+  font-weight: 500 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.container-modal .form-control {
+  background-color: var(--color-bg) !important;
+  border: 1px solid var(--color-navbar-border) !important;
+  color: var(--color-main-text) !important;
+  padding: 0.75rem 1rem !important;
+  border-radius: 8px !important;
+  transition: all 0.2s !important;
+}
+
+.container-modal .form-control:focus {
+  border-color: var(--color-navbar-link-active) !important;
+  box-shadow: 0 0 0 0.2rem rgba(25, 118, 210, 0.15) !important;
+}
+
+.container-modal .form-select {
+  background-color: var(--color-bg) !important;
+  border: 1px solid var(--color-navbar-border) !important;
+  color: var(--color-main-text) !important;
+  padding: 0.75rem 1rem !important;
+  border-radius: 8px !important;
+}
+
+.container-modal .form-select:focus {
+  border-color: var(--color-navbar-link-active) !important;
+  box-shadow: 0 0 0 0.2rem rgba(25, 118, 210, 0.15) !important;
+}
+
+/* Стилі для кнопок в моделях контейнерів */
+.container-modal .btn {
+  padding: 0.75rem 1.5rem !important;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  transition: all 0.2s !important;
+}
+
+.container-modal .btn-primary {
+  background-color: var(--color-btn-primary) !important;
+  border-color: var(--color-btn-primary) !important;
+  color: var(--color-btn-primary-text) !important;
+}
+
+.container-modal .btn-primary:hover {
+  opacity: 0.9 !important;
+  transform: translateY(-1px) !important;
+}
+
+.container-modal .btn-secondary {
+  background-color: var(--color-secondary-text) !important;
+  border-color: var(--color-secondary-text) !important;
+  color: var(--color-bg-navbar) !important;
+}
+
+.container-modal .btn-secondary:hover {
+  opacity: 0.9 !important;
+  transform: translateY(-1px) !important;
+}
+
+.container-modal .btn-outline-primary {
+  background-color: transparent !important;
+  border: 1.5px solid var(--color-btn-primary) !important;
+  color: var(--color-btn-primary) !important;
+}
+
+.container-modal .btn-outline-primary:hover {
+  background-color: var(--color-btn-primary) !important;
+  color: var(--color-btn-primary-text) !important;
+}
+
+/* Стилі для помилок в моделях контейнерів */
+.container-modal .invalid-feedback {
+  color: #dc3545 !important;
+  font-size: 0.875rem !important;
+  margin-top: 0.25rem !important;
+}
+
+.container-modal .is-invalid {
+  border-color: #dc3545 !important;
+}
+
+.container-modal .is-invalid:focus {
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.15) !important;
+}
+
+/* Стилі для підказок в моделях контейнерів */
+.container-modal .form-text {
+  color: var(--color-secondary-text) !important;
+  font-size: 0.875rem !important;
+  margin-top: 0.25rem !important;
+}
+
+/* Стилі для чекбоксів в моделях контейнерів */
+.container-modal .form-check {
+  margin-bottom: 1rem !important;
+}
+
+.container-modal .form-check-input {
+  background-color: var(--color-bg) !important;
+  border: 1.5px solid var(--color-navbar-border) !important;
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+  margin-top: 0.15rem !important;
+}
+
+.container-modal .form-check-input:checked {
+  background-color: var(--color-navbar-link-active) !important;
+  border-color: var(--color-navbar-link-active) !important;
+}
+
+.container-modal .form-check-label {
+  color: var(--color-main-text) !important;
+  font-size: 0.9375rem !important;
+  padding-left: 0.5rem !important;
+}
+
+/* Стилі для закриття моделі */
+.container-modal .btn-close {
+  color: var(--color-main-text) !important;
+  opacity: 0.7 !important;
+  transition: opacity 0.2s !important;
+}
+
+.container-modal .btn-close:hover {
+  opacity: 1 !important;
+}
+
+/* Стилі для оверлею моделі */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+.modal-backdrop.show {
+  opacity: 1 !important;
+}
+
+/* Адаптивні стилі для моделей контейнерів */
+@media (max-width: 768px) {
+  .container-modal .modal-dialog {
+    margin: 0.5rem !important;
+  }
+  
+  .container-modal .modal-body {
+    padding: 16px !important;
+  }
+  
+  .container-modal .modal-footer {
+    padding: 12px 16px !important;
+  }
+  
+  .container-modal .btn {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.875rem !important;
+  }
+}
+
+/* Стилі для react-select в темній темі (контрастні опції) */
+.theme-dark .select__menu {
+  background-color: #23272f !important;
+  border: 1px solid var(--color-navbar-border) !important;
+}
+.theme-dark .select__option {
+  background-color: #23272f !important;
+  color: #f7f9fb !important;
+  cursor: pointer !important;
+}
+.theme-dark .select__option--is-focused {
+  background-color: #31343b !important;
+  color: #ffd600 !important;
+}
+.theme-dark .select__option--is-selected {
+  background-color: #ffd600 !important;
+  color: #23272f !important;
+}
+.theme-dark .select__single-value {
+  color: #f7f9fb !important;
+}
+.theme-dark .select__placeholder {
+  color: #b0b8c1 !important;
+}
+.theme-dark .select__input {
+  color: #f7f9fb !important;
+}
+.theme-dark .select__indicator {
+  color: #f7f9fb !important;
+}
+.theme-dark .select__indicator:hover {
+  color: #ffd600 !important;
+}
+.theme-dark .select__menu-list {
+  padding: 4px 0 !important;
+}
+.theme-dark .select__menu-notice {
+  color: #b0b8c1 !important;
+  padding: 8px 12px !important;
+}
