@@ -983,3 +983,38 @@ body, html {
 .theme-toggle-btn:hover {
   filter: brightness(1.1);
 }
+
+.theme-dark .navbar-link {
+  color: #f7f9fb !important;
+}
+.theme-dark .navbar-link.active {
+  color: #ffd600 !important;
+  background: #23272f !important;
+}
+.theme-dark .navbar-link:hover {
+  color: #ffd600 !important;
+  background: #23272f !important;
+}
+
+.theme-dark .display-4,
+.theme-dark .fw-bold,
+.theme-dark h1,
+.theme-dark h2,
+.theme-dark h3,
+.theme-dark h4,
+.theme-dark h5,
+.theme-dark h6 {
+  color: #f7f9fb !important;
+}
+.theme-dark .lead,
+.theme-dark .text-muted,
+.theme-dark p {
+  color: #b0b8c1 !important;
+}
+
+.theme-dark .card,
+.theme-dark .card-body {
+  background: #23272f !important;
+  color: #f7f9fb !important;
+  border: 1px solid #333a45 !important;
+}
