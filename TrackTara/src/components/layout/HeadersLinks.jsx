@@ -1,31 +1,42 @@
 import React, { memo, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { isEmailConfirmed } from "../../store/state/actions/userActions";
 
-const HeadersLinks = () => {
+const HeadersLinks = ({ hideLinksOnMobile, isSidebar }) => {
     const user = useSelector((state) => state.user.currentUser);
     const userRoles = user ? (Array.isArray(user.role) ? user.role : [user.role]) : [];
     const [emailConfirmed, setEmailConfirmed] = useState(false);
     const dispatch = useDispatch();
     const currentUser = useSelector((store) => store.user.currentUser);
     const userId = currentUser?.id;
+    const location = useLocation();
 
     useEffect(() => {
         const checkEmailStatus = async () => {
             if (userId) {
-                const confirmed = await isEmailConfirmed(userId); // ← ДОДАНИЙ ВИКЛИК
-                console.log("Email підтверджений:", confirmed);
+                const confirmed = await isEmailConfirmed(userId);
                 setEmailConfirmed(confirmed);
             }
         };
-
         checkEmailStatus();
     }, [userId]);
 
+    // Функція для визначення активної вкладки
+    const isActive = (path) => {
+        if (path === "/") return location.pathname === "/";
+        return location.pathname.startsWith(path);
+    };
+
+    const navClass = isSidebar ? 'sidebar-nav' : `header-nav${hideLinksOnMobile ? ' hide-on-mobile' : ''}`;
+    const linkClass = (path) => {
+        let base = isSidebar ? 'sidebar-nav-link' : 'header-nav-link';
+        if (isActive(path)) base += ' active';
+        return base;
+    };
 
     return (
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
+        <nav className="header-links-nav">
             <Link className="navbar-brand d-flex align-items-center" to="/">
                 <img
                     src="/image-removebg-preview.png"
@@ -35,39 +46,38 @@ const HeadersLinks = () => {
                 />
                 <h5 className="navbar-title fs-5 ms-3 mb-0">TaraTrack</h5>
             </Link>
-            <ul className="navbar-nav ms-auto mb-2 mb-lg-0 gap-3">
-                <li className="nav-item">
-                    <Link className="nav-link fs-5" to="/">Головна</Link>
+            <ul className={navClass}>
+                <li>
+                    <Link className={linkClass("/")} to="/">Головна</Link>
                 </li>
-                {userRoles.includes("Operator") || userRoles.includes("Administrator") ? (
+                {(userRoles.includes("Operator") || userRoles.includes("Administrator")) && (
                     <>
-                        <li className="nav-item">
-                            <Link className="nav-link fs-5" to="/tare">Контейнери</Link>
+                        <li>
+                            <Link className={linkClass("/tare")} to="/tare">Контейнери</Link>
                         </li>
-
-                        <li className="nav-item">
-                            <Link className="nav-link fs-5" to="/products">Продукти</Link>
+                        <li>
+                            <Link className={linkClass("/products")} to="/products">Продукти</Link>
                         </li>
                     </>
-                ) : null}
-                {userRoles.includes("Administrator") ? (
+                )}
+                {userRoles.includes("Administrator") && (
                     <>
-                        <li className="nav-item">
-                            <Link className="nav-link fs-5" to="/productType">Типи продуктів</Link>
+                        <li>
+                            <Link className={linkClass("/productType")} to="/productType">Типи продуктів</Link>
                         </li>
-                        <li className="nav-item">
-                            <Link className="nav-link fs-5" to="/container/containerTypes">Типи контейнерів</Link>
+                        <li>
+                            <Link className={linkClass("/container/containerTypes")} to="/container/containerTypes">Типи контейнерів</Link>
                         </li>
-                        <li className="nav-item">
-                            <Link className="nav-link fs-5" to="/users">Користувачі</Link>
+                        <li>
+                            <Link className={linkClass("/users")} to="/users">Користувачі</Link>
                         </li>
-                        <li className="nav-item">
-                            <Link className="nav-link fs-5" to="/approval-requests">Підтвердження</Link>
+                        <li>
+                            <Link className={linkClass("/approval-requests")} to="/approval-requests">Підтвердження</Link>
                         </li>
                     </>
-                ) : null}
+                )}
             </ul>
-        </div>
+        </nav>
     );
 };
 
