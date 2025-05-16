@@ -40,6 +40,19 @@ const Navbar = memo(() => {
     }
   }, [currentUser]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 992) {
+        setIsOpen(false);
+      } else {
+        setIsOpen(true);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Run on mount
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const logoutHandler = () => {
     logoutUser();
     navigate("/");
