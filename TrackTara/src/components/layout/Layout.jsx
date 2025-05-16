@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "./Header";
 import Footer from "./Footer";
@@ -6,12 +6,27 @@ import "./layout.css";
 import AppSettingsHandler from "./AppSettingsHandler";
 
 const Layout = memo(() => {
+  const [isOpen, setIsOpen] = useState(true);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 992) {
+        setIsOpen(false);
+      } else {
+        setIsOpen(true);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Run on mount
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <>
       <AppSettingsHandler />
       <div className="navbar-container">
-        <Navbar />
-        <main className="main-content">
+        <Navbar isOpen={isOpen} setIsOpen={setIsOpen} />
+        <main className={`main-content${isOpen ? ' menu-open' : ''}`}>
           <Outlet />
         </main>
       </div>

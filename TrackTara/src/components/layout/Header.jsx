@@ -8,14 +8,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import { FaSun, FaMoon } from 'react-icons/fa';
 import './layout.css';
 
-const Navbar = memo(() => {
+const Navbar = memo(({ isOpen, setIsOpen }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { logoutUser } = useActions();
   const currentUser = useSelector((store) => store.user.currentUser);
   const isAuthenticated = useSelector((store) => store.user.isAuthenticated);
   const [emailConfirmed, setEmailConfirmed] = useState(true);
-  const [isOpen, setIsOpen] = useState(true);
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
 
   const userRoles = currentUser ? (Array.isArray(currentUser.role) ? currentUser.role : [currentUser.role]) : [];

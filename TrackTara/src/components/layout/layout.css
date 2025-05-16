@@ -97,6 +97,7 @@ body, html {
   min-width: 0;
   width: 100%;
   margin-left: 0;
+  background: var(--color-bg);
 }
 
 .custom-table {
@@ -876,6 +877,9 @@ body, html {
 }
 
 @media (max-width: 992px) {
+  .navbar-container {
+    display: block;
+  }
   .navbar {
     width: 220px !important;
     min-width: 180px !important;
@@ -896,37 +900,11 @@ body, html {
   .navbar.open {
     transform: translateX(0);
   }
-  .navbar-section,
-  .navbar-sections-wrapper,
-  .navbar-nav,
-  .user-section {
-    width: 100%;
-    align-items: flex-start;
-    text-align: left;
-  }
-  .navbar-brand {
-    width: 100%;
-    justify-content: flex-start;
-    padding-left: 24px;
-    padding-right: 0;
-  }
-  .navbar-section-title {
-    padding-left: 24px;
-    padding-right: 0;
-  }
-  .navbar-link,
-  .logout-btn {
-    width: 100%;
-    text-align: left;
-    justify-content: flex-start;
-    padding-left: 24px;
-    padding-right: 0;
-  }
   .main-content {
-    transition: margin-left 0.3s;
     margin-left: 0;
     width: 100%;
     padding: 16px;
+    transition: margin-left 0.3s;
   }
   .main-content.menu-open {
     margin-left: 220px;
