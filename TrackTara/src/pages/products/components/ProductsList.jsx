@@ -58,6 +58,7 @@ const ProductsList = () => {
       <table className="custom-table">
         <thead>
           <tr>
+            <th className="text-start">Фото</th>
             <th className="text-start">Назва</th>
             <th className="text-start">Опис</th>
             <th className="text-start">Дата виробництва</th>
@@ -67,6 +68,33 @@ const ProductsList = () => {
         <tbody>
           {products.map((product) => (
             <tr key={product.id}>
+              <td className="text-start">
+                {product.images && product.images.length > 0 && (
+                  <div
+                    onMouseEnter={() => {
+                      setHoveredProductId(product.id);
+                      setCurrentImageIndex((prevState) => ({
+                        ...prevState,
+                        [product.id]: 0,
+                      }));
+                    }}
+                    onMouseLeave={() => setHoveredProductId(null)}
+                  >
+                    <img
+                      src={product.images[currentImageIndex[product.id] || 0].filePath}
+                      alt={product.name}
+                      style={{
+                        width: "50px",
+                        height: "50px",
+                        objectFit: "cover",
+                        transition: "opacity 0.5s ease-in-out",
+                        borderRadius: "4px",
+                        border: "1px solid #eee"
+                      }}
+                    />
+                  </div>
+                )}
+              </td>
               <td className="text-start">
                 <Link to={`/product/detail/${product.id}`} className="table-link">
                   {product.name}

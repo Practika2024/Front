@@ -23,6 +23,8 @@ import { fetchProducts } from "../../../../store/state/actions/productActions.js
 import { fetchAllContainerHistories } from "../../../../store/state/actions/containerHistoryActions.js";
 import { addReminder } from "../../../../store/state/actions/reminderActions";
 import { Form } from "react-bootstrap";
+import ContainerReminderModal from '../tareModals/ContainerReminderModal';
+
 const ContainerDetailPage = () => {
   const { containerId } = useParams();
   const navigate = useNavigate();
@@ -41,9 +43,11 @@ const ContainerDetailPage = () => {
   const containerHistory = useSelector((state) => state.containerHistory?.histories || []);
   const [showReminderModal, setShowReminderModal] = useState(false);
   const [reminderForm, setReminderForm] = useState({ title: "", dueDate: "", type: "" });
+
   useEffect(() => {
     console.log("Container History:", containerHistory); // Debugging
   }, [containerHistory]);
+
   useEffect(() => {
     if (!containerId) return;
 
@@ -53,7 +57,6 @@ const ContainerDetailPage = () => {
           getContainerById(containerId),
           getAllContainerTypes(),
         ]);
-
 
         setContainer(tare.payload);
         setContainerTypes(types);
@@ -79,11 +82,13 @@ const ContainerDetailPage = () => {
       console.error("Error refreshing container:", error);
     }
   };
+
   const handleOpenReminderModal = (containerId) => {
     setSelectedContainerId(containerId);
     setReminderForm({ title: "", dueDate: "", type: "" });
     setShowReminderModal(true);
   };
+
   const handleCreateReminder = async () => {
     try {
       const payload = {
@@ -257,6 +262,7 @@ const ContainerDetailPage = () => {
                 onChange={(option) => setSelectedProductId(option?.value || "")}
                 placeholder="Пошук за назвою продукту"
                 isClearable
+                classNamePrefix="select"
             />
           </Modal.Body>
           <Modal.Footer>
@@ -264,41 +270,13 @@ const ContainerDetailPage = () => {
             <Button variant="primary" onClick={handleAddProduct} disabled={!selectedProductId}>Додати продукт</Button>
           </Modal.Footer>
         </Modal>
-        <Modal show={showReminderModal} onHide={() => setShowReminderModal(false)}>
-          <Modal.Header closeButton><Modal.Title>Створити нагадування</Modal.Title></Modal.Header>
-          <Modal.Body>
-            <Form>
-              <Form.Group className="mb-3">
-                <Form.Label>Назва</Form.Label>
-                <Form.Control
-                    type="text"
-                    value={reminderForm.title}
-                    onChange={(e) => setReminderForm({ ...reminderForm, title: e.target.value })}
-                />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Дата</Form.Label>
-                <Form.Control
-                    type="datetime-local"
-                    value={reminderForm.dueDate}
-                    onChange={(e) => setReminderForm({ ...reminderForm, dueDate: e.target.value })}
-                />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Тип</Form.Label>
-                <Form.Control
-                    type="text"
-                    value={reminderForm.type}
-                    onChange={(e) => setReminderForm({ ...reminderForm, type: e.target.value })}
-                />
-              </Form.Group>
-            </Form>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowReminderModal(false)}>Скасувати</Button>
-            <Button variant="primary" onClick={handleCreateReminder}>Зберегти</Button>
-          </Modal.Footer>
-        </Modal>
+        <ContainerReminderModal
+          show={showReminderModal}
+          onHide={() => setShowReminderModal(false)}
+          form={reminderForm}
+          setForm={setReminderForm}
+          onSubmit={handleCreateReminder}
+        />
         <Modal show={showRemoveProductModal} onHide={() => setShowRemoveProductModal(false)}>
           <Modal.Header closeButton>
             <Modal.Title>Видалення продукту</Modal.Title>
