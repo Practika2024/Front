@@ -79,7 +79,7 @@ const Navbar = memo(({ isOpen, setIsOpen }) => {
         </button>
       )}
       {isOpen && (
-        <div className={`navbar${theme === 'dark' ? ' navbar-dark' : ''}`}>
+        <div className={`navbar${theme === 'dark' ? ' navbar-dark' : ''} open`}>
           <button className="navbar-close-btn" onClick={closeNavbar} aria-label="Закрити меню">
             <CloseIcon fontSize="inherit" />
           </button>

@@ -878,7 +878,7 @@ body, html {
 
 @media (max-width: 992px) {
   .navbar-container {
-    display: block;
+    display: flex;
   }
   .navbar {
     width: 220px !important;
@@ -901,17 +901,25 @@ body, html {
     transform: translateX(0);
   }
   .main-content {
-    margin-left: 0;
+    margin-left: 0 !important;
     width: 100%;
     padding: 16px;
     transition: margin-left 0.3s;
   }
-  .main-content.menu-open {
-    margin-left: 220px;
-  }
   .header-container {
     padding-left: 16px;
     padding-right: 16px;
+  }
+  /* Overlay backdrop for navbar */
+  .navbar-backdrop {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 999;
+  }
+  .navbar.open ~ .navbar-backdrop {
+    display: block;
   }
 }
 

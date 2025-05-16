@@ -26,6 +26,9 @@ const Layout = memo(() => {
       <AppSettingsHandler />
       <div className="navbar-container">
         <Navbar isOpen={isOpen} setIsOpen={setIsOpen} />
+        {isOpen && typeof window !== 'undefined' && window.innerWidth <= 992 && (
+          <div className="navbar-backdrop" onClick={() => setIsOpen(false)} />
+        )}
         <main className={`main-content${isOpen ? ' menu-open' : ''}`}>
           <Outlet />
         </main>
