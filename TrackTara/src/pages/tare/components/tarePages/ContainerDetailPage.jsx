@@ -223,7 +223,7 @@ const ContainerDetailPage = () => {
               <Card.Body>
                 <Card.Title>Історія контейнера</Card.Title>
                 {containerHistory && containerHistory.length > 0 ? (
-                    <Table striped bordered hover>
+                    <Table striped bordered hover className="tare-detail-table">
                       <thead>
                       <tr>
                         <th>#</th>
