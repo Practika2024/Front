@@ -707,6 +707,8 @@ body, html {
     justify-content: center;
     background-color: #e3f0fa;
     border-radius: 12px;
+    margin-left: auto;
+    margin-right: auto;
     margin-bottom: 1rem;
 }
 
