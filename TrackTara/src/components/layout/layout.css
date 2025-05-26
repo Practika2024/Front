@@ -619,19 +619,16 @@ body, html {
 
 /* Стилі для кнопок в таблиці */
 .table-action-btn {
-    padding: 6px;
-    margin: 0 2px;
+    color: #1976d2;
     background: none;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
-    opacity: 0.7;
+    opacity: 0.85;
+    transition: color 0.2s, background 0.2s, opacity 0.2s;
 }
 
 .table-action-btn:hover {
+    color: #1565c0;
+    background: #e3f0fa;
     opacity: 1;
-    background-color: #f1f3f5;
 }
 
 .table-action-btn img {
@@ -1850,7 +1847,7 @@ body, html {
   top: 100%;
   right: 0;
   width: 330px;
-  background: var(--background-color, #fff);
+  background: #fff;
   border: 2px solid #ffd600;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -1862,28 +1859,32 @@ body, html {
 
 .notifications-header {
   padding: 12px 16px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .notifications-header h6 {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
+  color: #222;
 }
 
 .notifications-list {
   max-height: 400px;
   overflow-y: auto;
+  background: #fff;
 }
 
 .notification-item {
   padding: 12px 16px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid #e0e0e0;
   transition: background-color 0.2s ease;
+  background: #f8f9fa;
+  color: #222;
 }
 
 .notification-item:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: #e3f0fa;
 }
 
 .notification-item:last-child {
@@ -1893,7 +1894,7 @@ body, html {
 .notification-item p {
   margin: 0;
   font-size: 14px;
-  color: var(--text-color);
+  color: #1976d2;
 }
 
 .container-type-input {
@@ -1946,8 +1947,8 @@ body, html {
 .notifications-tab {
   padding: 6px 18px;
   border-radius: 8px 8px 0 0;
-  background: transparent;
-  color: #fff;
+  background: #fff;
+  color: #1976d2;
   cursor: pointer;
   font-weight: 500;
   border: 1.5px solid transparent;
@@ -1957,8 +1958,8 @@ body, html {
   opacity: 0.85;
 }
 .notifications-tab:hover {
-  background: #333;
-  color: #ffd600;
+  background: #e3f0fa;
+  color: #1565c0;
   opacity: 1;
 }
 .notifications-tab.active {
@@ -1977,4 +1978,103 @@ body, html {
   background: #ffd600;
   color: #232733;
   border-color: #ffd600;
+}
+
+/* --- Адаптація до темної теми для панелі сповіщень та модалки нагадувань --- */
+.theme-dark .notifications-dropdown-menu {
+  background: #232733;
+  border-color: #ffd600;
+}
+.theme-dark .notifications-header {
+  border-bottom: 1px solid #444;
+}
+.theme-dark .notifications-header h6 {
+  color: #ffd600;
+}
+.theme-dark .notifications-list {
+  background: #232733;
+}
+.theme-dark .notification-item {
+  background: #232733;
+  color: #fff;
+  border-bottom: 1px solid #444;
+}
+.theme-dark .notification-item:hover {
+  background: #2c2f3a;
+}
+.theme-dark .notification-item p {
+  color: #ffd600;
+}
+.theme-dark .table-action-btn {
+  color: #ffd600;
+}
+.theme-dark .table-action-btn:hover {
+  background: #333;
+  color: #fff;
+}
+/* Модалка ContainerReminderModal */
+.theme-dark .modal-content {
+  background: #232733;
+  color: #fff;
+  border: 1.5px solid #ffd600;
+}
+.theme-dark .modal-header,
+.theme-dark .modal-footer {
+  background: #232733;
+  border-color: #444;
+}
+.theme-dark .modal-title {
+  color: #ffd600;
+}
+.theme-dark .form-control,
+.theme-dark .form-select {
+  background: #181c23;
+  color: #fff;
+  border: 1.5px solid #444;
+}
+.theme-dark .form-control:focus,
+.theme-dark .form-select:focus {
+  border-color: #ffd600;
+  box-shadow: 0 0 0 0.2rem rgba(255, 214, 0, 0.15);
+}
+.theme-dark .form-label {
+  color: #ffd600;
+}
+.theme-dark .btn-primary {
+  background: #ffd600;
+  color: #232733;
+  border: none;
+}
+.theme-dark .btn-primary:hover {
+  background: #ffe066;
+  color: #232733;
+}
+.theme-dark .btn-secondary {
+  background: #444;
+  color: #ffd600;
+  border: none;
+}
+.theme-dark .btn-secondary:hover {
+  background: #333;
+  color: #fff;
+}
+
+/* --- Кнопки у модалці ContainerReminderModal для світлої теми --- */
+.modal-content .btn-primary {
+  background: #1976d2;
+  color: #fff;
+  border: none;
+}
+.modal-content .btn-primary:hover {
+  background: #1565c0;
+  color: #fff;
+}
+.modal-content .btn-secondary {
+  background: #f0f2f5;
+  color: #1976d2;
+  border: none;
+}
+.modal-content .btn-secondary:hover {
+  background: #e3f0fa;
+  color: #1976d2;
 }
