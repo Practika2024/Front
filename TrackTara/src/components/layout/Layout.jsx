@@ -1,9 +1,10 @@
 import React, { memo, useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import Navbar from "./Header";
+import Navbar from "./Navbar";
 import Footer from "./Footer";
 import "./layout.css";
 import AppSettingsHandler from "./AppSettingsHandler";
+import Header from "./Header";
 
 const Layout = memo(() => {
   const [isOpen, setIsOpen] = useState(true);
@@ -30,6 +31,7 @@ const Layout = memo(() => {
           <div className="navbar-backdrop" onClick={() => setIsOpen(false)} />
         )}
         <main className={`main-content${isOpen ? ' menu-open' : ''}`}>
+          <Header />
           <Outlet />
         </main>
       </div>

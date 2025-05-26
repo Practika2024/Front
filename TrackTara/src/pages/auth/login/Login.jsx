@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import useActions from "../../../hooks/useActions";
 import { toast } from "react-toastify";
 import GoogleLogin from "../google/GoogleLogin";
+import "./auth.css";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -59,14 +60,11 @@ const Login = () => {
   }, [isAuthenticated, navigate]);
 
   return (
-    <div className="container align-items-center d-flex flex-column my-4">
-      <div className="login-box w-50">
-        <form
-          onSubmit={handleSubmit}
-          className="form d-flex flex-column gap-3 text-start align-items-center"
-        >
+    <div className="auth-container">
+      <div className="auth-box">
+        <form onSubmit={handleSubmit} className="auth-form">
           <h1>Вхід</h1>
-          <div className="form-group w-50">
+          <div className="form-group">
             <label>Email</label>
             <input
               type="email"
@@ -79,7 +77,7 @@ const Login = () => {
               <div className="invalid-feedback">{errors.email}</div>
             )}
           </div>
-          <div className="form-group w-50">
+          <div className="form-group">
             <label>Пароль</label>
             <input
               type="password"
@@ -92,15 +90,20 @@ const Login = () => {
               <div className="invalid-feedback">{errors.password}</div>
             )}
           </div>
-          <button type="submit" className="btn btn-primary w-25">
+          <button type="submit" className="auth-button">
             Увійти
           </button>
-          <div className="register-link">
+          <div className="auth-link">
             <Link to="/register">Ще не маєте акаунта? Зареєструватися</Link>
           </div>
         </form>
+        <div className="google-login-container">
+          <div className="divider">
+            <span>або</span>
+          </div>
+          <GoogleLogin />
+        </div>
       </div>
-      <GoogleLogin />
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import useActions from "../../../hooks/useActions";
 import { toast } from "react-toastify";
 import GoogleLogin from "../google/GoogleLogin";
+import "../login/auth.css";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -65,45 +66,101 @@ const Register = () => {
   }, [isAuthenticated, navigate]);
 
   return (
-    <div className="container align-items-center d-flex flex-column my-4">
-      <div className="register-box w-50">
-        <form
-          onSubmit={handleSubmit}
-          className="form d-flex flex-column gap-3 text-start align-items-center"
-        >
+    <div className="auth-container">
+      <div className="auth-box">
+        <div className="auth-header">
           <h1>Реєстрація</h1>
-          {Object.entries({
-            name: "Ім'я",
-            surname: "Прізвище",
-            patronymic: "По батькові",
-            email: "Email",
-            password: "Пароль",
-          }).map(([field, label]) => (
-            <div className="form-group w-50" key={field}>
-              <label>{label}</label>
+          <p>Створіть свій акаунт</p>
+        </div>
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="form-row">
+            <div className="form-group">
+              <label>Ім'я</label>
               <input
-                type={field === "password" ? "password" : "text"}
-                name={field}
+                type="text"
+                name="name"
                 onChange={handleChange}
-                value={formValues[field]}
-                className={`form-control ${errors[field] ? "is-invalid" : ""}`}
+                value={formValues.name}
+                className={`form-control ${errors.name ? "is-invalid" : ""}`}
+                placeholder="Введіть ім'я"
               />
-              {errors[field] && (
-                <div className="invalid-feedback">{errors[field]}</div>
+              {errors.name && (
+                <div className="invalid-feedback">{errors.name}</div>
               )}
             </div>
-          ))}
-          <button type="submit" className="btn btn-primary w-25">
+            <div className="form-group">
+              <label>Прізвище</label>
+              <input
+                type="text"
+                name="surname"
+                onChange={handleChange}
+                value={formValues.surname}
+                className={`form-control ${errors.surname ? "is-invalid" : ""}`}
+                placeholder="Введіть прізвище"
+              />
+              {errors.surname && (
+                <div className="invalid-feedback">{errors.surname}</div>
+              )}
+            </div>
+          </div>
+          <div className="form-group">
+            <label>По батькові</label>
+            <input
+              type="text"
+              name="patronymic"
+              onChange={handleChange}
+              value={formValues.patronymic}
+              className={`form-control ${errors.patronymic ? "is-invalid" : ""}`}
+              placeholder="Введіть по батькові"
+            />
+            {errors.patronymic && (
+              <div className="invalid-feedback">{errors.patronymic}</div>
+            )}
+          </div>
+          <div className="form-group">
+            <label>Email</label>
+            <input
+              type="email"
+              name="email"
+              onChange={handleChange}
+              value={formValues.email}
+              className={`form-control ${errors.email ? "is-invalid" : ""}`}
+              placeholder="Введіть email"
+            />
+            {errors.email && (
+              <div className="invalid-feedback">{errors.email}</div>
+            )}
+          </div>
+          <div className="form-group">
+            <label>Пароль</label>
+            <input
+              type="password"
+              name="password"
+              onChange={handleChange}
+              value={formValues.password}
+              className={`form-control ${errors.password ? "is-invalid" : ""}`}
+              placeholder="Введіть пароль"
+            />
+            {errors.password && (
+              <div className="invalid-feedback">{errors.password}</div>
+            )}
+          </div>
+          <button type="submit" className="auth-button">
             Зареєструватися
           </button>
-          <div className="login-link">
+          <div className="auth-link">
             <Link to="/login">Вже маєте акаунт? Увійти</Link>
           </div>
         </form>
+        <div className="google-login-container">
+          <div className="divider">
+            <span>або</span>
+          </div>
+          <GoogleLogin />
+        </div>
       </div>
-      <GoogleLogin />
     </div>
   );
 };
 
-export default Register;
+export default Register; 

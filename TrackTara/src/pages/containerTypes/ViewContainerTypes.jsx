@@ -113,7 +113,7 @@ const ViewContainerTypes = () => {
                                         placeholder="Введіть назву типу"
                                         value={newTypeName}
                                         onChange={(e) => setNewTypeName(e.target.value)}
-                                        className="mb-3"
+                                        className="mb-3 container-type-input"
                                     />
                                     <Button type="submit" variant="primary" className="w-100">
                                         Додати

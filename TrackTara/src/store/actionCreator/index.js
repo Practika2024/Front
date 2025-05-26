@@ -7,6 +7,7 @@ import * as AppSettingActions from "../state/actions/appSettingActions";
 import * as FiltersActions from "../state/actions/filtersActions";
 import * as ContainerActions from "../state/actions/containerActions";
 import * as ContainerTypeActions from "../state/actions/containerTypeActions.js";
+import * as ReminderActions from "../state/actions/reminderActions";
 
 const actions = {
   ...UserActionCreators,
@@ -17,7 +18,8 @@ const actions = {
   ...AppSettingActions,
   ...ContainerActions,
   ...ContainerTypeActions,
-  ...FiltersActions
+  ...FiltersActions,
+  ...ReminderActions
 };
 
 export default actions;

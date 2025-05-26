@@ -36,7 +36,7 @@ const GoogleLogin = () => {
         toast.success("Успішний вхід!");
         navigate("/");
       }
-      console.log("JWT Token:", token);
+      console.log("JWT Token:", credential);
     } catch (error) {
       console.error("Error during login:", error.response?.data || error.message);
     }
@@ -65,7 +65,7 @@ const GoogleLogin = () => {
       window.google.accounts.id.initialize({
         client_id: clientId,
         callback: handleLoginSuccess,
-        locale: "en",
+        locale: "uk",
         ux_mode: "popup",
         auto_select: false,
       });
@@ -73,24 +73,18 @@ const GoogleLogin = () => {
       window.google.accounts.id.renderButton(
         document.getElementById("loginGoogleBtn"),
         {
-
-            theme: "outline",
-            size: "large", 
-            shape: "pill",    
-            text: "continue_with",
+          theme: document.body.classList.contains('theme-dark') ? 'filled_black' : 'outline',
+          size: "large",
+          shape: "pill",
+          text: "continue_with",
+          width: 280,
         }
       );
     }
   }, [googleApiLoaded]);
 
   return (
-    <div className="d-flex justify-center align-items-center my-3 mx-3">
-        {googleApiLoaded ? (
-          <div id="loginGoogleBtn">Google</div>
-        ) : (
-          <div>Loading...</div>
-        )}
-    </div>
+    <div id="loginGoogleBtn" style={{ display: 'flex', justifyContent: 'center' }}></div>
   );
 };
 
