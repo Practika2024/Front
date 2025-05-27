@@ -8,13 +8,14 @@ import { isEmailConfirmed } from "../../store/state/actions/userActions";
 import "./layout.css";
 import ContainerReminderModal from '../../pages/tare/components/tareModals/ContainerReminderModal';
 import { updateReminder } from '../../store/state/actions/reminderActions';
+import { ReminderService } from '../../utils/services/ReminderService';
 
 const Header = () => {
   console.log('Header render');
   const currentUser = useSelector((store) => store.user.currentUser);
   const isAuthenticated = useSelector((store) => store.user.isAuthenticated);
   const reminders = useSelector((store) => store.reminders.reminders);
-  const { logoutUser, getNotCompletedReminders, getCompletedReminders, getAllReminders, deleteReminder } = useActions();
+  const { logoutUser, getNotCompletedReminders, getCompletedReminders, getAllReminders, getNotViewedReminders, deleteReminder } = useActions();
   const navigate = useNavigate();
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -30,6 +31,7 @@ const Header = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editForm, setEditForm] = useState({});
   const [editReminderId, setEditReminderId] = useState(null);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   console.log('notificationsOpen:', notificationsOpen, 'activeTab:', activeTab);
 
@@ -41,6 +43,26 @@ const Header = () => {
         abortControllerRef.current.abort();
       }
     };
+  }, []);
+
+  useEffect(() => {
+    const loadInitialNotifications = async () => {
+      if (!isMounted.current) return;
+      try {
+        setLoading(true);
+        abortControllerRef.current = new AbortController();
+        await getNotViewedReminders();
+      } catch (error) {
+        if (error.name === 'AbortError') return;
+        console.error('Error loading initial notifications:', error);
+      } finally {
+        if (isMounted.current) {
+          setLoading(false);
+        }
+        abortControllerRef.current = null;
+      }
+    };
+    loadInitialNotifications();
   }, []);
 
   useEffect(() => {
@@ -113,13 +135,11 @@ const Header = () => {
       } else if (activeTab === 'all') {
         console.log('CALL getAllReminders');
         await getAllReminders();
+      } else if (activeTab === 'notViewed') {
+        console.log('CALL getNotViewedReminders');
+        await getNotViewedReminders();
       } else {
         console.log('NO MATCH for activeTab');
-      }
-      if (isMounted.current) {
-        const hasUnread = reminders.some(reminder => !reminder.isViewed);
-        setHasUnreadNotifications(hasUnread);
-        console.log('Reminders after fetch:', reminders);
       }
     } catch (error) {
       if (error.name === 'AbortError') return;
@@ -139,6 +159,14 @@ const Header = () => {
     }
   }, [notificationsOpen, activeTab]);
 
+  useEffect(() => {
+    if (activeTab === 'notViewed' && notificationsOpen) {
+      setHasUnreadNotifications(reminders.length > 0);
+    } else {
+      setHasUnreadNotifications(false);
+    }
+  }, [reminders, activeTab, notificationsOpen]);
+
   const handleLogout = useCallback(() => {
     logoutUser();
     navigate("/");
@@ -153,15 +181,40 @@ const Header = () => {
     setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
   }, []);
 
+  const fetchUnreadCount = useCallback(async () => {
+    try {
+      const response = await ReminderService.getNotViewedByUser();
+      if (response && Array.isArray(response.payload)) {
+        setUnreadCount(response.payload.length);
+      } else {
+        setUnreadCount(0);
+      }
+    } catch (e) {
+      setUnreadCount(0);
+    }
+  }, []);
+
+  // Initial load
+  useEffect(() => {
+    fetchUnreadCount();
+  }, [fetchUnreadCount]);
+
+  // Update unread count when switching to 'notViewed' tab
+  useEffect(() => {
+    if (activeTab === 'notViewed') {
+      fetchUnreadCount();
+    }
+  }, [activeTab, fetchUnreadCount]);
+
   const handleDeleteReminder = useCallback(async (reminderId) => {
     if (!isMounted.current) return;
-
     try {
       setLoading(true);
       abortControllerRef.current = new AbortController();
       await deleteReminder(reminderId);
       if (isMounted.current) {
         await loadReminders();
+        await fetchUnreadCount();
       }
     } catch (error) {
       if (error.name === 'AbortError') return;
@@ -172,7 +225,7 @@ const Header = () => {
       }
       abortControllerRef.current = null;
     }
-  }, [deleteReminder, loadReminders]);
+  }, [deleteReminder, loadReminders, fetchUnreadCount]);
 
   const handleEditReminder = useCallback((reminderId) => {
     const reminder = reminders.find(r => r.id === reminderId);
@@ -207,6 +260,7 @@ const Header = () => {
       setEditForm({});
       setEditReminderId(null);
       loadReminders();
+      fetchUnreadCount();
     } catch (e) {
       // handle error
     }
@@ -234,7 +288,7 @@ const Header = () => {
         
         <div className="notifications-btn" ref={notificationsRef}>
           <button 
-            className={`notifications-btn ${hasUnreadNotifications ? 'has-notifications' : ''}`}
+            className={`notifications-btn${unreadCount > 0 ? ' has-notifications' : ''}`}
             onClick={() => setNotificationsOpen((v) => !v)}
             style={{ 
               display: 'flex', 
@@ -251,7 +305,7 @@ const Header = () => {
             }}
           >
             <FaBell size={22} />
-            {hasUnreadNotifications && (
+            {unreadCount > 0 && (
               <span className="notification-badge"></span>
             )}
           </button>
@@ -290,6 +344,15 @@ const Header = () => {
                     }}
                   >
                     Всі
+                  </div>
+                  <div
+                    className={`notifications-tab${activeTab === 'notViewed' ? ' active' : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveTab('notViewed');
+                    }}
+                  >
+                    Непрочитані
                   </div>
                 </div>
               </div>
@@ -340,13 +403,13 @@ const Header = () => {
                         </div>
                       </div>
                     ))
-                  ) : (activeTab === 'all' ?
-                    reminders.length === 0 ? (
+                  ) : (activeTab === 'past' ?
+                    reminders.filter(r => new Date(r.dueDate) <= new Date()).length === 0 ? (
                       <div className="notification-item">
                         <p>Немає сповіщень</p>
                       </div>
                     ) : (
-                      reminders.map((reminder) => (
+                      reminders.filter(r => new Date(r.dueDate) <= new Date()).map((reminder) => (
                         <div className="notification-item" key={reminder.id}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div>
@@ -378,7 +441,7 @@ const Header = () => {
                           </div>
                         </div>
                       ))
-                    ) : (
+                    ) : (activeTab === 'all' ?
                       reminders.length === 0 ? (
                         <div className="notification-item">
                           <p>Немає сповіщень</p>
@@ -416,6 +479,45 @@ const Header = () => {
                             </div>
                           </div>
                         ))
+                      ) : (activeTab === 'notViewed' ?
+                        reminders.length === 0 ? (
+                          <div className="notification-item">
+                            <p>Немає сповіщень</p>
+                          </div>
+                        ) : (
+                          reminders.map((reminder) => (
+                            <div className="notification-item" key={reminder.id}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div>
+                                  <div style={{ fontWeight: 500 }}>{reminder.title}</div>
+                                  <div style={{ fontSize: 12, color: '#888' }}>{new Date(reminder.dueDate).toLocaleString()}</div>
+                                </div>
+                                <div style={{ display: 'flex', gap: 8 }}>
+                                  <button 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleEditReminder(reminder.id);
+                                    }} 
+                                    className="table-action-btn" 
+                                    title="Редагувати"
+                                  >
+                                    <FaEdit />
+                                  </button>
+                                  <button 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteReminder(reminder.id);
+                                    }} 
+                                    className="table-action-btn" 
+                                    title="Видалити"
+                                  >
+                                    <FaTrash />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        ) : null
                       )
                     )
                   )
