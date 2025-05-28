@@ -278,14 +278,6 @@ const Header = () => {
       </div>
       <div className="header-center"></div>
       <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <button 
-          className="theme-toggle-btn" 
-          onClick={toggleTheme} 
-          aria-label="Змінити тему"
-        >
-          {theme === 'light' ? '🌙' : '☀️'}
-        </button>
-        
         <div className="notifications-btn" ref={notificationsRef}>
           <button 
             className={`notifications-btn${unreadCount > 0 ? ' has-notifications' : ''}`}

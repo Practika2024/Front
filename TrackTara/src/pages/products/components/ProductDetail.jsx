@@ -80,13 +80,14 @@ const ProductDetail = () => {
                             <Button
                                 variant="primary"
                                 onClick={() => navigate(`/product/update/${product.id}`)}
+                                style={{ marginRight: '10px' }}
                             >
                                 Змінити
                             </Button>
                             <Button
-                                variant="secondary"
-                                className="ms-2"
+                                variant="outline-primary"
                                 onClick={() => navigate("/products")}
+                                style={{ borderWidth: '2px' }}
                             >
                                 Назад до списку
                             </Button>

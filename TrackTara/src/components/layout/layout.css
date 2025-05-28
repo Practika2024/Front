@@ -1299,7 +1299,13 @@ body, html {
 }
 
 .search-input::placeholder, .filter-input::placeholder {
-  color: var(--color-secondary-text) !important;
+  color: #b0b8c1 !important;
+  opacity: 1;
+}
+
+.theme-dark .search-input::placeholder, .theme-dark .filter-input::placeholder {
+  color: #e0e0e0 !important;
+  opacity: 1;
 }
 
 /* Стилі для пагінації на CRUD сторінках */

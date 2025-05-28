@@ -87,11 +87,6 @@ const Navbar = memo(({ isOpen, setIsOpen }) => {
             <img src="/image-removebg-preview.png" alt="TrackTara Logo" />
             <h5>TrackTara</h5>
           </Link>
-          <div className="navbar-theme-toggle" style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: '0 24px 12px 24px'}}>
-            <button className="theme-toggle-btn" onClick={toggleTheme} aria-label="Змінити тему">
-              {theme === 'light' ? '🌙' : '☀️'}
-            </button>
-          </div>
           <div className="navbar-sections-wrapper">
             <nav>
               <div className="navbar-section">

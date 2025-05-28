@@ -57,6 +57,7 @@ const ContainerFilterForm = ({ onFilter }) => {
             <Form.Group className="mb-3">
                 <Form.Control
                     type="text"
+                    className="filter-input"
                     placeholder="За унікальним кодом"
                     value={uniqueCode}
                     onChange={(e) => setUniqueCode(e.target.value)}
@@ -65,6 +66,7 @@ const ContainerFilterForm = ({ onFilter }) => {
             <Form.Group className="mb-3">
                 <Form.Control
                     type="text"
+                    className="filter-input"
                     placeholder="Пошук за назвою"
                     value={name}
                     onChange={(e) => setName(e.target.value)}

@@ -90,7 +90,6 @@ const ProductEdit = () => {
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         rows="4"
-                        required
                     ></textarea>
                 </div>
                 <div className="mb-3">
