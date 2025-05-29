@@ -278,6 +278,29 @@ const Header = () => {
       </div>
       <div className="header-center"></div>
       <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <button
+          className="theme-toggle-btn"
+          onClick={toggleTheme}
+          aria-label="Змінити тему"
+          style={{
+            borderRadius: '50%',
+            width: 38,
+            height: 38,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+            cursor: 'pointer',
+            fontSize: 18,
+            outline: '2px solid transparent',
+            border: '2px solid var(--color-navbar-border)',
+            background: theme === 'dark' ? '#fff' : '#23272f',
+            color: theme === 'dark' ? '#ffd600' : '#1976d2',
+            marginRight: 8
+          }}
+        >
+          {theme === 'dark' ? <FaSun /> : <FaMoon />}
+        </button>
         <div className="notifications-btn" ref={notificationsRef}>
           <button 
             className={`notifications-btn${unreadCount > 0 ? ' has-notifications' : ''}`}
