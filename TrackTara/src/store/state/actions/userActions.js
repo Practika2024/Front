@@ -1,21 +1,20 @@
-import {
-  authUser,
-  logout,
-} from "./../reduserSlises/userSlice";
+import { authUser, logout } from "./../reduserSlises/userSlice";
 import { deleteUserSlice, getAll } from "./../reduserSlises/usersSlice";
 import { AuthService } from "../../../utils/services/AuthService";
 import { UserService } from "../../../utils/services/UserService";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "react-toastify";
+import REMOTE_HOST_NAME from "../../../env";
 
 export const signInUser = (model) => async (dispatch) => {
   try {
+    console.log("REMOTE_HOST_NAME:", REMOTE_HOST_NAME);
     const response = await AuthService.signIn(model);
     console.log(response.payload);
     await AuthByToken(response.payload)(dispatch);
     return { success: true, message: "You login successfuly!" };
   } catch (error) {
-    toast.error(error.response.data.message);
+    toast.error(error.response?.data.message);
   }
 };
 export const externalLoginUser = (model) => async (dispatch) => {
@@ -23,7 +22,7 @@ export const externalLoginUser = (model) => async (dispatch) => {
     const response = await AuthService.externalLogin(model);
     await AuthByToken(response.payload)(dispatch);
 
-    if(!response.payload) {
+    if (!response.payload) {
       return { success: false, message: response.message };
     }
 
@@ -100,7 +99,7 @@ export const getUsers = () => async (dispatch) => {
     return { success: true, message: "get users success" };
   } catch (error) {
     const errorMessage = error.response?.data;
-    toast.error(errorMessage)
+    toast.error(errorMessage);
   }
 };
 
@@ -113,7 +112,7 @@ export const deleteUser = (userId) => async (dispatch) => {
     return { success: true, message: "delete users success" };
   } catch (error) {
     const errorMessage = error.response?.data;
-    toast.error(errorMessage)
+    toast.error(errorMessage);
   }
 };
 
@@ -124,7 +123,7 @@ export const changeRoles = (userId, roles) => async (dispatch) => {
     return { success: true, message: "User roles updated successfully" };
   } catch (error) {
     const errorMessage = error.response?.data;
-    toast.error(errorMessage)
+    toast.error(errorMessage);
   }
 };
 
@@ -137,7 +136,7 @@ export const uploadImage = (userId, file) => async (dispatch) => {
     return { success: true, message: "Image saved!" };
   } catch (error) {
     const errorMessage = error.response?.data;
-    toast.error(errorMessage)
+    toast.error(errorMessage);
   }
 };
 export const createUser = (model) => async (dispatch) => {
@@ -147,7 +146,7 @@ export const createUser = (model) => async (dispatch) => {
     return { success: true, message: "User created successfully" };
   } catch (error) {
     const errorMessage = error.response?.data;
-    toast.error(errorMessage)
+    toast.error(errorMessage);
   }
 };
 export const updateUser = (userId, model) => async (dispatch) => {
@@ -159,6 +158,6 @@ export const updateUser = (userId, model) => async (dispatch) => {
     return { success: true, message: "User updated successfully" };
   } catch (error) {
     const errorMessage = error.response?.data;
-    toast.error(errorMessage)
+    toast.error(errorMessage);
   }
 };
