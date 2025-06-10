@@ -74,6 +74,9 @@ const HeadersLinks = ({ hideLinksOnMobile, isSidebar }) => {
                         <li>
                             <Link className={linkClass("/approval-requests")} to="/approval-requests">Підтвердження</Link>
                         </li>
+                        <li>
+                            <Link className={linkClass("/reminder-types")} to="/reminder-types">Типи нагадувань</Link>
+                        </li>
                     </>
                 )}
             </ul>

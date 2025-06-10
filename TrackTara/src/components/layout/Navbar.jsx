@@ -121,11 +121,15 @@ const Navbar = memo(({ isOpen, setIsOpen }) => {
                       <Link to="/container/containerTypes" className={`navbar-link ${isActive('/container/containerTypes') ? 'active' : ''}`}>Типи контейнерів</Link>
                     </li>
                     <li className="navbar-item">
+                      <Link to="/reminder-types" className={`navbar-link ${isActive('/reminder-types') ? 'active' : ''}`}>Типи нагадувань</Link>
+                    </li>
+                    <li className="navbar-item">
                       <Link to="/users" className={`navbar-link ${isActive('/users') ? 'active' : ''}`}>Користувачі</Link>
                     </li>
                     <li className="navbar-item">
                       <Link to="/approval-requests" className={`navbar-link ${isActive('/approval-requests') ? 'active' : ''}`}>Підтвердження</Link>
                     </li>
+
                   </ul>
                 </div>
               )}

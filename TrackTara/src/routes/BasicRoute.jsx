@@ -19,6 +19,7 @@ import ProductTypesPage from "../pages/ProductTypesPage/ProductTypesPage.jsx"; /
 import ProductEdit from "../pages/products/components/edit/ProductEdit.jsx";
 import ApprovalRequestsPage from "../pages/users/components/usersModals/ApprovalRequestsPage.jsx"; // Import TareDetailPage
 import EmailConfirmationPage from "../pages/users/components/usersModals/EmailConfirmationPage";
+import ReminderTypesPage from "../pages/ReminderTypesPage/ReminderTypesPage.jsx";
 
 // Add this route
 // eslint-disable-next-line react/display-name
@@ -63,6 +64,14 @@ const BasicRoute = memo(() => {
             element={
               <ProtectedRoute allowedRoles={["Administrator"]}>
                 <ApprovalRequestsPage />
+              </ProtectedRoute>
+            }
+          />
+            <Route
+            path="/reminder-types"
+            element={
+              <ProtectedRoute allowedRoles={["Administrator"]}>
+                <ReminderTypesPage />
               </ProtectedRoute>
             }
           />

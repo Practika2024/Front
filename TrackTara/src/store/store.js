@@ -12,6 +12,7 @@ import containersReducer from '../store/state/reduserSlises/containerSlice';
 import productTypeReducer from '../store/state/reduserSlises/productTypeSlice';
 import containerHistoryReducer from '../store/state/reduserSlises/containerHistorySlice';
 import remindersReducer from '../store/state/reduserSlises/remindersSlice';
+import reminderTypesReducer from '../store/state/reduserSlises/reminderTypesSlice';
 
 export const rootReducer = combineReducers({
     user: userReducer,
@@ -26,6 +27,7 @@ export const rootReducer = combineReducers({
     containers: containersReducer,
     productTypes: productTypeReducer,
     reminders: remindersReducer,
+    reminderTypes: reminderTypesReducer,
 });
 
 export const store = configureStore({

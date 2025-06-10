@@ -10,6 +10,7 @@ import { AuthByToken } from "./store/state/actions/userActions";
 import { ToastContainer } from "react-toastify";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import './i18n';
 
 const theme = createTheme({
   palette: {

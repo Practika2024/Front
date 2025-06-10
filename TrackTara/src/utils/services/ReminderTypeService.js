@@ -1,37 +1,74 @@
-import HttpClient from '../http/HttpClient';
+import axios from 'axios';
 import REMOTE_HOST_NAME from "../../env/index";
 
-export class ReminderTypeService {
-    static httpClient = new HttpClient({
-        baseURL: REMOTE_HOST_NAME + "reminders-type",
-    });
+const baseURL = REMOTE_HOST_NAME + "reminders-type";
 
-    static setAuthorizationToken(token) {
-        this.httpClient.setAuthorizationToken(token);
-    }
-
-    static async getAll() {
-        this.setAuthorizationToken(localStorage.getItem("accessToken"));
-        return await this.httpClient.get("get-all");
+class ReminderTypeService {
+    static async getAll(page, pageSize) {
+        const token = localStorage.getItem("accessToken");
+        const params = {};
+        if (page && pageSize) {
+            params.page = page;
+            params.pageSize = pageSize;
+        }
+        const response = await axios.get(`${baseURL}/get-all`, {
+            params,
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            }
+        });
+        return response.data;
     }
 
     static async getById(typeId) {
-        this.setAuthorizationToken(localStorage.getItem("accessToken"));
-        return await this.httpClient.get(`get-by-id/${typeId}`);
+        const token = localStorage.getItem("accessToken");
+        const response = await axios.get(`${baseURL}/get-by-id/${typeId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            }
+        });
+        return response.data;
     }
 
     static async add(model) {
-        this.setAuthorizationToken(localStorage.getItem("accessToken"));
-        return await this.httpClient.post("add", model);
+        const token = localStorage.getItem("accessToken");
+        const response = await axios.post(`${baseURL}/add`, model, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            }
+        });
+        return response.data;
     }
 
     static async update(typeId, model) {
-        this.setAuthorizationToken(localStorage.getItem("accessToken"));
-        return await this.httpClient.put(`update/${typeId}`, model);
+        const token = localStorage.getItem("accessToken");
+        const response = await axios.put(`${baseURL}/update/${typeId}`, model, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            }
+        });
+        return response.data;
     }
 
     static async delete(typeId) {
-        this.setAuthorizationToken(localStorage.getItem("accessToken"));
-        return await this.httpClient.delete(`delete/${typeId}`);
+        const token = localStorage.getItem("accessToken");
+        const response = await axios.delete(`${baseURL}/delete/${typeId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            }
+        });
+        return response.data;
     }
-} 
+}
+
+export { ReminderTypeService }; 
