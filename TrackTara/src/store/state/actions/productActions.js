@@ -18,18 +18,24 @@ export const addProduct = createAsyncThunk('products/add', async (product) => {
 });
 
 export const deleteProduct = createAsyncThunk('products/delete', async (id) => {
-  const response = await ProductService.deleteProduct(id);
-  return response.payload;
+  try {
+    const response = await ProductService.deleteProduct(id);
+    return id; // Return the ID for filtering in the reducer
+  } catch (error) {
+    throw error;
+  }
 });
 
 export const deleteProductImage = async ({productId, imageId}) => {
   const response = await ProductService.deleteProductImage({productId, imageId});
   return response;
 };
+
 export const updateProduct = createAsyncThunk('products/update', async (product) => {
   const response = await ProductService.updateProduct(product);
   return response;
 });
+
 export const uploadProductImages = async (productId, imagesFiles) => {  
   const response = await ProductService.uploadProductImages(productId, imagesFiles);
   return response;

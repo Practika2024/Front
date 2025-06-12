@@ -38,10 +38,14 @@ const ProductsList = () => {
     setShowModal(true);
   };
 
-  const confirmDelete = () => {
-    dispatch(deleteProduct(productToDelete));
-    setShowModal(false);
-    setProductToDelete(null);
+  const confirmDelete = async () => {
+    try {
+      await dispatch(deleteProduct(productToDelete)).unwrap();
+      setShowModal(false);
+      setProductToDelete(null);
+    } catch (err) {
+      console.error("Error deleting product:", err);
+    }
   };
 
   const cancelDelete = () => {
@@ -54,53 +58,50 @@ const ProductsList = () => {
   if (!Array.isArray(products) || products.length === 0) return <div className="table-empty-state">Продукти відсутні</div>;
 
   return (
-    <div className="table-responsive">
+    <div className="table-container">
+      <div className="text-end mb-3">
+        <Link to="/product/create" className="btn btn-primary" title="Додати продукт">
+          <img src="/Icons for functions/free-icon-plus-3303893.png" alt="Create New" height="20" />
+        </Link>
+      </div>
+
       <table className="custom-table">
         <thead>
           <tr>
-            <th className="text-start">Фото</th>
-            <th className="text-start">Назва</th>
-            <th className="text-start">Опис</th>
-            <th className="text-start">Дата виробництва</th>
-            <th className="text-center" style={{ width: '120px' }}>Дії</th>
+            <th>Зображення</th>
+            <th>Назва</th>
+            <th>Опис</th>
+            <th>Тип</th>
+            <th>Дата виробництва</th>
+            <th>Дії</th>
           </tr>
         </thead>
         <tbody>
           {products.map((product) => (
             <tr key={product.id}>
-              <td className="text-start">
-                {product.images && product.images.length > 0 && (
-                  <div
-                    onMouseEnter={() => {
-                      setHoveredProductId(product.id);
-                      setCurrentImageIndex((prevState) => ({
-                        ...prevState,
-                        [product.id]: 0,
-                      }));
-                    }}
-                    onMouseLeave={() => setHoveredProductId(null)}
-                  >
+              <td>
+                <div
+                  onMouseEnter={() => setHoveredProductId(product.id)}
+                  onMouseLeave={() => setHoveredProductId(null)}
+                >
+                  {product.images && product.images.length > 0 ? (
                     <img
-                      src={product.images[currentImageIndex[product.id] || 0].filePath}
+                      src={product.images[currentImageIndex[product.id] || 0]?.filePath || "/images/noImageProduct.png"}
                       alt={product.name}
-                      style={{
-                        width: "50px",
-                        height: "50px",
-                        objectFit: "cover",
-                        transition: "opacity 0.5s ease-in-out",
-                        borderRadius: "4px",
-                        border: "1px solid #eee"
-                      }}
+                      style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "4px" }}
                     />
-                  </div>
-                )}
+                  ) : (
+                    <img
+                      src="/images/noImageProduct.png"
+                      alt="No image"
+                      style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "4px" }}
+                    />
+                  )}
+                </div>
               </td>
-              <td className="text-start">
-                <Link to={`/product/detail/${product.id}`} className="table-link">
-                  {product.name}
-                </Link>
-              </td>
+              <td className="text-start">{product.name}</td>
               <td className="text-start">{product.description}</td>
+              <td className="text-start">{product.typeName}</td>
               <td className="text-start">{new Date(product.manufactureDate).toISOString().split("T")[0]}</td>
               <td className="text-center">
                 <button
