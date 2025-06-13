@@ -99,7 +99,11 @@ const ProductsList = () => {
                   )}
                 </div>
               </td>
-              <td className="text-start">{product.name}</td>
+              <td className="text-start">
+                <Link to={`/product/detail/${product.id}`} className="table-link">
+                  {product.name}
+                </Link>
+              </td>
               <td className="text-start">{product.description}</td>
               <td className="text-start">{product.typeName}</td>
               <td className="text-start">{new Date(product.manufactureDate).toISOString().split("T")[0]}</td>
