@@ -20,17 +20,28 @@ const UpdateContainer = () => {
     const [containerTypes, setContainerTypes] = useState([]);
     const [imageFile, setImageFile] = useState(null);
     const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
+    const [currentImage, setCurrentImage] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchContainerData = async () => {
             try {
-                const container = await getContainerById(id);
+                setLoading(true);
+                const response = await getContainerById(id);
+                const container = response.payload;
+                
                 setName(container.name || '');
                 setTypeId(container.typeId || '');
                 setVolume(container.volume || 0);
                 setNotes(container.notes || '');
+                setCurrentImage(container.filePath || null);
+                setError(null);
             } catch (error) {
                 console.error('Error fetching container:', error);
+                setError('Помилка завантаження даних контейнера');
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -40,6 +51,7 @@ const UpdateContainer = () => {
                 setContainerTypes(types);
             } catch (error) {
                 console.error('Error fetching container types:', error);
+                setError('Помилка завантаження типів контейнерів');
             }
         };
 
@@ -51,7 +63,7 @@ const UpdateContainer = () => {
         e.preventDefault();
         const token = localStorage.getItem('accessToken');
         if (!token) {
-            console.error('JWT token not found in local storage');
+            setError('JWT token не знайдено в локальному сховищі');
             return;
         }
 
@@ -60,7 +72,7 @@ const UpdateContainer = () => {
             const modifiedBy = decodedToken.id;
 
             if (!modifiedBy) {
-                console.error('User ID not found in token');
+                setError('ID користувача не знайдено в токені');
                 return;
             }
 
@@ -75,21 +87,28 @@ const UpdateContainer = () => {
             await updateContainer(id, updatedData);
             navigate('/tare');
         } catch (error) {
-            console.error('Error decoding token or updating container:', error);
+            console.error('Error updating container:', error);
+            setError('Помилка оновлення контейнера');
         }
     };
 
     const handleImageUpload = async () => {
         if (!imageFile) {
-            console.error('No image file selected');
+            setError('Файл зображення не вибрано');
             return;
         }
 
         try {
             await updateContainerImage(id, imageFile);
-            alert('Зображення оновлено успішно!');
+            // Оновлюємо поточне зображення після успішного завантаження
+            const response = await getContainerById(id);
+            setCurrentImage(response.payload.filePath);
+            setImageFile(null);
+            setImagePreviewUrl(null);
+            setError(null);
         } catch (error) {
             console.error('Error updating container image:', error);
+            setError('Помилка оновлення зображення');
         }
     };
 
@@ -108,6 +127,9 @@ const UpdateContainer = () => {
         }
     };
 
+    if (loading) return <div className="table-empty-state">Завантаження...</div>;
+    if (error) return <div className="alert alert-danger">{error}</div>;
+
     return (
         <div className="container mt-5">
             <div className="d-flex justify-content-start mb-4">
@@ -123,7 +145,7 @@ const UpdateContainer = () => {
                     <input
                         type="text"
                         className="form-control"
-                        value={name || ''}
+                        value={name}
                         onChange={(e) => setName(e.target.value)}
                         required
                     />
@@ -133,7 +155,7 @@ const UpdateContainer = () => {
                     <label className="form-label">Тип</label>
                     <select
                         className="form-control"
-                        value={typeId || ''}
+                        value={typeId}
                         onChange={(e) => setTypeId(e.target.value)}
                         required
                     >
@@ -162,7 +184,7 @@ const UpdateContainer = () => {
                     <label className="form-label">Нотатки</label>
                     <textarea
                         className="form-control"
-                        value={notes || ''}
+                        value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                     />
                 </div>
@@ -174,6 +196,16 @@ const UpdateContainer = () => {
 
             <div className="mt-5">
                 <h4>Оновити фотографію</h4>
+                {currentImage && (
+                    <div className="mb-3">
+                        <h5>Поточне зображення:</h5>
+                        <img
+                            src={currentImage}
+                            alt="Поточне зображення контейнера"
+                            style={{ maxWidth: '300px', height: 'auto', marginBottom: '1rem' }}
+                        />
+                    </div>
+                )}
                 <input
                     type="file"
                     accept="image/png, image/jpeg, image/jpg, image/gif, image/webp"
@@ -182,6 +214,7 @@ const UpdateContainer = () => {
                 />
                 {imagePreviewUrl && (
                     <div className="mb-3">
+                        <h5>Попередній перегляд нового зображення:</h5>
                         <img
                             src={imagePreviewUrl}
                             alt="Вибране зображення"
@@ -189,7 +222,7 @@ const UpdateContainer = () => {
                         />
                     </div>
                 )}
-                <Button variant="primary" onClick={handleImageUpload}>
+                <Button variant="primary" onClick={handleImageUpload} disabled={!imageFile}>
                     Оновити фотографію
                 </Button>
             </div>
