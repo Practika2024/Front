@@ -36,22 +36,21 @@ export const refreshToken = async (originalRequest, setAuthorizationToken) => {
     const refreshToken = localStorage.getItem("refreshToken");
     const accessToken = localStorage.getItem("accessToken");
 
-    const { data } = await axios.post(
-      "http://localhost:5081/account/refresh-token",
-      { refreshToken, accessToken }
-    );
+    // Використовуємо AuthService для refresh token (він автоматично вибере між моком та реальним API)
+    const { AuthService } = await import('../services');
+    const tokens = await AuthService.refreshToken({ refreshToken, accessToken });
 
-    if (data) {
-      localStorage.setItem("accessToken", data.accessToken);
-      localStorage.setItem("refreshToken", data.refreshToken);
+    if (tokens && tokens.accessToken) {
+      localStorage.setItem("accessToken", tokens.accessToken);
+      localStorage.setItem("refreshToken", tokens.refreshToken);
 
-      setAuthorizationToken(data.accessToken);
+      setAuthorizationToken(tokens.accessToken);
 
-      const user = jwtDecode(data.accessToken);
+      const user = jwtDecode(tokens.accessToken);
       store.dispatch(authUser(user));
 
-      processQueue(null, data.accessToken);
-      return data.accessToken;
+      processQueue(null, tokens.accessToken);
+      return tokens.accessToken;
     } else {
       throw new Error("Failed to refresh tokens");
     }

@@ -1,5 +1,5 @@
 import { getRoles } from "./../reduserSlises/roleSlice";
-import { RoleService } from "../../../utils/services/RoleService";
+import { RoleService } from "../../../utils/services";
 
 export const getRolesData = () => async (dispatch) => {
   try {

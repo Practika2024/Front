@@ -2,7 +2,7 @@ import {
     createContainerType, deleteContainerType,
     getAllContainerTypes,
     getContainerTypeNameById, updateContainerType
-} from '../../../utils/services/ContainerTypesService';
+} from '../../../utils/services';
 import { getAll, setLoading, setError } from '../reduserSlises/containerTypeSlice.js';
 
 

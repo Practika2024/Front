@@ -14,7 +14,12 @@ if (localStorage.accessToken && localStorage.refreshToken) {
   AuthByToken({
     accessToken: localStorage.accessToken,
     refreshToken: localStorage.refreshToken,
-  })(store.dispatch);
+  })(store.dispatch).catch((error) => {
+    console.error('Error during token authentication:', error);
+    // Якщо токен невалідний, очищаємо localStorage
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+  });
 }
 
 createRoot(document.getElementById("root")).render(

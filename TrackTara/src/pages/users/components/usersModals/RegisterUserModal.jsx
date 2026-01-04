@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Box, TextField, Button } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import { UserService } from '../../../../utils/services/UserService';
+import { UserService } from '../../../../utils/services';
 import { getUsers } from '../../../../store/state/actions/userActions';
 import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';

@@ -47,29 +47,41 @@ const ProductsList = () => {
             <table className="table table-striped">
                 <thead>
                 <tr>
+                    <th>Код</th>
                     <th>Назва</th>
                     <th>Опис</th>
                     <th>Дата виробництва</th>
+                    <th>Номер тари</th>
                     <th>Дії</th>
                 </tr>
                 </thead>
                 <tbody>
                 {products.map((product) => (
                     <tr key={product.id}>
+                        <td>
+                            <Link to={`/product/detail/${product.id}`}>
+                                {product.id ? `PRD-${String(product.id).padStart(3, '0')}` : '-'}
+                            </Link>
+                        </td>
                         <td>{product.name}</td>
                         <td>{product.description}</td>
-                        <td>{product.manufactureDate}</td>
+                        <td>{product.manufactureDate ? new Date(product.manufactureDate).toLocaleDateString('uk-UA') : '-'}</td>
+                        <td>{product.containerNumber || <span className="text-muted">Не в тарі</span>}</td>
                         <td>
-                            <Link   title={`Деталі продукту`} to={`/product/detail/${product.id}`} className="btn btn-info btn-sm">
+                            <Link
+                                title={`Редагувати продукт`}
+                                to={`/product/update/${product.id}`}
+                                className="btn btn-outline-secondary btn-sm p-0 border-0"
+                            >
                                 <img
-                                    src="/Icons for functions/free-icon-info-1445402.png"
-                                    alt="Details"
+                                    src="/Icons for functions/free-icon-edit-3597088.png"
+                                    alt="Edit"
                                     height="20"
                                 />
                             </Link>
                             <button
                                 title={`Видалити продукт`}
-                                className="btn btn-danger btn-sm ms-2"
+                                className="btn btn-outline-secondary btn-sm ms-2 p-0 border-0"
                                 onClick={() => handleDelete(product.id)}
                             >
                                 <img

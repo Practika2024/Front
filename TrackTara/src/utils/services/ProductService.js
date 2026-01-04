@@ -25,6 +25,11 @@ export const ProductService = {
     const response = await axios.post(`${API_URL}/add`, product, getAuthHeaders());
     return response.data;
   },
+  updateProduct: async (id, product) => {
+    const response = await axios.put(`${API_URL}/update/${id}`, product, getAuthHeaders());
+    return response.data;
+  },
+
   deleteProduct: async (id) => {
     const response = await axios.delete(`${API_URL}/delete/${id}`, getAuthHeaders());
     return response.data;

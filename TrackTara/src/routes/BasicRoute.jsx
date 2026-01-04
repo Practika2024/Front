@@ -16,7 +16,9 @@ import ContainerDetailPage from "../pages/tare/components/tareModals/ContainerDe
 import ViewContainerTypes from "../pages/containerTypes/ViewContainerTypes.jsx";
 import ProductDetail from "../pages/products/components/ProductDetail.jsx";
 import CreateProduct from "../pages/products/components/modals/CreateProduct.jsx";
+import UpdateProduct from "../pages/products/components/modals/UpdateProduct.jsx";
 import ProductTypesPage from "../pages/ProductTypesPage/ProductTypesPage.jsx"; // Import TareDetailPage
+import CreateOrder from "../pages/orders/CreateOrder.jsx";
 
 // eslint-disable-next-line react/display-name
 const BasicRoute = memo(() => {
@@ -81,6 +83,15 @@ const BasicRoute = memo(() => {
                             }
                     />
                     <Route
+                        path="/product/update/:productId"
+                        element=
+                            {
+                                <ProtectedRoute allowedRoles={["Operator"]}>
+                                    <UpdateProduct/>
+                                </ProtectedRoute>
+                            }
+                    />
+                    <Route
                         path="/productType"
                         element=
                             {
@@ -125,6 +136,15 @@ const BasicRoute = memo(() => {
                                 </ProtectedRoute>
                             }
                     /> {/* Add TareDetailPage route */}
+                    <Route
+                        path="/orders/create"
+                        element=
+                            {
+                                <ProtectedRoute allowedRoles={["Administrator"]}>
+                                    <CreateOrder/>
+                                </ProtectedRoute>
+                            }
+                    />
                     <Route path="/register" element={<Register/>}/>
                     <Route path="/login" element={<Login/>}/>
                     <Route path="*" element={<NotFoundPage/>}/>

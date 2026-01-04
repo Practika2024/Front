@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Badge } from "@mui/material";
@@ -7,6 +7,7 @@ import HeadersLinks from "./HeadersLinks";
 import useActions from "../../hooks/useActions";
 import userImage from "../../hooks/userImage";
 import { useNavigate } from "react-router-dom";
+import SectorsManagement from "./SectorsManagement";
 
 const Header = memo(() => {
   const currentUser = useSelector((store) => store.user.currentUser);
@@ -23,6 +24,9 @@ const Header = memo(() => {
 
   const userId = currentUser?.id;
   const userCartItems = cartItems.filter((item) => item.userId === userId);
+  const [showSectorsModal, setShowSectorsModal] = useState(false);
+  const userRoles = currentUser ? (Array.isArray(currentUser.role) ? currentUser.role : [currentUser.role]) : [];
+  const isAdministrator = userRoles.includes("Administrator");
 
   return (
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -57,6 +61,39 @@ const Header = memo(() => {
                 <ShoppingCart />
               </Badge>
             </Link>
+
+            {/* Випадаюче меню "Інше" - тільки для Administrator */}
+            {isAuthenticated && isAdministrator && (
+              <div className="dropdown me-3">
+                <button
+                  className="btn btn-outline-secondary dropdown-toggle"
+                  type="button"
+                  id="otherDropdown"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Інше
+                </button>
+                <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="otherDropdown">
+                  <li>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => setShowSectorsModal(true)}
+                    >
+                      Управління секторами та рядами
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => navigate('/orders/create')}
+                    >
+                      Створити замовлення
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            )}
 
             {isAuthenticated ? (
                 <div className="dropdown">
@@ -98,6 +135,7 @@ const Header = memo(() => {
             )}
           </div>
         </div>
+        <SectorsManagement show={showSectorsModal} onHide={() => setShowSectorsModal(false)} />
       </nav>
   );
 });

@@ -1,6 +1,6 @@
 import { getAll, deleteTareSlice, setProduct, clearProduct, setLoading, setError } from '../reduserSlises/containerSlice';
-import { getAllContainers, deleteContainer, setProductToContainer, clearProductFromTare } from '../../../utils/services/ContainerService';
-import { getContainerTypeNameById } from '../../../utils/services/ContainerTypesService';
+import { getAllContainers, deleteContainer, setProductToContainer, clearProductFromTare } from '../../../utils/services';
+import { getContainerTypeNameById } from '../../../utils/services';
 
 //
 export const fetchContainers = () => async (dispatch) => {
@@ -37,20 +37,24 @@ export const removeContainer = (id) => async (dispatch) => {
     }
 };
 
-export const addProductToContainer = (containerId, productId) => async (dispatch) => {
+export const addProductToContainer = (containerId, productId, quantity = null) => async (dispatch) => {
     try {
-        await setProductToContainer(containerId, productId);
+        await setProductToContainer(containerId, productId, quantity);
         dispatch(setProduct({ containerId, productId }));
+        return { success: true };
     } catch (error) {
         dispatch(setError(error.message));
+        throw error; // Прокидаємо помилку далі для обробки в компоненті
     }
 };
 
-export const removeProductFromContainer = (containerId) => async (dispatch) => {
+export const removeProductFromContainer = (containerId, quantity = null) => async (dispatch) => {
     try {
-        await clearProductFromTare(containerId);
+        await clearProductFromTare(containerId, quantity);
         dispatch(clearProduct(containerId));
+        return { success: true };
     } catch (error) {
         dispatch(setError(error.message));
+        throw error; // Прокидаємо помилку далі для обробки в компоненті
     }
 };

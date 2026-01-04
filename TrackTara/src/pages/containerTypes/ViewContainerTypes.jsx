@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Form, Table } from 'react-bootstrap';
-import { getAllContainerTypes, deleteContainerType, createContainerType } from '../../utils/services/ContainerTypesService.js';
+import { getAllContainerTypes, deleteContainerType, createContainerType } from '../../utils/services';
 
 const ViewContainerTypes = () => {
     const [containerTypes, setContainerTypes] = useState([]);

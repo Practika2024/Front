@@ -36,8 +36,8 @@ export const deleteContainer = async (id) => {
     await axios.delete(`${API_URL}/delete/${id}`, getAuthHeaders());
 };
 
-export const setProductToContainer = async (containerId, productId) => {
-    await axios.put(`${API_URL}/set-content/${containerId}`, { productId }, getAuthHeaders());
+export const setProductToContainer = async (containerId, productId, quantity = null) => {
+    await axios.put(`${API_URL}/set-content/${containerId}`, { productId, quantity }, getAuthHeaders());
 };
 
 export const updateContainer = async (id, tareData) => {
@@ -50,6 +50,6 @@ export const updateContainer = async (id, tareData) => {
     }
 };
 
-export const clearProductFromTare = async (containerId) => {
-    await axios.put(`${API_URL}/clear-content/${containerId}`, {}, getAuthHeaders());
+export const clearProductFromTare = async (containerId, quantity = null) => {
+    await axios.put(`${API_URL}/clear-content/${containerId}`, { quantity }, getAuthHeaders());
 };

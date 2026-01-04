@@ -12,9 +12,11 @@ import filtersReducer from '../store/state/reduserSlises/filtersSlice';
 import containersReducer from '../store/state/reduserSlises/containerSlice';
 import productTypeReducer from '../store/state/reduserSlises/productTypeSlice';
 import containerHistoryReducer from '../store/state/reduserSlises/containerHistorySlice';
+import productHistoryReducer from '../store/state/reduserSlises/productHistorySlice';
 export const rootReducer = combineReducers({
     user: userReducer,
     containerHistory: containerHistoryReducer,
+    productHistory: productHistoryReducer,
     role: roleReducer,
     category: categoryReducer,
     manufacturer: manufacturerReducer,

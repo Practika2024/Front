@@ -6,8 +6,7 @@ import {
   removeFavoriteProduct,
 } from "./../reduserSlises/userSlice";
 import { deleteUserSlice, getAll } from "./../reduserSlises/usersSlice";
-import { AuthService } from "../../../utils/services/AuthService";
-import { UserService } from "../../../utils/services/UserService";
+import { AuthService, UserService } from "../../../utils/services";
 import { jwtDecode } from "jwt-decode";
 import { getCartItemsByUserId } from "./cartItemActions";
 
@@ -38,18 +37,28 @@ export const AuthByToken = (tokens) => async (dispatch) => {
     localStorage.setItem("refreshToken", tokens.refreshToken);
 
     await AuthService.setAuthorizationToken(tokens.accessToken);
-    const user = jwtDecode(tokens.accessToken);
+    
+    try {
+      const user = jwtDecode(tokens.accessToken);
 
-    if (
-      Array.isArray(user?.role)
-        ? user?.role.includes("User")
-        : user?.role === "User"
-    ) {
-      await loadFavoriteProducts(user.id)(dispatch);
-      await getCartItemsByUserId(user.id)(dispatch);
+      if (
+        Array.isArray(user?.role)
+          ? user?.role.includes("User")
+          : user?.role === "User"
+      ) {
+        await loadFavoriteProducts(user.id)(dispatch);
+        await getCartItemsByUserId(user.id)(dispatch);
+      }
+
+      dispatch(authUser(user));
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      // Якщо токен не вдалося декодувати, очищаємо localStorage
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      await AuthService.setAuthorizationToken(null);
+      throw error;
     }
-
-    dispatch(authUser(user));
   } else {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");

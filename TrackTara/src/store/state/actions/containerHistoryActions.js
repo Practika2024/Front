@@ -1,6 +1,6 @@
 // src/store/actions/containerHistoryActions.js
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { getAllContainerHistories, getContainerHistoryById } from '../../../utils/services/ContainerHistoryService';
+import { getAllContainerHistories, getContainerHistoryById } from '../../../utils/services';
 
 export const fetchAllContainerHistories = createAsyncThunk(
     'containerHistory/fetchAll',

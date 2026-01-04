@@ -37,7 +37,7 @@ const GoogleLogin = () => {
         toast.success("Успішний вхід!");
         navigate("/");
       }
-      console.log("JWT Token:", token);
+      console.log("JWT Token:", credential);
     } catch (error) {
       console.error("Error during login:", error.response?.data || error.message);
     }

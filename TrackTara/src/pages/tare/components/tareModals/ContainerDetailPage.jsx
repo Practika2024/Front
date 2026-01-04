@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Modal, Card, Container, Row, Col, Table } from 'react-bootstrap';
+import { Button, Modal, Card, Container, Row, Col, Table, Form, Alert } from 'react-bootstrap';
 import Select from 'react-select';
 import Loader from '../../../../components/common/loader/Loader.jsx';
-import { getContainerById, deleteContainer, setProductToContainer, clearProductFromTare } from '../../../../utils/services/ContainerService.js';
-import { getAllContainerTypes } from '../../../../utils/services/ContainerTypesService.js';
+import { getContainerById, deleteContainer, setProductToContainer, clearProductFromTare } from '../../../../utils/services';
+import { getAllContainerTypes } from '../../../../utils/services';
 import { fetchProducts } from '../../../../store/state/actions/productActions.js';
 import { fetchAllContainerHistories } from '../../../../store/state/actions/containerHistoryActions.js';
 import { useDispatch, useSelector } from 'react-redux';
+import { formatQuantity, getUnitLabel, getUnitFullLabel } from '../../../../utils/helpers/unitFormatter';
 
 const ContainerDetailPage = () => {
     const { containerId } = useParams();
@@ -19,10 +20,13 @@ const ContainerDetailPage = () => {
     const dispatch = useDispatch();
 
     const [selectedProductId, setSelectedProductId] = useState('');
+    const [addQuantity, setAddQuantity] = useState('');
+    const [removeQuantity, setRemoveQuantity] = useState('');
     const [showAddProductModal, setShowAddProductModal] = useState(false);
     const [showRemoveProductModal, setShowRemoveProductModal] = useState(false);
     const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
     const [containerTypes, setContainerTypes] = useState([]);
+    const [validationError, setValidationError] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -54,6 +58,16 @@ const ContainerDetailPage = () => {
         fetchContainerTypes();
         fetchContainerHistory();
     }, [containerId, dispatch]);
+
+    // Автоматично встановлюємо selectedProductId, коли відкривається модальне вікно для не порожнього контейнера
+    useEffect(() => {
+        if (showAddProductModal && container && !container.isEmpty && container.productId) {
+            // Встановлюємо продукт, який вже в контейнері, тільки якщо продукт ще не вибрано
+            if (!selectedProductId) {
+                setSelectedProductId(container.productId);
+            }
+        }
+    }, [showAddProductModal, container]);
 
     const fetchContainerData = async () => {
         try {
@@ -99,25 +113,39 @@ const ContainerDetailPage = () => {
     };
 
     const handleAddProduct = async () => {
-        if (!selectedProductId) return;
+        if (!selectedProductId) {
+            setValidationError('Оберіть продукт');
+            return;
+        }
+        setValidationError('');
         try {
-            await setProductToContainer(containerId, selectedProductId);
+            const quantity = addQuantity ? parseFloat(addQuantity) : null;
+            await setProductToContainer(containerId, selectedProductId, quantity);
             setShowAddProductModal(false);
+            setSelectedProductId('');
+            setAddQuantity('');
             fetchContainerData();
             fetchContainerHistory();
+            dispatch(fetchProducts()); // Оновлюємо продукти
         } catch (error) {
             console.error('Error adding product to container:', error);
+            setValidationError(error.response?.data || 'Помилка додавання продукту');
         }
     };
 
     const handleClearProduct = async () => {
+        setValidationError('');
         try {
-            await clearProductFromTare(containerId);
+            const quantity = removeQuantity ? parseFloat(removeQuantity) : null;
+            await clearProductFromTare(containerId, quantity);
             setShowRemoveProductModal(false);
+            setRemoveQuantity('');
             fetchContainerData();
             fetchContainerHistory();
+            dispatch(fetchProducts()); // Оновлюємо продукти
         } catch (error) {
             console.error('Error clearing products from container:', error);
+            setValidationError(error.response?.data || 'Помилка вийняття продукту');
         }
     };
 
@@ -141,8 +169,14 @@ const ContainerDetailPage = () => {
                             <Card.Title>{container.name}</Card.Title>
                             <Card.Text>
                                 <strong>Тип:</strong> {getTypeName(container.typeId)}<br />
-                                <strong>Об'єм (л):</strong> {container.volume}<br />
+                                <strong>Об'єм:</strong> {container.volume} {getUnitLabel(container.unitType || 'liters')}<br />
                                 <strong>Вміст:</strong> {container.isEmpty ? 'Порожній' : (getProductName(container.productId) || 'Невідомий продукт')}<br />
+                                {!container.isEmpty && container.currentQuantity !== undefined && (
+                                    <>
+                                        <strong>Поточна кількість:</strong> {formatQuantity(container.currentQuantity, container.unitType || 'liters')}<br />
+                                        <strong>Залишок місця:</strong> {formatQuantity(container.volume - container.currentQuantity, container.unitType || 'liters')}<br />
+                                    </>
+                                )}
                                 <strong>Нотатки:</strong> {container.notes || 'Немає'}
                             </Card.Text>
                             <Button title={`Редагувати контейнер `} variant="outline-secondary" onClick={handleUpdate} className="p-1 border-0">
@@ -151,11 +185,14 @@ const ContainerDetailPage = () => {
                             <Button title={`Видалити контейнер `} variant="outline-secondary" onClick={handleDelete} className="p-1 border-0">
                                 <img src="/Icons for functions/free-icon-recycle-bin-3156999.png" alt="Delete" height="20" />
                             </Button>
-                            {container.isEmpty ? (
+                            {/* Показуємо кнопку додавання, якщо контейнер порожній або є вільне місце */}
+                            {(container.isEmpty || (container.volume - (container.currentQuantity || 0)) > 0) && (
                                 <Button title={`Додати продукт `} variant="outline-secondary" onClick={() => setShowAddProductModal(true)} className="p-1 border-0">
                                     <img src="/Icons for functions/free-icon-import-7234396.png" alt="Add Product" height="20" />
                                 </Button>
-                            ) : (
+                            )}
+                            {/* Показуємо кнопку вийняття, якщо контейнер не порожній */}
+                            {!container.isEmpty && (
                                 <Button variant="outline-secondary" onClick={() => setShowRemoveProductModal(true)} className="p-1 border-0">
                                     <img src="/Icons for functions/free-icon-package-1666995.png" alt="Clear Product" height="20" />
                                 </Button>
@@ -172,18 +209,31 @@ const ContainerDetailPage = () => {
                                     <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Product</th>
-                                        <th>Start Date</th>
-                                        <th>End Date</th>
+                                        <th>Продукт</th>
+                                        <th>Дія</th>
+                                        <th>Кількість</th>
+                                        <th>Дата початку</th>
+                                        <th>Дата закінчення</th>
+                                        <th>Користувач</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     {containerHistory.map((history, index) => (
                                         <tr key={history.id}>
                                             <td>{index + 1}</td>
-                                            <td>{getProductName(history.productId)}</td>
-                                            <td>{new Date(history.startDate).toLocaleString()}</td>
-                                            <td>{history.endDate ? new Date(history.endDate).toLocaleString() : ''}</td>
+                                            <td>{history.productId ? getProductName(history.productId) : '-'}</td>
+                                            <td>
+                                                {history.action === 'created' ? 'Створено' :
+                                                 history.action === 'placed' ? 'Покладено' : 
+                                                 history.action === 'removed' ? 'Вийнято' : 
+                                                 history.action || '-'}
+                                            </td>
+                                            <td>{history.quantity !== undefined && history.quantity !== null 
+                                            ? formatQuantity(history.quantity, container.unitType || 'liters')
+                                            : '-'}</td>
+                                            <td>{new Date(history.startDate).toLocaleString('uk-UA')}</td>
+                                            <td>{history.endDate ? new Date(history.endDate).toLocaleString('uk-UA') : 'Досі в контейнері'}</td>
+                                            <td>{history.userLogin || '-'}</td>
                                         </tr>
                                     ))}
                                     </tbody>
@@ -196,42 +246,143 @@ const ContainerDetailPage = () => {
                 </Col>
             </Row>
 
-            <Modal show={showAddProductModal} onHide={() => setShowAddProductModal(false)}>
+            <Modal show={showAddProductModal} onHide={() => {
+                setShowAddProductModal(false);
+                setValidationError('');
+                setAddQuantity('');
+                setSelectedProductId('');
+            }}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Choose a Product</Modal.Title>
+                    <Modal.Title>Додати продукт до контейнера</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <p>Select a product to add to the container:</p>
-                    <Select
-                        options={products.map(product => ({ value: product.id, label: product.name }))}
-                        onChange={(selectedOption) => setSelectedProductId(selectedOption.value)}
-                        placeholder="Search by product name"
-                        isClearable
-                    />
+                    {validationError && <Alert variant="danger">{validationError}</Alert>}
+                    {(() => {
+                        const currentQuantity = container?.currentQuantity || 0;
+                        const availableSpace = (container?.volume || 0) - currentQuantity;
+                        const isContainerEmpty = container?.isEmpty;
+                        const existingProductId = container?.productId;
+                        
+                        // Якщо контейнер не порожній, показуємо тільки той продукт, який вже в контейнері
+                        const availableProducts = isContainerEmpty 
+                            ? products 
+                            : products.filter(p => p.id === existingProductId);
+                        
+                        return (
+                            <>
+                                {!isContainerEmpty && (
+                                    <Alert variant="info" className="mb-3">
+                                        <strong>Контейнер вже містить продукт:</strong> {getProductName(existingProductId) || 'Невідомий продукт'}<br />
+                                        <strong>Поточна кількість:</strong> {formatQuantity(currentQuantity, container?.unitType || 'liters')}<br />
+                                        <strong>Доступне вільне місце:</strong> {formatQuantity(availableSpace, container?.unitType || 'liters')}
+                                    </Alert>
+                                )}
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Оберіть продукт:</Form.Label>
+                                    <Select
+                                        options={availableProducts.map(product => ({ value: product.id, label: product.name }))}
+                                        onChange={(selectedOption) => {
+                                            setSelectedProductId(selectedOption?.value || '');
+                                            setValidationError('');
+                                        }}
+                                        placeholder="Оберіть продукт"
+                                        isClearable={isContainerEmpty}
+                                        isDisabled={!isContainerEmpty} // Якщо контейнер не порожній, не можна змінити продукт
+                                        value={
+                                            selectedProductId 
+                                                ? { value: selectedProductId, label: getProductName(selectedProductId) || '' }
+                                                : (!isContainerEmpty && existingProductId 
+                                                    ? { value: existingProductId, label: getProductName(existingProductId) || '' }
+                                                    : null
+                                                )
+                                        }
+                                    />
+                                    {!isContainerEmpty && (
+                                        <Form.Text className="text-muted">
+                                            Можна додавати тільки той самий продукт, який вже в контейнері
+                                        </Form.Text>
+                                    )}
+                                </Form.Group>
+                                <Form.Group className="mb-3">
+                                    <Form.Label>
+                                        Кількість ({getUnitLabel(container?.unitType || 'liters')}):
+                                    </Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        step={container?.unitType === 'pieces' ? '1' : '0.01'}
+                                        min="0"
+                                        max={availableSpace}
+                                        value={addQuantity}
+                                        onChange={(e) => {
+                                            setAddQuantity(e.target.value);
+                                            setValidationError('');
+                                        }}
+                                        placeholder={`Максимум: ${formatQuantity(availableSpace, container?.unitType || 'liters')}`}
+                                    />
+                                    <Form.Text className="text-muted">
+                                        Залишити порожнім, щоб додати максимальну доступну кількість ({formatQuantity(availableSpace, container?.unitType || 'liters')})
+                                    </Form.Text>
+                                </Form.Group>
+                            </>
+                        );
+                    })()}
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowAddProductModal(false)}>
-                        Cancel
+                    <Button variant="secondary" onClick={() => {
+                        setShowAddProductModal(false);
+                        setValidationError('');
+                        setAddQuantity('');
+                    }}>
+                        Скасувати
                     </Button>
                     <Button variant="primary" onClick={handleAddProduct} disabled={!selectedProductId}>
-                        Add Product
+                        Додати продукт
                     </Button>
                 </Modal.Footer>
             </Modal>
 
-            <Modal show={showRemoveProductModal} onHide={() => setShowRemoveProductModal(false)}>
+            <Modal show={showRemoveProductModal} onHide={() => {
+                setShowRemoveProductModal(false);
+                setValidationError('');
+                setRemoveQuantity('');
+            }}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Remove Product</Modal.Title>
+                    <Modal.Title>Вийняти продукт з контейнера</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <p>Are you sure you want to remove the product from this container?</p>
+                    {validationError && <Alert variant="danger">{validationError}</Alert>}
+                    <p>Поточна кількість в контейнері: <strong>{formatQuantity(container?.currentQuantity || 0, container?.unitType || 'liters')}</strong></p>
+                            <Form.Group className="mb-3">
+                                <Form.Label>
+                                    Кількість для вийняття ({getUnitLabel(container?.unitType || 'liters')}):
+                                </Form.Label>
+                                <Form.Control
+                                    type="number"
+                                    step={container?.unitType === 'pieces' ? '1' : '0.01'}
+                                    min="0"
+                                    max={container?.currentQuantity || 0}
+                                    value={removeQuantity}
+                                    onChange={(e) => {
+                                        setRemoveQuantity(e.target.value);
+                                        setValidationError('');
+                                    }}
+                                    placeholder={`Максимум: ${formatQuantity(container?.currentQuantity || 0, container?.unitType || 'liters')}`}
+                                />
+                                <Form.Text className="text-muted">
+                                    Залишити порожнім, щоб вийняти весь продукт ({formatQuantity(container?.currentQuantity || 0, container?.unitType || 'liters')})
+                                </Form.Text>
+                            </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowRemoveProductModal(false)}>
-                        Cancel
+                    <Button variant="secondary" onClick={() => {
+                        setShowRemoveProductModal(false);
+                        setValidationError('');
+                        setRemoveQuantity('');
+                    }}>
+                        Скасувати
                     </Button>
                     <Button variant="primary" onClick={handleClearProduct}>
-                        Remove Product
+                        Вийняти продукт
                     </Button>
                 </Modal.Footer>
             </Modal>

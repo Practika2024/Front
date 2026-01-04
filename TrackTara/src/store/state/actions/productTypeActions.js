@@ -4,7 +4,7 @@ import {
     addProductType,
     updateProductType,
     deleteProductType
-} from '../../../utils/services/ProductTypesService';
+} from '../../../utils/services';
 import { getAll, addType, updateType, deleteType, setLoading, setError } from '../reduserSlises/productTypeSlice';
 
 export const fetchProductTypes = () => async (dispatch) => {

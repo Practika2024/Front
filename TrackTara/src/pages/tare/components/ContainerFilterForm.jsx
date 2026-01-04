@@ -3,15 +3,18 @@ import 'rc-slider/assets/index.css';
 import Slider from 'rc-slider';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import PropTypes from 'prop-types';
-import { getAllContainerTypes } from '../../../utils/services/ContainerTypesService';
+import { getAllContainerTypes } from '../../../utils/services';
+import { getUnitLabel } from '../../../utils/helpers/unitFormatter';
 
 const ContainerFilterForm = ({ onFilter }) => {
     const [containerTypes, setContainerTypes] = useState([]);
     const [uniqueCode, setUniqueCode] = useState('');
     const [name, setName] = useState('');
+    const [sector, setSector] = useState('');
     const [minVolume, setMinVolume] = useState(0);
     const [maxVolume, setMaxVolume] = useState(1000);
     const [selectedTypes, setSelectedTypes] = useState([]); // масив id вибраних типів
+    const [selectedUnitType, setSelectedUnitType] = useState(''); // Один вибраний тип одиниць: 'liters', 'kilograms', 'pieces' або ''
     const [isEmpty, setIsEmpty] = useState(null);
 
     useEffect(() => {
@@ -39,18 +42,45 @@ const ContainerFilterForm = ({ onFilter }) => {
         }
     };
 
+    const handleUnitTypeChange = (unitType) => {
+        // Якщо той самий тип вже вибраний, знімаємо вибір, інакше встановлюємо новий
+        setSelectedUnitType(selectedUnitType === unitType ? '' : unitType);
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        onFilter({ uniqueCode, name, minVolume, maxVolume, type: selectedTypes, isEmpty });
+        onFilter({ 
+            uniqueCode, 
+            name, 
+            sector, 
+            minVolume, 
+            maxVolume, 
+            type: selectedTypes, 
+            unitType: selectedUnitType ? [selectedUnitType] : [],
+            isEmpty 
+        });
     };
 
     const handleReset = () => {
         setUniqueCode('');
         setName('');
+        setSector('');
         setMinVolume(0);
         setMaxVolume(1000);
         setSelectedTypes([]);
+        setSelectedUnitType('');
         setIsEmpty(null);
+        // Одразу застосовуємо скинуті фільтри
+        onFilter({ 
+            uniqueCode: '', 
+            name: '', 
+            sector: '', 
+            minVolume: 0, 
+            maxVolume: 1000, 
+            type: [], 
+            unitType: [],
+            isEmpty: null 
+        });
     };
 
     return (
@@ -72,34 +102,82 @@ const ContainerFilterForm = ({ onFilter }) => {
                 />
             </Form.Group>
             <Form.Group className="mb-3">
-                <Form.Label>Об'єм (л)</Form.Label>
-                <Slider
-                    range
-                    min={0}
-                    max={1000}
-                    value={[minVolume, maxVolume]}
-                    onChange={([min, max]) => {
-                        setMinVolume(min);
-                        setMaxVolume(max);
+                <Form.Control
+                    type="text"
+                    placeholder="Фільтр за сектором (A, B, C...)"
+                    value={sector}
+                    onChange={(e) => {
+                        // Дозволяємо тільки літери, максимум 1 символ
+                        const value = e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 1);
+                        setSector(value);
                     }}
+                    maxLength={1}
                 />
-                <Row className="mt-2">
-                    <Col>
-                        <Form.Control
-                            type="number"
-                            value={minVolume}
-                            onChange={(e) => setMinVolume(Number(e.target.value))}
-                        />
-                    </Col>
-                    <Col>
-                        <Form.Control
-                            type="number"
-                            value={maxVolume}
-                            onChange={(e) => setMaxVolume(Number(e.target.value))}
-                        />
-                    </Col>
-                </Row>
             </Form.Group>
+            <Form.Group className="mb-3">
+                <Form.Label>Тип одиниць вимірювання</Form.Label>
+                <div>
+                    <Form.Check
+                        type="radio"
+                        id="unit-type-liters"
+                        label="Літри (л)"
+                        name="unitType"
+                        checked={selectedUnitType === 'liters'}
+                        onChange={() => handleUnitTypeChange('liters')}
+                    />
+                    <Form.Check
+                        type="radio"
+                        id="unit-type-kilograms"
+                        label="Кілограми (кг)"
+                        name="unitType"
+                        checked={selectedUnitType === 'kilograms'}
+                        onChange={() => handleUnitTypeChange('kilograms')}
+                    />
+                    <Form.Check
+                        type="radio"
+                        id="unit-type-pieces"
+                        label="Штуки (шт)"
+                        name="unitType"
+                        checked={selectedUnitType === 'pieces'}
+                        onChange={() => handleUnitTypeChange('pieces')}
+                    />
+                </div>
+            </Form.Group>
+            {selectedUnitType && (
+                <Form.Group className="mb-3">
+                    <Form.Label>
+                        Об'єм ({getUnitLabel(selectedUnitType)})
+                    </Form.Label>
+                    <Slider
+                        range
+                        min={0}
+                        max={1000}
+                        value={[minVolume, maxVolume]}
+                        onChange={([min, max]) => {
+                            setMinVolume(min);
+                            setMaxVolume(max);
+                        }}
+                    />
+                    <Row className="mt-2">
+                        <Col>
+                            <Form.Control
+                                type="number"
+                                value={minVolume}
+                                onChange={(e) => setMinVolume(Number(e.target.value))}
+                                placeholder="Мін"
+                            />
+                        </Col>
+                        <Col>
+                            <Form.Control
+                                type="number"
+                                value={maxVolume}
+                                onChange={(e) => setMaxVolume(Number(e.target.value))}
+                                placeholder="Макс"
+                            />
+                        </Col>
+                    </Row>
+                </Form.Group>
+            )}
             <Form.Group className="mb-3">
                 <Form.Label>Тип контейнера</Form.Label>
                 <div>
