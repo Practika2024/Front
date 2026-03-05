@@ -30,11 +30,11 @@ const ProductDetail = () => {
     };
 
     if (status === 'loading') {
-        return <div>Loading...</div>;
+        return <div>Завантаження...</div>;
     }
 
     if (status === 'failed') {
-        return <div>Error loading product</div>;
+        return <div>Помилка завантаження продукту</div>;
     }
 
     return (

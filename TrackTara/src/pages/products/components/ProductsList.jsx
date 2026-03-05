@@ -31,15 +31,15 @@ const ProductsList = () => {
     };
 
     if (status === 'loading') {
-        return <div>Loading...</div>;
+        return <div>Завантаження...</div>;
     }
 
     if (status === 'failed') {
-        return <div>Error loading products</div>;
+        return <div>Помилка завантаження продуктів</div>;
     }
 
     if (!Array.isArray(products) || products.length === 0) {
-        return <div>No products available</div>;
+        return <div>Немає доступних продуктів</div>;
     }
 
     return (
@@ -75,7 +75,7 @@ const ProductsList = () => {
                             >
                                 <img
                                     src="/Icons for functions/free-icon-edit-3597088.png"
-                                    alt="Edit"
+                                    alt="Редагувати"
                                     height="20"
                                 />
                             </Link>
@@ -86,7 +86,7 @@ const ProductsList = () => {
                             >
                                 <img
                                     src="/Icons for functions/free-icon-recycle-bin-3156999.png"
-                                    alt="Delete"
+                                    alt="Видалити"
                                     height="20"
                                 />
                             </button>
@@ -101,15 +101,15 @@ const ProductsList = () => {
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h5 className="modal-title">Confirm Deletion</h5>
+                                <h5 className="modal-title">Підтвердження видалення</h5>
                                 <button type="button" className="btn-close" onClick={cancelDelete}></button>
                             </div>
                             <div className="modal-body">
-                                <p>Are you sure you want to delete this product?</p>
+                                <p>Ви впевнені, що хочете видалити цей продукт?</p>
                             </div>
                             <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" onClick={cancelDelete}>No</button>
-                                <button type="button" className="btn btn-danger" onClick={confirmDelete}>Yes</button>
+                                <button type="button" className="btn btn-secondary" onClick={cancelDelete}>Ні</button>
+                                <button type="button" className="btn btn-danger" onClick={confirmDelete}>Так</button>
                             </div>
                         </div>
                     </div>

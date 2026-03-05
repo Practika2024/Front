@@ -9,7 +9,7 @@ const ProductsPage = () => {
         <button className="btn btn-primary float-end">
             <img
                 src="public/Icons for functions/free-icon-plus-3303893.png"
-                alt="Create New Container"
+                alt="Створити новий продукт"
                 height="20"
             />
         </button>

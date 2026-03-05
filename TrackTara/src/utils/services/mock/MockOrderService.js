@@ -8,11 +8,11 @@ let mockOrders = [
   {
     id: 1,
     sector: 'A',
-    status: 'active', // 'active', 'completed', 'cancelled'
+    status: 'active',
     createdAt: '2024-01-20T10:00:00',
     createdBy: 'admin@test.com',
-    issueLineCode: null, // Лінія видання для замовлення
-    carts: [], // Візки з товарами: [{ cartNumber, items: [{ itemId, containerCode, quantity }] }]
+    issueLineCode: 'LINE-001',
+    carts: [],
     items: [
       {
         id: 1,
@@ -22,13 +22,45 @@ let mockOrders = [
         containerCode: 'A01-CNT-001',
         rowNumber: 1,
         productCode: 'PRD-001',
-        quantity: 35, // Кількість для вийняття
-        unitType: 'liters', // Тип одиниць вимірювання
-        status: 'pending', // 'pending', 'in_progress', 'completed'
-        pickedQuantity: 0, // Скільки вже вийнято
+        quantity: 35,
+        unitType: 'liters',
+        status: 'pending',
+        pickedQuantity: 0,
         pickedBy: null,
         pickedAt: null,
-        issueLineCode: null, // Код лінії видання
+        issueLineCode: null,
+      },
+      {
+        id: 2,
+        productId: 2,
+        productName: 'Хліб білий',
+        containerId: 2,
+        containerCode: 'A01-CNT-002',
+        rowNumber: 1,
+        productCode: 'PRD-002',
+        quantity: 25,
+        unitType: 'pieces',
+        status: 'pending',
+        pickedQuantity: 0,
+        pickedBy: null,
+        pickedAt: null,
+        issueLineCode: null,
+      },
+      {
+        id: 3,
+        productId: 4,
+        productName: 'Кефір 2.5%',
+        containerId: 3,
+        containerCode: 'A02-CNT-003',
+        rowNumber: 2,
+        productCode: 'PRD-004',
+        quantity: 40,
+        unitType: 'liters',
+        status: 'pending',
+        pickedQuantity: 0,
+        pickedBy: null,
+        pickedAt: null,
+        issueLineCode: null,
       },
     ],
   },
@@ -38,19 +70,221 @@ let mockOrders = [
     status: 'active',
     createdAt: '2024-01-20T11:00:00',
     createdBy: 'admin@test.com',
-    issueLineCode: null, // Лінія видання для замовлення
-    carts: [], // Візки з товарами
+    issueLineCode: 'LINE-002',
+    carts: [],
     items: [
       {
         id: 1,
         productId: 3,
         productName: 'Яйця курячі',
-        containerId: 3,
-        containerCode: 'B02-CNT-003',
-        rowNumber: 2,
+        containerId: 7,
+        containerCode: 'B01-CNT-007',
+        rowNumber: 1,
         productCode: 'PRD-003',
         quantity: 20,
-        unitType: 'pieces', // Тип одиниць вимірювання
+        unitType: 'pieces',
+        status: 'pending',
+        pickedQuantity: 0,
+        pickedBy: null,
+        pickedAt: null,
+        issueLineCode: null,
+      },
+      {
+        id: 2,
+        productId: 7,
+        productName: 'М\'ясо свиняче',
+        containerId: 9,
+        containerCode: 'B02-CNT-009',
+        rowNumber: 2,
+        productCode: 'PRD-007',
+        quantity: 30,
+        unitType: 'kilograms',
+        status: 'pending',
+        pickedQuantity: 0,
+        pickedBy: null,
+        pickedAt: null,
+        issueLineCode: null,
+      },
+      {
+        id: 3,
+        productId: 8,
+        productName: 'Риба морська',
+        containerId: 10,
+        containerCode: 'B02-CNT-010',
+        rowNumber: 2,
+        productCode: 'PRD-008',
+        quantity: 20,
+        unitType: 'kilograms',
+        status: 'pending',
+        pickedQuantity: 0,
+        pickedBy: null,
+        pickedAt: null,
+        issueLineCode: null,
+      },
+    ],
+  },
+  {
+    id: 3,
+    sector: 'A',
+    status: 'active',
+    createdAt: '2024-01-20T12:00:00',
+    createdBy: 'admin@test.com',
+    issueLineCode: 'LINE-003',
+    carts: [],
+    items: [
+      {
+        id: 1,
+        productId: 5,
+        productName: 'Сир твердий',
+        containerId: 4,
+        containerCode: 'A02-CNT-004',
+        rowNumber: 2,
+        productCode: 'PRD-005',
+        quantity: 15,
+        unitType: 'kilograms',
+        status: 'pending',
+        pickedQuantity: 0,
+        pickedBy: null,
+        pickedAt: null,
+        issueLineCode: null,
+      },
+      {
+        id: 2,
+        productId: 6,
+        productName: 'Масло вершкове',
+        containerId: 5,
+        containerCode: 'A03-CNT-005',
+        rowNumber: 3,
+        productCode: 'PRD-006',
+        quantity: 10,
+        unitType: 'kilograms',
+        status: 'pending',
+        pickedQuantity: 0,
+        pickedBy: null,
+        pickedAt: null,
+        issueLineCode: null,
+      },
+    ],
+  },
+  {
+    id: 4,
+    sector: 'C',
+    status: 'active',
+    createdAt: '2024-01-20T13:00:00',
+    createdBy: 'admin@test.com',
+    issueLineCode: 'LINE-004',
+    carts: [],
+    items: [
+      {
+        id: 1,
+        productId: 10,
+        productName: 'Фрукти свіжі',
+        containerId: 12,
+        containerCode: 'C01-CNT-012',
+        rowNumber: 1,
+        productCode: 'PRD-010',
+        quantity: 25,
+        unitType: 'kilograms',
+        status: 'pending',
+        pickedQuantity: 0,
+        pickedBy: null,
+        pickedAt: null,
+        issueLineCode: null,
+      },
+      {
+        id: 2,
+        productId: 11,
+        productName: 'Сік яблучний',
+        containerId: 13,
+        containerCode: 'C01-CNT-013',
+        rowNumber: 1,
+        productCode: 'PRD-011',
+        quantity: 40,
+        unitType: 'liters',
+        status: 'pending',
+        pickedQuantity: 0,
+        pickedBy: null,
+        pickedAt: null,
+        issueLineCode: null,
+      },
+      {
+        id: 3,
+        productId: 12,
+        productName: 'Вода мінеральна',
+        containerId: 14,
+        containerCode: 'C02-CNT-014',
+        rowNumber: 2,
+        productCode: 'PRD-012',
+        quantity: 60,
+        unitType: 'liters',
+        status: 'pending',
+        pickedQuantity: 0,
+        pickedBy: null,
+        pickedAt: null,
+        issueLineCode: null,
+      },
+      {
+        id: 4,
+        productId: 13,
+        productName: 'Крупа гречана',
+        containerId: 15,
+        containerCode: 'C02-CNT-015',
+        rowNumber: 2,
+        productCode: 'PRD-013',
+        quantity: 30,
+        unitType: 'kilograms',
+        status: 'pending',
+        pickedQuantity: 0,
+        pickedBy: null,
+        pickedAt: null,
+        issueLineCode: null,
+      },
+    ],
+  },
+  {
+    id: 5,
+    sector: 'B',
+    status: 'in_progress',
+    createdAt: '2024-01-20T09:00:00',
+    createdBy: 'admin@test.com',
+    issueLineCode: 'LINE-005',
+    carts: [
+      {
+        cartNumber: 'A123',
+        items: [
+          { itemId: 1, containerCode: 'B01-CNT-008', quantity: 10 },
+        ],
+        leftOnLine: false,
+        issueLineCode: null,
+      },
+    ],
+    items: [
+      {
+        id: 1,
+        productId: 3,
+        productName: 'Яйця курячі',
+        containerId: 8,
+        containerCode: 'B01-CNT-008',
+        rowNumber: 1,
+        productCode: 'PRD-003',
+        quantity: 15,
+        unitType: 'pieces',
+        status: 'in_progress',
+        pickedQuantity: 10,
+        pickedBy: 'operator@test.com',
+        pickedAt: '2024-01-20T09:30:00',
+        issueLineCode: null,
+      },
+      {
+        id: 2,
+        productId: 9,
+        productName: 'Овочі свіжі',
+        containerId: 11,
+        containerCode: 'B03-CNT-011',
+        rowNumber: 3,
+        productCode: 'PRD-009',
+        quantity: 30,
+        unitType: 'kilograms',
         status: 'pending',
         pickedQuantity: 0,
         pickedBy: null,
@@ -123,7 +357,7 @@ export const OrderService = {
       status: 'active',
       createdAt: new Date().toISOString(),
       createdBy: userLogin,
-      issueLineCode: null, // Лінія видання для замовлення
+      issueLineCode: orderData.issueLineCode || null, // Лінія видання для замовлення
       carts: [], // Візки з товарами
       items: orderData.items.map((item, index) => ({
         id: index + 1,
@@ -381,6 +615,28 @@ export const OrderService = {
       order.status = 'completed';
     } else {
       order.status = 'active'; // Замовлення продовжується
+    }
+
+    return JSON.parse(JSON.stringify(order));
+  },
+
+  // Позначити візок як залишений на лінії
+  markCartAsLeftOnLine: async (orderId, cartNumber, issueLineCode) => {
+    await delay(MOCK_DELAY);
+    const order = mockOrders.find(o => o.id === parseInt(orderId));
+    if (!order) {
+      throw {
+        response: {
+          data: 'Order not found',
+          status: 404,
+        },
+      };
+    }
+
+    const cart = order.carts.find(c => c.cartNumber === cartNumber && !c.leftOnLine);
+    if (cart) {
+      cart.leftOnLine = true;
+      cart.issueLineCode = issueLineCode || null;
     }
 
     return JSON.parse(JSON.stringify(order));

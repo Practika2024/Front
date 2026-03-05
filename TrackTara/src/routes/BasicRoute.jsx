@@ -19,6 +19,8 @@ import CreateProduct from "../pages/products/components/modals/CreateProduct.jsx
 import UpdateProduct from "../pages/products/components/modals/UpdateProduct.jsx";
 import ProductTypesPage from "../pages/ProductTypesPage/ProductTypesPage.jsx"; // Import TareDetailPage
 import CreateOrder from "../pages/orders/CreateOrder.jsx";
+import CartRegistry from "../pages/carts/CartRegistry.jsx";
+import BrakiMag from "../pages/brakimag/BrakiMag.jsx";
 
 // eslint-disable-next-line react/display-name
 const BasicRoute = memo(() => {
@@ -26,7 +28,14 @@ const BasicRoute = memo(() => {
         <>
             <Routes>
                 <Route path="/" element={<Layout/>}>
-                    <Route index element={<HomePage/>}/>
+                    <Route 
+                        index 
+                        element={
+                            <ProtectedRoute allowedRoles={["Operator", "Administrator"]}>
+                                <HomePage/>
+                            </ProtectedRoute>
+                        }
+                    />
 
                     <Route path="/products">
                         <Route
@@ -142,6 +151,24 @@ const BasicRoute = memo(() => {
                             {
                                 <ProtectedRoute allowedRoles={["Administrator"]}>
                                     <CreateOrder/>
+                                </ProtectedRoute>
+                            }
+                    />
+                    <Route
+                        path="/carts/registry"
+                        element=
+                            {
+                                <ProtectedRoute allowedRoles={["Administrator"]}>
+                                    <CartRegistry/>
+                                </ProtectedRoute>
+                            }
+                    />
+                    <Route
+                        path="/brakimag"
+                        element=
+                            {
+                                <ProtectedRoute allowedRoles={["Administrator"]}>
+                                    <BrakiMag/>
                                 </ProtectedRoute>
                             }
                     />

@@ -136,3 +136,4 @@ const getDefaultDescription = (action, containerId) => {
 // Експортуємо дані для доступу з інших модулів
 export { mockProductHistories };
 
+

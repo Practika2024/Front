@@ -6,7 +6,9 @@ const MOCK_DELAY = 500;
 // Структура: { sector: 'A', rows: [1, 2, 3, ...] }
 let mockSectors = [
   { sector: 'A', rows: [1, 2, 3, 4, 5] },
-  { sector: 'B', rows: [1, 2, 3] },
+  { sector: 'B', rows: [1, 2, 3, 4] },
+  { sector: 'C', rows: [1, 2, 3] },
+  { sector: 'D', rows: [1, 2] },
 ];
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -145,4 +147,5 @@ export const MockSectorService = {
     return sector.rows.includes(parseInt(rowNumber));
   },
 };
+
 

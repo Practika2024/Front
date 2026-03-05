@@ -41,10 +41,10 @@ const CreateProduct = () => {
 
     return (
         <div className="container mt-5">
-            <h2 className="mb-4">Add New Product</h2>
+            <h2 className="mb-4">Додати новий продукт</h2>
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                    <label className="form-label">Name</label>
+                    <label className="form-label">Назва</label>
                     <input
                         type="text"
                         className="form-control"
@@ -54,7 +54,7 @@ const CreateProduct = () => {
                     />
                 </div>
                 <div className="mb-3">
-                    <label className="form-label">Description</label>
+                    <label className="form-label">Опис</label>
                     <textarea
                         className="form-control"
                         value={description}
@@ -63,7 +63,7 @@ const CreateProduct = () => {
                     ></textarea>
                 </div>
                 <div className="mb-3">
-                    <label className="form-label">Manufacture Date</label>
+                    <label className="form-label">Дата виробництва</label>
                     <input
                         type="date"
                         className="form-control"
@@ -73,14 +73,14 @@ const CreateProduct = () => {
                     />
                 </div>
                 <div className="mb-3">
-                    <label className="form-label">Product Type</label>
+                    <label className="form-label">Тип продукту</label>
                     <select
                         className="form-control"
                         value={typeId}
                         onChange={(e) => setTypeId(e.target.value)}
                         required
                     >
-                        <option value="">Select a product type</option>
+                        <option value="">Оберіть тип продукту</option>
                         {productTypes.map((type) => (
                             <option key={type.id} value={type.id}>
                                 {type.name}
@@ -101,7 +101,7 @@ const CreateProduct = () => {
                         Вкажіть номер тари, якщо продукт вже в тарі. Ряд автоматично витягується з коду (A01-CNT-001 → ряд 01)
                     </small>
                 </div>
-                <button type="submit" className="btn btn-primary">Add Product</button>
+                <button type="submit" className="btn btn-primary">Додати продукт</button>
             </form>
         </div>
     );

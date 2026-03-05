@@ -91,6 +91,22 @@ const Header = memo(() => {
                       Створити замовлення
                     </button>
                   </li>
+                  <li>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => navigate('/carts/registry')}
+                    >
+                      Реєстр поємників
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => navigate('/brakimag')}
+                    >
+                      Бракімаг
+                    </button>
+                  </li>
                 </ul>
               </div>
             )}

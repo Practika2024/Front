@@ -85,19 +85,19 @@ const ContainerDetailPage = () => {
 
     const getTypeName = (typeId) => {
         const type = containerTypes.find((containerType) => containerType.id === typeId);
-        return type ? type.name : 'Unknown';
+        return type ? type.name : 'Невідомо';
     };
 
     const getProductName = (productId) => {
         const product = products.find((product) => product.id === productId);
-        return product ? product.name : 'Unknown';
+        return product ? product.name : 'Невідомо';
     };
 
     const handleUpdate = () => navigate(`/tare/update/${containerId}`);
 
     const handleDelete = async () => {
         if (!container.isEmpty) {
-            alert('Cannot delete a container that contains a product.');
+            alert('Неможливо видалити контейнер, в якому є продукт.');
             return;
         }
         setShowConfirmDeleteModal(true);
@@ -180,21 +180,21 @@ const ContainerDetailPage = () => {
                                 <strong>Нотатки:</strong> {container.notes || 'Немає'}
                             </Card.Text>
                             <Button title={`Редагувати контейнер `} variant="outline-secondary" onClick={handleUpdate} className="p-1 border-0">
-                                <img src="/Icons for functions/free-icon-edit-3597088.png" alt="Edit" height="20" />
+                                <img src="/Icons for functions/free-icon-edit-3597088.png" alt="Редагувати" height="20" />
                             </Button>
                             <Button title={`Видалити контейнер `} variant="outline-secondary" onClick={handleDelete} className="p-1 border-0">
-                                <img src="/Icons for functions/free-icon-recycle-bin-3156999.png" alt="Delete" height="20" />
+                                <img src="/Icons for functions/free-icon-recycle-bin-3156999.png" alt="Видалити" height="20" />
                             </Button>
                             {/* Показуємо кнопку додавання, якщо контейнер порожній або є вільне місце */}
                             {(container.isEmpty || (container.volume - (container.currentQuantity || 0)) > 0) && (
                                 <Button title={`Додати продукт `} variant="outline-secondary" onClick={() => setShowAddProductModal(true)} className="p-1 border-0">
-                                    <img src="/Icons for functions/free-icon-import-7234396.png" alt="Add Product" height="20" />
+                                    <img src="/Icons for functions/free-icon-import-7234396.png" alt="Додати продукт" height="20" />
                                 </Button>
                             )}
                             {/* Показуємо кнопку вийняття, якщо контейнер не порожній */}
                             {!container.isEmpty && (
                                 <Button variant="outline-secondary" onClick={() => setShowRemoveProductModal(true)} className="p-1 border-0">
-                                    <img src="/Icons for functions/free-icon-package-1666995.png" alt="Clear Product" height="20" />
+                                    <img src="/Icons for functions/free-icon-package-1666995.png" alt="Вийняти продукт" height="20" />
                                 </Button>
                             )}
                         </Card.Body>
@@ -389,17 +389,17 @@ const ContainerDetailPage = () => {
 
             <Modal show={showConfirmDeleteModal} onHide={() => setShowConfirmDeleteModal(false)}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Confirm Deletion</Modal.Title>
+                    <Modal.Title>Підтвердження видалення</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <p>Are you sure you want to delete this container?</p>
+                    <p>Ви впевнені, що хочете видалити цей контейнер?</p>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowConfirmDeleteModal(false)}>
-                        Cancel
+                        Скасувати
                     </Button>
                     <Button variant="danger" onClick={confirmDelete}>
-                        Delete
+                        Видалити
                     </Button>
                 </Modal.Footer>
             </Modal>

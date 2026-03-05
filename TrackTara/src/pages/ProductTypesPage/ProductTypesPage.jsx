@@ -26,8 +26,8 @@ const ProductTypesPage = () => {
         dispatch(removeProductType(id));
     };
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
+    if (loading) return <div>Завантаження...</div>;
+    if (error) return <div>Помилка: {error}</div>;
 
     return (
         <Container className="mt-5">
@@ -62,7 +62,7 @@ const ProductTypesPage = () => {
                                             >
                                                 <img
                                                     src="/Icons for functions/free-icon-recycle-bin-3156999.png"
-                                                    alt="Delete"
+                                                    alt="Видалити"
                                                     height="20"
                                                 />
                                             </Button>
@@ -96,7 +96,7 @@ const ProductTypesPage = () => {
                 </Col>
             </Row>
 
-            {error && <div className="error">Error: {error.message}</div>}
+            {error && <div className="error">Помилка: {error.message}</div>}
         </Container>
     );
 };

@@ -23,7 +23,7 @@ const UsersTable = () => {
 
   return (
       <>
-        <button onClick={handleOpenModal}>Create User</button>
+        <button onClick={handleOpenModal}>Створити користувача</button>
         <RegisterUserModal open={isModalOpen} onClose={handleCloseModal} />
         <table className="table">
           <thead>

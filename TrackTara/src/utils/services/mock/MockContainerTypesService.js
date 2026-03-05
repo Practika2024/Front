@@ -61,3 +61,4 @@ export const deleteContainerType = async (id) => {
   mockContainerTypes.splice(index, 1);
 };
 
+

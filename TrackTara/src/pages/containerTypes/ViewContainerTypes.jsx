@@ -77,7 +77,7 @@ const ViewContainerTypes = () => {
                                             >
                                                 <img
                                                     src="/Icons for functions/free-icon-recycle-bin-3156999.png"
-                                                    alt="Delete"
+                                                    alt="Видалити"
                                                     height="20"
                                                 />
                                             </Button>
@@ -111,7 +111,7 @@ const ViewContainerTypes = () => {
                 </Col>
             </Row>
 
-            {error && <div className="error">Error: {error.message}</div>}
+            {error && <div className="error">Помилка: {error.message}</div>}
         </Container>
     );
 };

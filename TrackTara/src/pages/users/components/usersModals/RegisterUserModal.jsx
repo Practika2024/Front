@@ -8,11 +8,11 @@ import PropTypes from 'prop-types';
 import * as yup from 'yup';
 
 const validationSchema = yup.object().shape({
-  email: yup.string().email('Invalid email format').required('Email is required'),
-  password: yup.string().min(8, 'Password must be at least 8 characters long').required('Enter your password'),
-  name: yup.string().trim().required('Name is required').max(50, 'Name cannot exceed 50 characters'),
-  surname: yup.string().max(50, 'Surname cannot exceed 50 characters'),
-  patronymic: yup.string().max(50, 'Patronymic cannot exceed 50 characters'),
+  email: yup.string().email('Некоректний формат email').required('Email обов\'язковий'),
+  password: yup.string().min(8, 'Пароль має містити щонайменше 8 символів').required('Введіть пароль'),
+  name: yup.string().trim().required('Ім\'я обов\'язкове').max(50, 'Ім\'я не може перевищувати 50 символів'),
+  surname: yup.string().max(50, 'Прізвище не може перевищувати 50 символів'),
+  patronymic: yup.string().max(50, 'По батькові не може перевищувати 50 символів'),
 });
 
 const RegisterUserModal = ({ open, onClose }) => {
@@ -35,7 +35,7 @@ const RegisterUserModal = ({ open, onClose }) => {
     try {
       await validationSchema.validate(formData, { abortEarly: false });
       await UserService.createUser(formData);
-      toast.success('User registered successfully.');
+      toast.success('Користувача успішно зареєстровано.');
       dispatch(getUsers()); // Refresh the user list after creating a new user
       onClose();
     } catch (validationErrors) {
@@ -44,7 +44,7 @@ const RegisterUserModal = ({ open, onClose }) => {
           toast.error(error.message);
         });
       } else {
-        toast.error('Failed to register user.');
+        toast.error('Не вдалося зареєструвати користувача.');
       }
     }
   };
@@ -53,13 +53,13 @@ const RegisterUserModal = ({ open, onClose }) => {
       <Modal open={open} onClose={() => onClose(false)}>
         <Box sx={modalStyle}>
           <form onSubmit={handleSubmit}>
-            <TextField label="Name" name="name" value={formData.name} onChange={handleChange} fullWidth margin="normal" />
-            <TextField label="Surname" name="surname" value={formData.surname} onChange={handleChange} fullWidth margin="normal" />
-            <TextField label="Patronymic" name="patronymic" value={formData.patronymic} onChange={handleChange} fullWidth margin="normal" />
+            <TextField label="Ім'я" name="name" value={formData.name} onChange={handleChange} fullWidth margin="normal" />
+            <TextField label="Прізвище" name="surname" value={formData.surname} onChange={handleChange} fullWidth margin="normal" />
+            <TextField label="По батькові" name="patronymic" value={formData.patronymic} onChange={handleChange} fullWidth margin="normal" />
             <TextField label="Email" name="email" value={formData.email} onChange={handleChange} fullWidth margin="normal" />
-            <TextField label="Password" name="password" type="password" value={formData.password} onChange={handleChange} fullWidth margin="normal" />
+            <TextField label="Пароль" name="password" type="password" value={formData.password} onChange={handleChange} fullWidth margin="normal" />
             <Button type="submit" variant="contained" color="primary" fullWidth>
-              Register
+              Зареєструвати
             </Button>
           </form>
         </Box>

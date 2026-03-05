@@ -10,7 +10,7 @@ const DeleteProductModal = ({ showModal, closeModal, productId }) => {
     const result = await deleteProduct(productId)
     if (result.success) {
       closeModal()
-      toast.success("product deleted successfully")
+      toast.success("Продукт успішно видалено")
     } else {
       toast.error(result.message)
     }
@@ -33,17 +33,17 @@ const DeleteProductModal = ({ showModal, closeModal, productId }) => {
         }}
       >
         <Typography variant="h6" component="h2">
-          Confirm Deletion
+          Підтвердження видалення
         </Typography>
         <Typography variant="body1" sx={{ mt: 2 }}>
-          Are you sure you want to delete this Product?
+          Ви впевнені, що хочете видалити цей продукт?
         </Typography>
         <Box sx={{ display: 'flex', justifyContent: 'space-around', mt: 3 }}>
           <Button variant="contained" color="inherit" onClick={closeModal}>
-            Cancel
+            Скасувати
           </Button>
           <Button variant="contained" color="error" onClick={handleDeleteProduct}>
-            Delete
+            Видалити
           </Button>
         </Box>
       </Box>

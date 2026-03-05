@@ -89,7 +89,7 @@ const GoogleLogin = () => {
         {googleApiLoaded ? (
           <div id="loginGoogleBtn">Google</div>
         ) : (
-          <div>Loading...</div>
+          <div>Завантаження...</div>
         )}
     </div>
   );

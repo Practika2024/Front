@@ -17,6 +17,7 @@ const CreateOrder = () => {
     const [sectors, setSectors] = useState([]);
     const [selectedSector, setSelectedSector] = useState('');
     const [selectedItems, setSelectedItems] = useState([]); // [{productId, containerId, quantity}]
+    const [issueLineCode, setIssueLineCode] = useState(''); // Лінія видачі для замовлення
     const [error, setError] = useState('');
     
     // Стани для модального вікна введення кількості
@@ -177,10 +178,16 @@ const CreateOrder = () => {
             return;
         }
 
+        if (!issueLineCode.trim()) {
+            setError('Введіть лінію видачі для замовлення');
+            return;
+        }
+
         try {
             await OrderService.createOrder({
                 sector: selectedSector,
                 items: selectedItems,
+                issueLineCode: issueLineCode.trim(),
             });
             toast.success('Замовлення створено успішно');
             navigate('/');
@@ -226,6 +233,20 @@ const CreateOrder = () => {
                                             </option>
                                         ))}
                                     </Form.Select>
+                                </Form.Group>
+
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Лінія видачі</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        value={issueLineCode}
+                                        onChange={(e) => setIssueLineCode(e.target.value)}
+                                        placeholder="Наприклад: LINE-001"
+                                        required
+                                    />
+                                    <Form.Text className="text-muted">
+                                        Вкажіть лінію видачі, на яку потрібно покласти поємник з товарами
+                                    </Form.Text>
                                 </Form.Group>
 
                                 {selectedSector && (

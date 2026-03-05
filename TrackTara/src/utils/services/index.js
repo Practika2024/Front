@@ -25,3 +25,19 @@ export {
 // для зворотної сумісності з існуючим кодом
 export * from './ServiceFactory';
 
+// Експортуємо функції для реєстру поємників
+export {
+    validateCartNumber,
+    getAllCarts,
+    addCartToRegistry,
+    deleteCartFromRegistry,
+} from './mock/MockCartRegistry';
+
+// Експортуємо функції для бракімагу
+export {
+    getAllBrakiMagItems,
+    addToBrakiMag,
+    removeFromBrakiMag,
+    updateBrakiMagItem,
+} from './mock/MockBrakiMagService';
+

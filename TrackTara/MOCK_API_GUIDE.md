@@ -162,3 +162,4 @@ import { ServiceName } from '@/utils/services/ServiceName';
 
 Всі реальні сервіси залишаються в проекті і готові до використання коли бекенд буде готовий. Просто змініть `VITE_USE_MOCK_API=false` в `.env`.
 
+

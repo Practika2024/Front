@@ -19,7 +19,7 @@ const HeadersLinks = () => {
             </a>
             <ul className="navbar-nav ms-auto mb-2 mb-lg-0 gap-3">
                 <li className="nav-item">
-                    <Link className="nav-link fs-5" to="/">Головна</Link>
+                    <Link className="nav-link fs-5" to="/">Замовлення</Link>
                 </li>
                 {userRoles.includes("Operator") || userRoles.includes("Administrator") ? (
                     <>

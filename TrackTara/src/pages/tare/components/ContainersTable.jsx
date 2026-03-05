@@ -211,7 +211,7 @@ const ContainersTable = () => {
                 <Link  title={`Додати контейнер `} to="/tare/create" className="btn btn-primary">
                     <img
                         src="public/Icons for functions/free-icon-plus-3303893.png"
-                        alt="Create New Container"
+                        alt="Створити новий контейнер"
                         height="20"
                     />
                 </Link>
@@ -247,7 +247,7 @@ const ContainersTable = () => {
                                         <a href={`/tare/detail/${container.id}`}>{container.uniqueCode}</a>
                                     </td>
                                     <td>{container.name}</td>
-                                    <td>{typeNames[container.typeId] || 'Loading...'}</td>
+                                    <td>{typeNames[container.typeId] || 'Завантаження...'}</td>
                                     <td>{container.sector || '-'}</td>
                                     <td>{container.rowNumber || '-'}</td>
                                     <td>{container.volume} {getUnitLabel(container.unitType || 'liters')}</td>
@@ -271,7 +271,7 @@ const ContainersTable = () => {
 
                                             <img
                                                 src="/Icons for functions/free-icon-edit-3597088.png"
-                                                alt="Edit"
+                                                alt="Редагувати"
                                                 height="20"
                                             />
                                         </Button>
@@ -286,7 +286,7 @@ const ContainersTable = () => {
                                             >
                                                 <img
                                                     src="/Icons for functions/free-icon-import-7234396.png"
-                                                    alt="Set Product"
+                                                    alt="Призначити продукт"
                                                     height="20"
                                                 />
                                             </Button>
@@ -302,7 +302,7 @@ const ContainersTable = () => {
                                                     >
                                                         <img
                                                             src="/Icons for functions/free-icon-import-7234396.png"
-                                                            alt="Add Product"
+                                                            alt="Додати продукт"
                                                             height="20"
                                                         />
                                                     </Button>
@@ -315,7 +315,7 @@ const ContainersTable = () => {
                                                 >
                                                     <img
                                                         src="/Icons for functions/free-icon-package-1666995.png"
-                                                        alt="Clear Product"
+                                                        alt="Вийняти продукт"
                                                         height="20"
                                                     />
                                                 </Button>
@@ -329,7 +329,7 @@ const ContainersTable = () => {
                                         >
                                             <img
                                                 src="/Icons for functions/free-icon-recycle-bin-3156999.png"
-                                                alt="Delete"
+                                                alt="Видалити"
                                                 height="20"
                                             />
                                         </Button>

@@ -30,19 +30,19 @@ const UsersTableRow = React.memo(
                     if (result.success) {
                         await getUsers();
                         setSelectedRole(newRole);
-                        toast.success("User role updated successfully.");
+                        toast.success("Роль користувача успішно оновлено.");
                     } else {
-                        toast.error(result.message || "Failed to update role.");
+                        toast.error(result.message || "Не вдалося оновити роль.");
                     }
                 } catch (error) {
-                    toast.error("Failed to change roles.");
+                    toast.error("Не вдалося змінити ролі.");
                 }
             },
             [user.id, selectedRole, changeRoles, getUsers]
         );
 
         const userAvatar = useMemo(() => userImage(user.image?.filePath), [user.image]);
-        const roleOptions = useMemo(() => roleList.length ? roleList : [{ name: "No Roles Available" }], [roleList]);
+        const roleOptions = useMemo(() => roleList.length ? roleList : [{ name: "Ролі відсутні" }], [roleList]);
 
         return (
             <>
@@ -54,10 +54,10 @@ const UsersTableRow = React.memo(
                             value={selectedRole}
                             onChange={handleRoleChange}
                             displayEmpty
-                            inputProps={{ 'aria-label': 'Role' }}
+                            inputProps={{ 'aria-label': 'Роль' }}
                         >
                             {roleOptions.map((role) => (
-                                <MenuItem key={role.name} value={role.name} disabled={role.name === "No Roles Available"}>
+                                <MenuItem key={role.name} value={role.name} disabled={role.name === "Ролі відсутні"}>
                                     {role.name}
                                 </MenuItem>
                             ))}
@@ -67,7 +67,7 @@ const UsersTableRow = React.memo(
                         <img
                             height="50"
                             width="50"
-                            alt="User Avatar"
+                            alt="Аватар користувача"
                             loading="lazy"
                             src={userAvatar}
                         />
@@ -78,7 +78,7 @@ const UsersTableRow = React.memo(
                             color="error"
                             onClick={() => setShowDeleteModal(true)}
                         >
-                            Delete
+                            Видалити
                         </Button>
                     </td>
                 </tr>

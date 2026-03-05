@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Table, Button, Form, Modal, Alert, Badge } from 'react-bootstrap';
-import { OrderService, SectorService, getAllContainers } from '../../utils/services';
+import { OrderService, SectorService, getAllContainers, validateCartNumber, addToBrakiMag } from '../../utils/services';
 import { toast } from 'react-toastify';
 import { fetchProducts } from '../../store/state/actions/productActions';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,6 +27,12 @@ const HomePage = () => {
     const [pickedQuantity, setPickedQuantity] = useState(''); // Кількість, яку виймають (може бути менше за замовлену)
     const [issueLineCode, setIssueLineCode] = useState('');
     const [pickStep, setPickStep] = useState(0); // 0 - введення номера візка, 1 - введення коду продукту, 2 - введення коду контейнера, 3 - введення кількості для вийняття, 4 - введення коду лінії видання (тільки при повному вийнятті)
+    const [showChangeCartModal, setShowChangeCartModal] = useState(false); // Модальне вікно для зміни візка
+    const [newCartNumber, setNewCartNumber] = useState(''); // Новий номер візка
+    const [oldCartIssueLine, setOldCartIssueLine] = useState(''); // Лінія видачі для старого поємника
+    const [showBrakiMagModal, setShowBrakiMagModal] = useState(false); // Модальне вікно для додавання до бракімагу
+    const [brakiMagQuantity, setBrakiMagQuantity] = useState(''); // Кількість для бракімагу
+    const [brakiMagReason, setBrakiMagReason] = useState('Не вистачило товару'); // Причина додавання до бракімагу
     const [error, setError] = useState('');
 
     useEffect(() => {
@@ -103,16 +109,27 @@ const HomePage = () => {
         setShowPickModal(true);
     };
 
-    const handleCartNumberSubmit = (e) => {
+    const handleCartNumberSubmit = async (e) => {
         e.preventDefault();
         setError('');
 
         if (!cartNumber.trim()) {
-            setError('Введіть номер візка');
+            setError('Введіть номер поємника');
             return;
         }
 
-        setPickStep(1);
+        // Перевіряємо, чи існує поємник в реєстрі
+        try {
+            const isValid = await validateCartNumber(cartNumber.trim());
+            if (!isValid) {
+                setError('Поємник з таким номером не існує в реєстрі. Перевірте правильність введення.');
+                return;
+            }
+            setPickStep(1);
+        } catch (error) {
+            console.error('Error validating cart number:', error);
+            setError('Помилка перевірки номера поємника');
+        }
     };
 
     const handleProductCodeSubmit = (e) => {
@@ -188,9 +205,8 @@ const HomePage = () => {
         if (quantity === remainingQuantity) {
             setPickStep(4);
         } else {
-            // Якщо часткове вийняття - питаємо, чи потрібен новий візок
-            setPickStep(5); // Крок 5 - питання про новий візок
-            // Зберігаємо кількість для подальшого використання
+            // Якщо часткове вийняття - одразу продовжуємо з тим самим візком
+            handlePartialPick(quantity);
         }
     };
 
@@ -211,19 +227,27 @@ const HomePage = () => {
                 : `Вийнято ${formatQuantity(quantity, currentContainer?.unitType || 'liters')} у візок ${cartNumber}. Замовлення продовжується.`;
             
             toast.success(message);
-            setShowPickModal(false);
-            setPickStep(0);
-            setCartNumber('');
-            setProductCode('');
-            setContainerCode('');
-            setPickedQuantity('');
-            setIssueLineCode('');
-            setError('');
-            setCurrentContainer(null);
             
             // Оновлюємо список замовлень та контейнерів
-            loadOrders(selectedSector);
-            loadContainers();
+            await loadOrders(selectedSector);
+            await loadContainers();
+            
+            // Оновлюємо поточний елемент замовлення з новими даними
+            const updatedOrders = await OrderService.getOrdersBySector(selectedSector);
+            const updatedOrder = updatedOrders.find(o => o.id === currentOrder.id);
+            if (updatedOrder) {
+                const updatedItem = updatedOrder.items.find(i => i.id === currentItem.id);
+                if (updatedItem) {
+                    setCurrentItem(updatedItem);
+                    setCurrentOrder(updatedOrder);
+                    // Очищаємо поля для продовження роботи
+                    setProductCode('');
+                    setContainerCode('');
+                    setPickedQuantity('');
+                    // Залишаємось на кроку 1 (введення коду продукту)
+                    setPickStep(1);
+                }
+            }
         } catch (error) {
             console.error('Error picking product partially:', error);
             setError(error.response?.data || 'Помилка вийняття продукту');
@@ -269,6 +293,55 @@ const HomePage = () => {
         }
     };
 
+    const handleChangeCart = () => {
+        setShowChangeCartModal(true);
+        setNewCartNumber('');
+        setOldCartIssueLine('');
+        setError('');
+    };
+
+    const handleConfirmChangeCart = async () => {
+        setError('');
+        if (!newCartNumber.trim()) {
+            setError('Введіть номер нового поємника');
+            return;
+        }
+
+        // Перевіряємо, чи вказано лінію видачі для старого поємника
+        if (!oldCartIssueLine.trim()) {
+            setError('Введіть лінію видачі для поточного поємника');
+            return;
+        }
+
+        // Перевіряємо, чи існує поємник в реєстрі
+        try {
+            const isValid = await validateCartNumber(newCartNumber.trim());
+            if (!isValid) {
+                setError('Поємник з таким номером не існує в реєстрі. Перевірте правильність введення.');
+                return;
+            }
+
+            // Якщо в поточному візку вже є товари, позначаємо його як залишений на лінії
+            if (cartNumber && currentOrder) {
+                try {
+                    await OrderService.markCartAsLeftOnLine(currentOrder.id, cartNumber, oldCartIssueLine.trim());
+                } catch (error) {
+                    console.error('Error marking cart as left on line:', error);
+                }
+            }
+
+            // Встановлюємо новий номер візка
+            setCartNumber(newCartNumber.trim().toUpperCase());
+            setShowChangeCartModal(false);
+            setNewCartNumber('');
+            setOldCartIssueLine('');
+            toast.success(`Поємник змінено на ${newCartNumber.trim().toUpperCase()}. Старий поємник ${cartNumber} залишено на лінії ${oldCartIssueLine.trim()}`);
+        } catch (error) {
+            console.error('Error validating cart number:', error);
+            setError('Помилка перевірки номера поємника');
+        }
+    };
+
     const handleClosePickModal = () => {
         setShowPickModal(false);
         setPickStep(0);
@@ -281,6 +354,91 @@ const HomePage = () => {
         setCurrentItem(null);
         setCurrentOrder(null);
         setCurrentContainer(null);
+        setShowChangeCartModal(false);
+        setNewCartNumber('');
+        setOldCartIssueLine('');
+        setShowBrakiMagModal(false);
+        setBrakiMagQuantity('');
+        setBrakiMagReason('Не вистачило товару');
+    };
+
+    const handleAddToBrakiMag = async () => {
+        if (!brakiMagQuantity.trim()) {
+            setError('Введіть кількість для бракімагу');
+            return;
+        }
+
+        const quantity = parseFloat(brakiMagQuantity);
+        if (isNaN(quantity) || quantity <= 0) {
+            setError('Введіть коректну кількість');
+            return;
+        }
+
+        const remainingQuantity = currentItem.quantity - (currentItem.pickedQuantity || 0);
+        if (quantity > remainingQuantity) {
+            setError(`Кількість не може перевищувати ${formatQuantity(remainingQuantity, currentContainer?.unitType || 'liters')}`);
+            return;
+        }
+
+        try {
+            await addToBrakiMag({
+                productId: currentItem.productId,
+                productName: currentItem.productName,
+                productCode: currentItem.productCode,
+                containerCode: currentItem.containerCode,
+                quantity: quantity,
+                unitType: currentContainer?.unitType || 'liters',
+                reason: brakiMagReason,
+                orderId: currentOrder?.id || null,
+            });
+
+            toast.success(`Додано ${formatQuantity(quantity, currentContainer?.unitType || 'liters')} до бракімагу`);
+            setShowBrakiMagModal(false);
+            setBrakiMagQuantity('');
+            setBrakiMagReason('Не вистачило товару');
+            
+            // Оновлюємо список замовлень
+            await loadOrders(selectedSector);
+        } catch (error) {
+            console.error('Error adding to braki mag:', error);
+            setError(error.response?.data || 'Помилка додавання до бракімагу');
+        }
+    };
+
+    const handleAddFullItemToBrakiMag = async () => {
+        if (!currentItem) return;
+
+        const remainingQuantity = currentItem.quantity - (currentItem.pickedQuantity || 0);
+        if (remainingQuantity <= 0) {
+            toast.warning('Немає товару для додавання до бракімагу');
+            return;
+        }
+
+        try {
+            // Знаходимо контейнер для отримання інформації про одиниці вимірювання
+            const container = containers.find(c => c.uniqueCode === currentItem.containerCode);
+            const unitType = container?.unitType || 'liters';
+
+            await addToBrakiMag({
+                productId: currentItem.productId,
+                productName: currentItem.productName,
+                productCode: currentItem.productCode,
+                containerCode: currentItem.containerCode,
+                quantity: remainingQuantity,
+                unitType: unitType,
+                reason: 'Не вистачило товару',
+                orderId: currentOrder?.id || null,
+            });
+
+            toast.success(`Додано повністю позицію (${formatQuantity(remainingQuantity, unitType)}) до бракімагу`);
+            
+            // Закриваємо модальне вікно та оновлюємо замовлення
+            handleClosePickModal();
+            await loadOrders(selectedSector);
+        } catch (error) {
+            console.error('Error adding full item to braki mag:', error);
+            setError(error.response?.data || 'Помилка додавання до бракімагу');
+        }
     };
 
     // Використовуємо orders напряму для відображення
@@ -343,6 +501,18 @@ const HomePage = () => {
                     <Modal.Title>Вийняти продукт</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    {/* Кнопка зміни візка */}
+                    {cartNumber && pickStep > 0 && (
+                        <div className="mb-3 d-flex justify-content-end">
+                            <Button 
+                                variant="outline-secondary" 
+                                size="sm"
+                                onClick={handleChangeCart}
+                            >
+                                Змінити візок ({cartNumber})
+                            </Button>
+                        </div>
+                    )}
                     {error && <Alert variant="danger">{error}</Alert>}
                     
                     {currentItem && (
@@ -354,6 +524,10 @@ const HomePage = () => {
                                     <p><strong>Очікуваний код продукту:</strong> {currentItem.productCode}</p>
                                     <p><strong>Очікуваний код контейнера:</strong> {currentItem.containerCode}</p>
                                     <p><strong>Ряд:</strong> {currentItem.rowNumber}</p>
+                                    <p>
+                                        <strong>Куди класти поємнік (лінія видачі):</strong>{' '}
+                                        {currentOrder?.issueLineCode || '—'}
+                                    </p>
                                     <p><strong>Замовлена кількість:</strong> {
                                         currentContainer 
                                             ? formatQuantity(currentItem.quantity, currentContainer.unitType || 'liters')
@@ -379,19 +553,20 @@ const HomePage = () => {
                     {pickStep === 0 && (
                         <Form onSubmit={handleCartNumberSubmit}>
                             <Form.Group className="mb-3">
-                                <Form.Label>Крок 0: Введіть номер візка</Form.Label>
+                                <Form.Label>Крок 0: Введіть номер поємника</Form.Label>
                                 <Form.Control
                                     type="text"
                                     value={cartNumber}
                                     onChange={(e) => {
-                                        setCartNumber(e.target.value);
+                                        setCartNumber(e.target.value.toUpperCase());
                                         setError('');
                                     }}
-                                    placeholder="Введіть номер візка (наприклад, CART-001)"
+                                    placeholder="Введіть номер поємника (наприклад, A123)"
                                     autoFocus
+                                    style={{ textTransform: 'uppercase' }}
                                 />
                                 <Form.Text className="text-muted">
-                                    Вкажіть номер візка, в який буде покладено товар
+                                    Вкажіть номер поємника, в який буде покладено товар. Формат: літера + 3 цифри (наприклад, A123)
                                 </Form.Text>
                             </Form.Group>
                             <Button type="submit" variant="primary">Далі</Button>
@@ -416,6 +591,15 @@ const HomePage = () => {
                                     В майбутньому це буде скануватися штрих-кодом
                                 </Form.Text>
                             </Form.Group>
+                            <div className="mb-3">
+                                <Button 
+                                    variant="outline-warning" 
+                                    onClick={handleAddFullItemToBrakiMag}
+                                    className="w-100"
+                                >
+                                    Додати всю позицію до бракімагу
+                                </Button>
+                            </div>
                             <div className="d-flex gap-2">
                                 <Button variant="secondary" onClick={() => setPickStep(0)}>Назад</Button>
                                 <Button type="submit" variant="primary">Далі</Button>
@@ -479,6 +663,15 @@ const HomePage = () => {
                                     }
                                 </Form.Text>
                             </Form.Group>
+                            <div className="mb-3">
+                                <Button 
+                                    variant="outline-warning" 
+                                    onClick={() => setShowBrakiMagModal(true)}
+                                    className="w-100"
+                                >
+                                    Додати до бракімагу (якщо не вистачило або не знайшли)
+                                </Button>
+                            </div>
                             <div className="d-flex gap-2">
                                 <Button variant="secondary" onClick={() => setPickStep(2)}>Назад</Button>
                                 <Button type="submit" variant="primary">Продовжити</Button>
@@ -510,87 +703,67 @@ const HomePage = () => {
                             </div>
                         </Form>
                     )}
-
-                    {pickStep === 5 && (
-                        <div>
-                            <Alert variant="info" className="mb-3">
-                                <strong>Вийнято:</strong> {formatQuantity(parseFloat(pickedQuantity), currentContainer?.unitType || 'liters')}<br />
-                                <strong>Візок:</strong> {cartNumber}
-                            </Alert>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Чи потрібен новий візок для наступного товару?</Form.Label>
-                                <div className="d-flex gap-2 mb-3">
-                                    <Button 
-                                        variant="primary" 
-                                        onClick={() => {
-                                            // Продовжуємо з тим самим візком
-                                            handlePartialPick(parseFloat(pickedQuantity), false);
-                                        }}
-                                    >
-                                        Продовжити з цим візком
-                                    </Button>
-                                    <Button 
-                                        variant="outline-primary" 
-                                        onClick={() => {
-                                            // Потрібен новий візок - переходимо до введення нового номера
-                                            setPickStep(6);
-                                        }}
-                                    >
-                                        Ввести новий візок
-                                    </Button>
-                                </div>
-                                <Form.Text className="text-muted">
-                                    Якщо поточний візок заповнився, введіть номер нового візка для продовження роботи
-                                </Form.Text>
-                            </Form.Group>
-                            <div className="d-flex gap-2">
-                                <Button variant="secondary" onClick={() => setPickStep(3)}>Назад</Button>
-                            </div>
-                        </div>
-                    )}
-
-                    {pickStep === 6 && (
-                        <Form>
-                            <Alert variant="warning" className="mb-3">
-                                Старий візок залишається на поточній позиції. Введіть номер нового візка для продовження.
-                            </Alert>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Введіть номер нового візка</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={cartNumber}
-                                    onChange={(e) => {
-                                        setCartNumber(e.target.value);
-                                        setError('');
-                                    }}
-                                    placeholder="Наприклад: CART-002"
-                                    autoFocus
-                                />
-                            </Form.Group>
-                            {error && <Alert variant="danger">{error}</Alert>}
-                            <div className="d-flex gap-2">
-                                <Button variant="secondary" onClick={() => setPickStep(5)}>Назад</Button>
-                                <Button 
-                                    type="button" 
-                                    variant="primary"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        setError('');
-                                        const newCartNumber = cartNumber.trim();
-                                        if (!newCartNumber) {
-                                            setError('Введіть номер нового візка');
-                                            return;
-                                        }
-                                        // Продовжуємо з новим візком
-                                        handlePartialPick(parseFloat(pickedQuantity), true);
-                                    }}
-                                >
-                                    Продовжити
-                                </Button>
-                            </div>
-                        </Form>
-                    )}
                 </Modal.Body>
+            </Modal>
+
+            {/* Модальне вікно зміни візка */}
+            <Modal show={showChangeCartModal} onHide={() => setShowChangeCartModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Змінити візок</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {error && <Alert variant="danger">{error}</Alert>}
+                    {cartNumber && (
+                        <Alert variant="info" className="mb-3">
+                            Поточний поємник: <strong>{cartNumber}</strong>
+                            {currentOrder && (
+                                <div className="mt-2">
+                                    <small>Вкажіть лінію видачі, на яку покладено поточний поємник.</small>
+                                </div>
+                            )}
+                        </Alert>
+                    )}
+                    <Form.Group className="mb-3">
+                        <Form.Label>Лінія видачі для поточного поємника ({cartNumber})</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={oldCartIssueLine}
+                            onChange={(e) => {
+                                setOldCartIssueLine(e.target.value);
+                                setError('');
+                            }}
+                            placeholder="Наприклад: LINE-001"
+                            autoFocus
+                        />
+                        <Form.Text className="text-muted">
+                            Вкажіть лінію видачі, на яку покладено поточний поємник
+                        </Form.Text>
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Введіть номер нового поємника</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={newCartNumber}
+                            onChange={(e) => {
+                                setNewCartNumber(e.target.value.toUpperCase());
+                                setError('');
+                            }}
+                            placeholder="Наприклад: A123"
+                            style={{ textTransform: 'uppercase' }}
+                        />
+                        <Form.Text className="text-muted">
+                            Формат: літера + 3 цифри (наприклад, A123, B456)
+                        </Form.Text>
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowChangeCartModal(false)}>
+                        Скасувати
+                    </Button>
+                    <Button variant="primary" onClick={handleConfirmChangeCart}>
+                        Змінити
+                    </Button>
+                </Modal.Footer>
             </Modal>
 
             {/* Список замовлень */}
@@ -612,10 +785,15 @@ const HomePage = () => {
                                     Замовлення #{order.id} 
                                     {order.issueLineCode && (
                                         <Badge bg="info" className="ms-2">
-                                            Лінія видання: {order.issueLineCode}
+                                            Лінія видачі: {order.issueLineCode}
                                         </Badge>
                                     )}
                                 </Card.Title>
+                                {order.issueLineCode && (
+                                    <Alert variant="info" className="mb-3">
+                                        <strong>Лінія видачі для поємника:</strong> {order.issueLineCode}
+                                    </Alert>
+                                )}
                                 
                                 {/* Інформація про візки */}
                                 {order.carts && order.carts.length > 0 && (
@@ -713,6 +891,79 @@ const HomePage = () => {
                     ))}
                 </div>
             )}
+
+            {/* Модальне вікно додавання до бракімагу */}
+            <Modal show={showBrakiMagModal} onHide={() => {
+                setShowBrakiMagModal(false);
+                setBrakiMagQuantity('');
+                setBrakiMagReason('Не вистачило товару');
+                setError('');
+            }}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Додати до бракімагу</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {error && <Alert variant="danger">{error}</Alert>}
+                    {currentItem && (
+                        <div className="mb-3">
+                            <p><strong>Продукт:</strong> {currentItem.productName}</p>
+                            <p><strong>Код продукту:</strong> {currentItem.productCode}</p>
+                            <p><strong>Код контейнера:</strong> {currentItem.containerCode}</p>
+                            <p><strong>Залишилось вийняти:</strong> {
+                                currentContainer 
+                                    ? formatQuantity(currentItem.quantity - (currentItem.pickedQuantity || 0), currentContainer.unitType || 'liters')
+                                    : `${currentItem.quantity - (currentItem.pickedQuantity || 0)} л/кг`
+                            }</p>
+                        </div>
+                    )}
+                    <Form.Group className="mb-3">
+                        <Form.Label>Кількість для бракімагу</Form.Label>
+                        <Form.Control
+                            type="number"
+                            step={currentContainer?.unitType === 'pieces' ? '1' : '0.01'}
+                            min={currentContainer?.unitType === 'pieces' ? '1' : '0.01'}
+                            max={currentItem ? (currentItem.quantity - (currentItem.pickedQuantity || 0)) : 0}
+                            value={brakiMagQuantity}
+                            onChange={(e) => {
+                                setBrakiMagQuantity(e.target.value);
+                                setError('');
+                            }}
+                            placeholder="Введіть кількість"
+                            autoFocus
+                        />
+                        <Form.Text className="text-muted">
+                            Максимальна кількість: {currentItem && currentContainer 
+                                ? formatQuantity(currentItem.quantity - (currentItem.pickedQuantity || 0), currentContainer.unitType || 'liters')
+                                : '0'}
+                        </Form.Text>
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Причина</Form.Label>
+                        <Form.Select
+                            value={brakiMagReason}
+                            onChange={(e) => setBrakiMagReason(e.target.value)}
+                        >
+                            <option value="Не вистачило товару">Не вистачило товару</option>
+                            <option value="Не знайшли потрібної кількості">Не знайшли потрібної кількості</option>
+                            <option value="Пошкоджений товар">Пошкоджений товар</option>
+                            <option value="Інша причина">Інша причина</option>
+                        </Form.Select>
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => {
+                        setShowBrakiMagModal(false);
+                        setBrakiMagQuantity('');
+                        setBrakiMagReason('Не вистачило товару');
+                        setError('');
+                    }}>
+                        Скасувати
+                    </Button>
+                    <Button variant="warning" onClick={handleAddToBrakiMag}>
+                        Додати до бракімагу
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </Container>
     );
 };

@@ -62,6 +62,15 @@ export const pickProductPartial = async (orderId, itemId, productCode, container
     return response.data;
 };
 
+export const markCartAsLeftOnLine = async (orderId, cartNumber, issueLineCode) => {
+    const response = await axios.post(`${API_URL}/mark-cart-left-on-line`, {
+        orderId,
+        cartNumber,
+        issueLineCode,
+    }, getAuthHeaders());
+    return response.data;
+};
+
 // Експортуємо як об'єкт для сумісності з MockOrderService
 export const OrderService = {
     getAllOrders,
@@ -71,5 +80,6 @@ export const OrderService = {
     updateOrderStatus,
     pickProduct,
     pickProductPartial,
+    markCartAsLeftOnLine,
 };
 

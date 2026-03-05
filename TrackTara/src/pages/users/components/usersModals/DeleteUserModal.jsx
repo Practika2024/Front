@@ -32,17 +32,17 @@ const DeleteUserModal = ({ showModal, closeModal, userId }) => {
         }}
       >
         <Typography variant="h6" component="h2">
-          Confirm Deletion
+          Підтвердження видалення
         </Typography>
         <Typography variant="body1" sx={{ mt: 2 }}>
-          Are you sure you want to delete this user?
+          Ви впевнені, що хочете видалити цього користувача?
         </Typography>
         <Box sx={{ display: 'flex', justifyContent: 'space-around', mt: 3 }}>
           <Button variant="contained" color="inherit" onClick={closeModal}>
-            Cancel
+            Скасувати
           </Button>
           <Button variant="contained" color="error" onClick={handleDeleteUser}>
-            Delete
+            Видалити
           </Button>
         </Box>
       </Box>
