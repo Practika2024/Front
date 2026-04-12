@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { getAllBrakiMagItems, removeFromBrakiMag } from '../../utils/services';
 import { toast } from 'react-toastify';
 import { formatQuantity } from '../../utils/helpers/unitFormatter';
+import { lineTotalWeightKg, formatWeightKg } from '../../utils/helpers/productWeight';
 
 const BrakiMag = () => {
     const navigate = useNavigate();
@@ -71,6 +72,7 @@ const BrakiMag = () => {
                             <th>Код продукту</th>
                             <th>Код контейнера</th>
                             <th>Кількість</th>
+                            <th>Вага ряд., кг</th>
                             <th>Причина</th>
                             <th>ID замовлення</th>
                             <th>Додав</th>
@@ -81,7 +83,7 @@ const BrakiMag = () => {
                     <tbody>
                         {items.length === 0 ? (
                             <tr>
-                                <td colSpan="10" className="text-center text-muted">
+                                <td colSpan="11" className="text-center text-muted">
                                     Бракімаг порожній
                                 </td>
                             </tr>
@@ -93,6 +95,7 @@ const BrakiMag = () => {
                                     <td>{item.productCode}</td>
                                     <td>{item.containerCode || '—'}</td>
                                     <td>{formatQuantity(item.quantity, item.unitType || 'liters')}</td>
+                                    <td>{formatWeightKg(lineTotalWeightKg(item.quantity, item.weightKg))}</td>
                                     <td>{item.reason}</td>
                                     <td>{item.orderId ? `#${item.orderId}` : '—'}</td>
                                     <td>{item.addedBy}</td>

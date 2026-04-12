@@ -13,6 +13,7 @@ export let mockProducts = [
     typeName: 'Молочні продукти',
     containerNumber: 'A01-CNT-001',
     rowNumber: 1,
+    weightKg: 1.03,
   },
   {
     id: 2,
@@ -23,6 +24,7 @@ export let mockProducts = [
     typeName: 'Хлібобулочні вироби',
     containerNumber: 'A01-CNT-002',
     rowNumber: 1,
+    weightKg: 0.45,
   },
   {
     id: 3,
@@ -33,6 +35,7 @@ export let mockProducts = [
     typeName: 'Яйця',
     containerNumber: 'B01-CNT-007',
     rowNumber: 1,
+    weightKg: 0.062,
   },
   {
     id: 4,
@@ -43,6 +46,7 @@ export let mockProducts = [
     typeName: 'Молочні продукти',
     containerNumber: 'A02-CNT-003',
     rowNumber: 2,
+    weightKg: 1.03,
   },
   {
     id: 5,
@@ -53,6 +57,7 @@ export let mockProducts = [
     typeName: 'Молочні продукти',
     containerNumber: 'A02-CNT-004',
     rowNumber: 2,
+    weightKg: 1,
   },
   {
     id: 6,
@@ -63,6 +68,7 @@ export let mockProducts = [
     typeName: 'Молочні продукти',
     containerNumber: 'A03-CNT-005',
     rowNumber: 3,
+    weightKg: 1,
   },
   {
     id: 7,
@@ -73,6 +79,7 @@ export let mockProducts = [
     typeName: 'М\'ясо',
     containerNumber: 'B02-CNT-009',
     rowNumber: 2,
+    weightKg: 1,
   },
   {
     id: 8,
@@ -83,6 +90,7 @@ export let mockProducts = [
     typeName: 'Риба',
     containerNumber: 'B02-CNT-010',
     rowNumber: 2,
+    weightKg: 1,
   },
   {
     id: 9,
@@ -93,6 +101,7 @@ export let mockProducts = [
     typeName: 'Овочі',
     containerNumber: 'B03-CNT-011',
     rowNumber: 3,
+    weightKg: 1,
   },
   {
     id: 10,
@@ -103,6 +112,7 @@ export let mockProducts = [
     typeName: 'Фрукти',
     containerNumber: 'C01-CNT-012',
     rowNumber: 1,
+    weightKg: 1,
   },
   {
     id: 11,
@@ -113,6 +123,7 @@ export let mockProducts = [
     typeName: 'Напої',
     containerNumber: 'C01-CNT-013',
     rowNumber: 1,
+    weightKg: 1.05,
   },
   {
     id: 12,
@@ -123,6 +134,7 @@ export let mockProducts = [
     typeName: 'Напої',
     containerNumber: 'C02-CNT-014',
     rowNumber: 2,
+    weightKg: 1,
   },
   {
     id: 13,
@@ -133,6 +145,7 @@ export let mockProducts = [
     typeName: 'Крупи',
     containerNumber: 'C02-CNT-015',
     rowNumber: 2,
+    weightKg: 1,
   },
 ];
 
@@ -180,6 +193,10 @@ export const MockProductService = {
     const newProduct = {
       id: Math.max(...mockProducts.map(p => p.id), 0) + 1,
       ...product,
+      weightKg:
+        product.weightKg != null && product.weightKg !== ''
+          ? Number(product.weightKg)
+          : 0,
       manufactureDate: product.manufactureDate || new Date().toISOString(),
     };
     mockProducts.push(newProduct);

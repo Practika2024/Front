@@ -1,9 +1,15 @@
 // Конфігурація для перемикання між реальним API та моками
 // Встановіть USE_MOCK_API=true в .env для використання мок-даних
 
+// У режимі розробки (vite dev) моки ввімкнені за замовчуванням, якщо явно не вказано VITE_USE_MOCK_API=false.
+// У production-білді моки лише при VITE_USE_MOCK_API=true (щоб не зламати деплой на реальний API).
+const useMockDefault =
+  import.meta.env.DEV
+    ? import.meta.env.VITE_USE_MOCK_API !== 'false'
+    : import.meta.env.VITE_USE_MOCK_API === 'true';
+
 export const API_CONFIG = {
-  // Перемикач між реальним API та моками
-  USE_MOCK_API: import.meta.env.VITE_USE_MOCK_API === 'true',
+  USE_MOCK_API: useMockDefault,
   
   // Базові URL для реального API
   BASE_URLS: {

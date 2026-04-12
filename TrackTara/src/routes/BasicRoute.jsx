@@ -4,7 +4,10 @@ import NotFoundPage from "../components/NotFoundPage";
 import Layout from "../components/layout/Layout";
 import Login from "../pages/auth/login/Login";
 import Register from "../pages/auth/register/Register";
-import HomePage from "../pages/home/HomePage";
+import RoleHomeRedirect from "../components/RoleHomeRedirect";
+import SalesDashboard from "../pages/sales/SalesDashboard.jsx";
+import ClientsRoutesPage from "../pages/sales/ClientsRoutesPage.jsx";
+import PackingStationPage from "../pages/packing/PackingStationPage.jsx";
 import MyProfilePage from "../pages/myProfile/MyProfilePage";
 import ProductPage from "../pages/products/ProductsPage";
 import UsersPage from "../pages/users/UsersPage";
@@ -21,6 +24,7 @@ import ProductTypesPage from "../pages/ProductTypesPage/ProductTypesPage.jsx"; /
 import CreateOrder from "../pages/orders/CreateOrder.jsx";
 import CartRegistry from "../pages/carts/CartRegistry.jsx";
 import BrakiMag from "../pages/brakimag/BrakiMag.jsx";
+import HomePage from "../pages/home/HomePage.jsx";
 
 // eslint-disable-next-line react/display-name
 const BasicRoute = memo(() => {
@@ -31,8 +35,42 @@ const BasicRoute = memo(() => {
                     <Route 
                         index 
                         element={
+                            <ProtectedRoute allowedRoles={["Operator", "Administrator", "SalesManager"]}>
+                                <RoleHomeRedirect/>
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/warehouse/pick"
+                        element={
                             <ProtectedRoute allowedRoles={["Operator", "Administrator"]}>
                                 <HomePage/>
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/sales"
+                        element={
+                            <ProtectedRoute allowedRoles={["SalesManager", "Administrator"]}>
+                                <SalesDashboard/>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/sales/clients"
+                        element={
+                            <ProtectedRoute allowedRoles={["SalesManager", "Administrator"]}>
+                                <ClientsRoutesPage/>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/packing"
+                        element={
+                            <ProtectedRoute allowedRoles={["Operator", "Administrator"]}>
+                                <PackingStationPage/>
                             </ProtectedRoute>
                         }
                     />
@@ -41,7 +79,7 @@ const BasicRoute = memo(() => {
                         <Route
                             index
                             element={
-                                <ProtectedRoute allowedRoles={["Operator"]}>
+                                <ProtectedRoute allowedRoles={["Operator", "Administrator", "SalesManager"]}>
                                     <ProductPage/>
                                 </ProtectedRoute>
                             }
@@ -59,7 +97,7 @@ const BasicRoute = memo(() => {
                     <Route
                         path="/profile"
                         element={
-                            <ProtectedRoute allowedRoles={["Operator"]}>
+                            <ProtectedRoute allowedRoles={["Operator", "Administrator", "SalesManager"]}>
                                 <MyProfilePage/>
                             </ProtectedRoute>
                         }
@@ -77,7 +115,7 @@ const BasicRoute = memo(() => {
                         path="/product/detail/:productId"
                         element=
                             {
-                                <ProtectedRoute allowedRoles={["Operator"]}>
+                                <ProtectedRoute allowedRoles={["Operator", "Administrator", "SalesManager"]}>
                                     <ProductDetail/>
                                 </ProtectedRoute>
                             }
@@ -149,7 +187,7 @@ const BasicRoute = memo(() => {
                         path="/orders/create"
                         element=
                             {
-                                <ProtectedRoute allowedRoles={["Administrator"]}>
+                                <ProtectedRoute allowedRoles={["Administrator", "SalesManager"]}>
                                     <CreateOrder/>
                                 </ProtectedRoute>
                             }

@@ -10,6 +10,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { fetchProducts } from '../../../store/state/actions/productActions';
 import { formatQuantity, getUnitLabel } from '../../../utils/helpers/unitFormatter';
+import { lineTotalWeightKg, formatWeightKg } from '../../../utils/helpers/productWeight';
+
 const ContainersTable = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -237,11 +239,18 @@ const ContainersTable = () => {
                                 <th onClick={() => handleSort('rowNumber')}>Ряд</th>
                                 <th onClick={() => handleSort('volume')}>Об&apos;єм</th>
                                 <th>Вміст</th>
+                                <th>
+                                    Вага{" "}
+                                    <span className="text-muted fw-normal">1&nbsp;од.,&nbsp;кг</span>
+                                </th>
+                                <th>Вага вмісту</th>
                                 <th>Дії</th>
                             </tr>
                             </thead>
                             <tbody>
-                            {currentItems.map(container => (
+                            {currentItems.map(container => {
+                                const prod = products.find(p => p.id === container.productId);
+                                return (
                                 <tr key={container.id}>
                                     <td>
                                         <a href={`/tare/detail/${container.id}`}>{container.uniqueCode}</a>
@@ -254,12 +263,27 @@ const ContainersTable = () => {
                                     <td>
                                         {container.isEmpty ? 'Порожній' : (
                                             <>
-                                                {products.find(p => p.id === container.productId)?.name || 'Невідомий продукт'}
+                                                {prod?.name || 'Невідомий продукт'}
                                                 {container.currentQuantity !== undefined && container.currentQuantity > 0 && (
                                                     <span className="text-muted ms-2">({formatQuantity(container.currentQuantity, container.unitType || 'liters')})</span>
                                                 )}
                                             </>
                                         )}
+                                    </td>
+                                    <td className="small text-nowrap text-muted" title="Кілограмів на 1 одиницю кількості в тарі (л, кг, шт)">
+                                        {container.isEmpty || !prod
+                                            ? '—'
+                                            : formatWeightKg(Number(prod.weightKg) || 0, 3)}
+                                    </td>
+                                    <td className="small text-nowrap">
+                                        {container.isEmpty || !container.productId
+                                            ? '—'
+                                            : formatWeightKg(
+                                                  lineTotalWeightKg(
+                                                      container.currentQuantity || 0,
+                                                      prod?.weightKg
+                                                  )
+                                              )}
                                     </td>
                                     <td>
                                         <Button
@@ -335,7 +359,8 @@ const ContainersTable = () => {
                                         </Button>
                                     </td>
                                 </tr>
-                            ))}
+                            );
+                            })}
                             </tbody>
                         </Table>
                     )}

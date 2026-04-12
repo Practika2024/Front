@@ -1,5 +1,16 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { thunk } from 'redux-thunk';
+import {
+    persistStore,
+    persistReducer,
+    FLUSH,
+    REHYDRATE,
+    PAUSE,
+    PERSIST,
+    PURGE,
+    REGISTER,
+} from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 import userReducer from '../store/state/reduserSlises/userSlice';
 import usersReducer from '../store/state/reduserSlises/usersSlice';
 import categoryReducer from '../store/state/reduserSlises/categorySlice';
@@ -13,6 +24,7 @@ import containersReducer from '../store/state/reduserSlises/containerSlice';
 import productTypeReducer from '../store/state/reduserSlises/productTypeSlice';
 import containerHistoryReducer from '../store/state/reduserSlises/containerHistorySlice';
 import productHistoryReducer from '../store/state/reduserSlises/productHistorySlice';
+
 export const rootReducer = combineReducers({
     user: userReducer,
     containerHistory: containerHistoryReducer,
@@ -29,7 +41,38 @@ export const rootReducer = combineReducers({
     productTypes: productTypeReducer,
 });
 
+const persistConfig = {
+    key: 'tracktara',
+    version: 1,
+    storage,
+    /** Усі зведені редʼюсери — кошик, фільтри, кеш списків тощо між F5 (localStorage, ~5 МБ ліміт). */
+    whitelist: [
+        'user',
+        'containerHistory',
+        'productHistory',
+        'role',
+        'category',
+        'manufacturer',
+        'product',
+        'appSettings',
+        'users',
+        'filters',
+        'containers',
+        'cartItem',
+        'productTypes',
+    ],
+};
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
 export const store = configureStore({
-    reducer: rootReducer,
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk),
+    reducer: persistedReducer,
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+            serializableCheck: {
+                ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+            },
+        }).concat(thunk),
 });
+
+export const persistor = persistStore(store);

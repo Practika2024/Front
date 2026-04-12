@@ -2,9 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProducts, deleteProduct } from '../../../store/state/actions/productActions';
 import { Link } from 'react-router-dom';
+import useAppRoles from '../../../hooks/useAppRoles';
+import { formatWeightKg } from '../../../utils/helpers/productWeight';
 
 const ProductsList = () => {
     const dispatch = useDispatch();
+    const roles = useAppRoles();
+    const canEditCatalog =
+        roles.includes('Operator') || roles.includes('Administrator');
     const products = useSelector((state) => state.product.products);
     const status = useSelector((state) => state.product.status);
     const [showModal, setShowModal] = useState(false);
@@ -52,7 +57,8 @@ const ProductsList = () => {
                     <th>Опис</th>
                     <th>Дата виробництва</th>
                     <th>Номер тари</th>
-                    <th>Дії</th>
+                    <th>Вага од., кг</th>
+                    {canEditCatalog && <th>Дії</th>}
                 </tr>
                 </thead>
                 <tbody>
@@ -67,30 +73,33 @@ const ProductsList = () => {
                         <td>{product.description}</td>
                         <td>{product.manufactureDate ? new Date(product.manufactureDate).toLocaleDateString('uk-UA') : '-'}</td>
                         <td>{product.containerNumber || <span className="text-muted">Не в тарі</span>}</td>
-                        <td>
-                            <Link
-                                title={`Редагувати продукт`}
-                                to={`/product/update/${product.id}`}
-                                className="btn btn-outline-secondary btn-sm p-0 border-0"
-                            >
-                                <img
-                                    src="/Icons for functions/free-icon-edit-3597088.png"
-                                    alt="Редагувати"
-                                    height="20"
-                                />
-                            </Link>
-                            <button
-                                title={`Видалити продукт`}
-                                className="btn btn-outline-secondary btn-sm ms-2 p-0 border-0"
-                                onClick={() => handleDelete(product.id)}
-                            >
-                                <img
-                                    src="/Icons for functions/free-icon-recycle-bin-3156999.png"
-                                    alt="Видалити"
-                                    height="20"
-                                />
-                            </button>
-                        </td>
+                        <td>{formatWeightKg(product.weightKg ?? 0)}</td>
+                        {canEditCatalog && (
+                            <td>
+                                <Link
+                                    title={`Редагувати продукт`}
+                                    to={`/product/update/${product.id}`}
+                                    className="btn btn-outline-secondary btn-sm p-0 border-0"
+                                >
+                                    <img
+                                        src="/Icons for functions/free-icon-edit-3597088.png"
+                                        alt="Редагувати"
+                                        height="20"
+                                    />
+                                </Link>
+                                <button
+                                    title={`Видалити продукт`}
+                                    className="btn btn-outline-secondary btn-sm ms-2 p-0 border-0"
+                                    onClick={() => handleDelete(product.id)}
+                                >
+                                    <img
+                                        src="/Icons for functions/free-icon-recycle-bin-3156999.png"
+                                        alt="Видалити"
+                                        height="20"
+                                    />
+                                </button>
+                            </td>
+                        )}
                     </tr>
                 ))}
                 </tbody>

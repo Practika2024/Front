@@ -25,7 +25,7 @@ const CartRegistry = () => {
             setCarts(data);
         } catch (error) {
             console.error('Error loading carts:', error);
-            toast.error('Помилка завантаження реєстру поємників');
+            toast.error('Помилка завантаження реєстру візків');
         } finally {
             setLoading(false);
         }
@@ -36,7 +36,7 @@ const CartRegistry = () => {
         setError('');
 
         if (!newCartNumber.trim()) {
-            setError('Введіть номер поємника');
+            setError('Введіть номер візка');
             return;
         }
 
@@ -52,20 +52,20 @@ const CartRegistry = () => {
         // Перевірка, чи вже існує
         const exists = await validateCartNumber(normalizedCartNumber);
         if (exists) {
-            setError('Поємник з таким номером вже існує');
+            setError('Візок з таким номером вже існує');
             return;
         }
 
         try {
             await addCartToRegistry(normalizedCartNumber);
-            toast.success(`Поємник ${normalizedCartNumber} додано до реєстру`);
+            toast.success(`Візок ${normalizedCartNumber} додано до реєстру`);
             setShowCreateModal(false);
             setNewCartNumber('');
             setError('');
             loadCarts();
         } catch (error) {
             console.error('Error creating cart:', error);
-            setError(error.response?.data || 'Помилка додавання поємника');
+            setError(error.response?.data || 'Помилка додавання візка');
         }
     };
 
@@ -79,13 +79,13 @@ const CartRegistry = () => {
 
         try {
             await deleteCartFromRegistry(cartToDelete);
-            toast.success(`Поємник ${cartToDelete} видалено з реєстру`);
+            toast.success(`Візок ${cartToDelete} видалено з реєстру`);
             setShowDeleteModal(false);
             setCartToDelete(null);
             loadCarts();
         } catch (error) {
             console.error('Error deleting cart:', error);
-            toast.error(error.response?.data || 'Помилка видалення поємника');
+            toast.error(error.response?.data || 'Помилка видалення візка');
         }
     };
 
@@ -96,10 +96,10 @@ const CartRegistry = () => {
                     <Button variant="outline-secondary" onClick={() => navigate('/')} className="me-3">
                         ← Назад
                     </Button>
-                    <h2>Реєстр поємників</h2>
+                    <h2>Реєстр візків</h2>
                 </div>
                 <Button variant="primary" onClick={() => setShowCreateModal(true)}>
-                    + Додати поємник
+                    + Додати візок
                 </Button>
             </div>
 
@@ -110,7 +110,7 @@ const CartRegistry = () => {
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Номер поємника</th>
+                            <th>Номер візка</th>
                             <th>Дія</th>
                         </tr>
                     </thead>
@@ -118,7 +118,7 @@ const CartRegistry = () => {
                         {carts.length === 0 ? (
                             <tr>
                                 <td colSpan="3" className="text-center text-muted">
-                                    Реєстр поємників порожній
+                                    Реєстр візків порожній
                                 </td>
                             </tr>
                         ) : (
@@ -142,20 +142,20 @@ const CartRegistry = () => {
                 </Table>
             )}
 
-            {/* Модальне вікно створення поємника */}
+            {/* Модальне вікно створення візка */}
             <Modal show={showCreateModal} onHide={() => {
                 setShowCreateModal(false);
                 setNewCartNumber('');
                 setError('');
             }}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Додати поємник</Modal.Title>
+                    <Modal.Title>Додати візок</Modal.Title>
                 </Modal.Header>
                 <Form onSubmit={handleCreateCart}>
                     <Modal.Body>
                         {error && <Alert variant="danger">{error}</Alert>}
                         <Form.Group className="mb-3">
-                            <Form.Label>Номер поємника</Form.Label>
+                            <Form.Label>Номер візка</Form.Label>
                             <Form.Control
                                 type="text"
                                 value={newCartNumber}
@@ -197,9 +197,9 @@ const CartRegistry = () => {
                     <Modal.Title>Підтвердження видалення</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <p>Ви впевнені, що хочете видалити поємник <strong>{cartToDelete}</strong> з реєстру?</p>
+                    <p>Ви впевнені, що хочете видалити візок <strong>{cartToDelete}</strong> з реєстру?</p>
                     <Alert variant="warning">
-                        Ця дія незворотна. Після видалення поємник не зможе бути використаний при виконанні замовлень.
+                        Ця дія незворотна. Після видалення візок не зможе бути використаний при виконанні замовлень.
                     </Alert>
                 </Modal.Body>
                 <Modal.Footer>

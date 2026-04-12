@@ -12,6 +12,8 @@ import { RoleService } from './RoleService';
 import * as ContainerHistoryService from './ContainerHistoryService';
 import * as ProductHistoryService from './ProductHistoryService';
 import { OrderService } from './OrderService';
+import { ClientRouteService } from './ClientRouteService';
+import * as RealPackingBoxService from './PackingBoxService';
 
 // Мок-сервіси
 import { MockAuthService } from './mock/MockAuthService';
@@ -25,6 +27,8 @@ import { MockSectorService } from './mock/MockSectorService';
 import * as MockContainerHistoryService from './mock/MockContainerHistoryService';
 import * as MockProductHistoryService from './mock/MockProductHistoryService';
 import { OrderService as MockOrderService } from './mock/MockOrderService';
+import { MockClientRouteService } from './mock/MockClientRouteService';
+import * as MockPackingBoxService from './mock/MockPackingBoxService';
 
 /**
  * Service Factory - вибирає між реальними та мок-сервісами
@@ -55,6 +59,7 @@ export const RoleServiceInstance = useMock ? MockRoleService : RoleService;
 export const ContainerHistoryServiceInstance = useMock ? MockContainerHistoryService : ContainerHistoryService;
 export const ProductHistoryServiceInstance = useMock ? MockProductHistoryService : ProductHistoryService;
 export const OrderServiceInstance = useMock ? MockOrderService : OrderService;
+export const ClientRouteServiceInstance = useMock ? MockClientRouteService : ClientRouteService;
 
 // Для зворотної сумісності - експортуємо також як класи/об'єкти
 export { AuthServiceInstance as AuthService };
@@ -107,4 +112,12 @@ export const {
 
 // Експортуємо OrderService
 export { OrderServiceInstance as OrderService };
+export { ClientRouteServiceInstance as ClientRouteService };
+
+const PackingBoxModule = useMock ? MockPackingBoxService : RealPackingBoxService;
+export const getAllPackingBoxes = PackingBoxModule.getAllPackingBoxes;
+export const createPackingBox = PackingBoxModule.createPackingBox;
+export const deletePackingBox = PackingBoxModule.deletePackingBox;
+export const addToPackingBox = PackingBoxModule.addToPackingBox;
+export const transferPackingBoxContent = PackingBoxModule.transferPackingBoxContent;
 

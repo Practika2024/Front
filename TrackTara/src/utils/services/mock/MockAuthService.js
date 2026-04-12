@@ -20,6 +20,22 @@ const MOCK_USERS = [
     role: 'Administrator',
     image: 'N/A',
   },
+  {
+    id: 3,
+    email: 'sales@test.com',
+    password: 'password123',
+    name: 'Sales Manager',
+    role: 'SalesManager',
+    image: 'N/A',
+  },
+  {
+    id: 4,
+    email: 'vetal05most@gmail.com',
+    password: 'password123',
+    name: 'Sales Manager',
+    role: 'SalesManager',
+    image: 'N/A',
+  },
 ];
 
 // Генерація JWT токенів у валідному форматі (header.payload.signature)
@@ -53,6 +69,54 @@ const generateMockToken = (user) => {
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export class MockAuthService {
+  /**
+   * Скидання пароля користувача (тільки для адмін-флоу в моках).
+   */
+  static findAuthUserByEmail(email) {
+    const n = String(email || "")
+      .trim()
+      .toLowerCase();
+    return MOCK_USERS.find((x) => x.email.toLowerCase() === n) || null;
+  }
+
+  static adminSetPassword(userId, newPassword) {
+    const id = Number(userId);
+    const u = MOCK_USERS.find((x) => x.id === id);
+    if (!u) {
+      throw {
+        response: { status: 404, data: { message: "Користувача не знайдено" } },
+      };
+    }
+    const pw = String(newPassword ?? "");
+    if (pw.length < 6) {
+      throw {
+        response: {
+          status: 400,
+          data: { message: "Пароль має містити щонайменше 6 символів" },
+        },
+      };
+    }
+    u.password = pw;
+    return { success: true };
+  }
+
+  /** Скидання пароля за email (id у довіднику користувачів може відрізнятися від auth). */
+  static adminSetPasswordForEmail(email, newPassword) {
+    const u = MockAuthService.findAuthUserByEmail(email);
+    if (!u) {
+      throw {
+        response: {
+          status: 404,
+          data: {
+            message:
+              "Немає облікового запису для входу з цим email. У моках додайте користувача в MockAuthService.",
+          },
+        },
+      };
+    }
+    return MockAuthService.adminSetPassword(u.id, newPassword);
+  }
+
   static setAuthorizationToken(token) {
     // Моки не потребують реального токену
     console.log('[MOCK] Setting auth token:', token ? 'Token set' : 'Token cleared');
@@ -60,19 +124,39 @@ export class MockAuthService {
 
   static async signIn(model) {
     await delay(MOCK_DELAY);
-    
-    const user = MOCK_USERS.find(
-      u => u.email === model.email && u.password === model.password
+
+    const email = (model.email || '').trim().toLowerCase();
+    const password = model.password ?? '';
+
+    const byEmail = MOCK_USERS.find(
+      (u) => u.email.toLowerCase() === email
     );
 
-    if (!user) {
+    if (!byEmail) {
       throw {
         response: {
-          data: 'Invalid email or password',
           status: 401,
+          data: {
+            code: 'EMAIL_NOT_FOUND',
+            message: 'Користувача з таким email не знайдено.',
+          },
         },
       };
     }
+
+    if (byEmail.password !== password) {
+      throw {
+        response: {
+          status: 401,
+          data: {
+            code: 'WRONG_PASSWORD',
+            message: 'Невірний пароль.',
+          },
+        },
+      };
+    }
+
+    const user = byEmail;
 
     const accessToken = generateMockToken(user);
     const refreshToken = generateMockToken({ ...user, type: 'refresh' });
@@ -149,7 +233,10 @@ export class MockAuthService {
     await delay(MOCK_DELAY);
 
     // Перевірка чи користувач вже існує
-    const existingUser = MOCK_USERS.find(u => u.email === model.email);
+    const emailNorm = (model.email || '').trim().toLowerCase();
+    const existingUser = MOCK_USERS.find(
+      (u) => u.email.toLowerCase() === emailNorm
+    );
     if (existingUser) {
       throw {
         response: {

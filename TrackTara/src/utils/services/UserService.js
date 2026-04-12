@@ -57,4 +57,10 @@ export class UserService {
       throw error;
     }
   }
+
+  /** Адмін: новий пароль для користувача (реалізація на бекенді — свій endpoint). */
+  static async adminResetPassword(userId, payload) {
+    this.setAuthorizationToken(localStorage.getItem("accessToken"));
+    return await this.httpClient.put(`admin/reset-password/${userId}`, payload);
+  }
 }

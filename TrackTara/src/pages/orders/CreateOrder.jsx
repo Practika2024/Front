@@ -6,8 +6,10 @@ import { getAllContainers } from '../../utils/services';
 import { fetchProducts } from '../../store/state/actions/productActions';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { SectorService } from '../../utils/services';
-import { formatQuantity, getUnitLabel, getUnitFullLabel } from '../../utils/helpers/unitFormatter';
+import { SectorService, ClientRouteService } from '../../utils/services';
+import { formatQuantity, getUnitFullLabel } from '../../utils/helpers/unitFormatter';
+import { lineTotalWeightKg, formatWeightKg } from '../../utils/helpers/productWeight';
+import useAppRoles from '../../hooks/useAppRoles';
 
 const CreateOrder = () => {
     const navigate = useNavigate();
@@ -17,8 +19,14 @@ const CreateOrder = () => {
     const [sectors, setSectors] = useState([]);
     const [selectedSector, setSelectedSector] = useState('');
     const [selectedItems, setSelectedItems] = useState([]); // [{productId, containerId, quantity}]
-    const [issueLineCode, setIssueLineCode] = useState(''); // Лінія видачі для замовлення
+    const [issueLineCode, setIssueLineCode] = useState(''); // лінія пакування / видачі
+    const [clients, setClients] = useState([]);
+    const [routeMasters, setRouteMasters] = useState([]);
+    const [selectedClientId, setSelectedClientId] = useState('');
     const [error, setError] = useState('');
+
+    const userRoles = useAppRoles();
+    const salesManagerMustPickClient = userRoles.includes('SalesManager');
     
     // Стани для модального вікна введення кількості
     const [showQuantityModal, setShowQuantityModal] = useState(false);
@@ -29,7 +37,34 @@ const CreateOrder = () => {
         dispatch(fetchProducts());
         loadContainers();
         loadSectors();
+        loadClientsAndRoutes();
     }, [dispatch]);
+
+    const loadClientsAndRoutes = async () => {
+        try {
+            const [c, r] = await Promise.all([
+                ClientRouteService.getClients(),
+                ClientRouteService.getRouteMasters(),
+            ]);
+            setClients(c);
+            setRouteMasters(r);
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    const selectedClient = clients.find((c) => c.id === Number(selectedClientId));
+    const packingLineFromClient = selectedClient
+        ? routeMasters.find((m) => m.routeCode === selectedClient.routeCode)?.packingLineCode
+        : '';
+
+    useEffect(() => {
+        if (!selectedClientId) return;
+        const c = clients.find((x) => x.id === Number(selectedClientId));
+        if (!c) return;
+        const line = routeMasters.find((m) => m.routeCode === c.routeCode)?.packingLineCode;
+        if (line) setIssueLineCode(line);
+    }, [selectedClientId, clients, routeMasters]);
 
     const loadContainers = async () => {
         try {
@@ -87,6 +122,7 @@ const CreateOrder = () => {
             rowNumber: container.rowNumber,
             productCode: `PRD-${String(productId).padStart(3, '0')}`,
             maxQuantity,
+            weightKg: Number(product.weightKg) || 0,
         });
         setQuantity(maxQuantity.toString());
         setShowQuantityModal(true);
@@ -116,6 +152,7 @@ const CreateOrder = () => {
             productCode: pendingItem.productCode,
             quantity: quantityValue,
             unitType: container?.unitType || 'liters', // Зберігаємо тип одиниць
+            weightKg: Number(pendingItem.weightKg) || 0,
         };
 
         setSelectedItems([...selectedItems, newItem]);
@@ -178,8 +215,14 @@ const CreateOrder = () => {
             return;
         }
 
-        if (!issueLineCode.trim()) {
-            setError('Введіть лінію видачі для замовлення');
+        if (salesManagerMustPickClient && !selectedClientId) {
+            setError('Оберіть клієнта для замовлення');
+            return;
+        }
+
+        const line = (packingLineFromClient || issueLineCode).trim();
+        if (!line) {
+            setError('Вкажіть лінію пакування: оберіть клієнта або введіть лінію вручну');
             return;
         }
 
@@ -187,7 +230,11 @@ const CreateOrder = () => {
             await OrderService.createOrder({
                 sector: selectedSector,
                 items: selectedItems,
-                issueLineCode: issueLineCode.trim(),
+                issueLineCode: line,
+                packingLineCode: line,
+                clientId: selectedClientId ? Number(selectedClientId) : null,
+                clientName: selectedClient?.name || null,
+                routeCode: selectedClient?.routeCode || null,
             });
             toast.success('Замовлення створено успішно');
             navigate('/');
@@ -236,16 +283,45 @@ const CreateOrder = () => {
                                 </Form.Group>
 
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Лінія видачі</Form.Label>
+                                    <Form.Label>Клієнт {salesManagerMustPickClient ? '(обов’язково)' : ''}</Form.Label>
+                                    <Form.Select
+                                        value={selectedClientId}
+                                        onChange={(e) => setSelectedClientId(e.target.value)}
+                                        required={salesManagerMustPickClient}
+                                    >
+                                        <option value="">— Не обрано —</option>
+                                        {clients.map((c) => (
+                                            <option key={c.id} value={c.id}>
+                                                {c.name} (траса {c.routeCode})
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                    <Form.Text className="text-muted">
+                                        Під клієнта закріплена траса; лінія пакування підставляється автоматично.
+                                    </Form.Text>
+                                </Form.Group>
+
+                                {selectedClient && (
+                                    <Alert variant="secondary" className="py-2 small">
+                                        Траса: <strong>{selectedClient.routeCode}</strong>
+                                        {packingLineFromClient && (
+                                            <> · Лінія пакування: <strong>{packingLineFromClient}</strong></>
+                                        )}
+                                    </Alert>
+                                )}
+
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Лінія пакування / видачі</Form.Label>
                                     <Form.Control
                                         type="text"
                                         value={issueLineCode}
                                         onChange={(e) => setIssueLineCode(e.target.value)}
-                                        placeholder="Наприклад: LINE-001"
+                                        placeholder="Підставляється з траси або вручну"
                                         required
+                                        disabled={!!salesManagerMustPickClient && !!packingLineFromClient}
                                     />
                                     <Form.Text className="text-muted">
-                                        Вкажіть лінію видачі, на яку потрібно покласти поємник з товарами
+                                        Для менеджера з продажу береться з довідника трас. Адміністратор може змінити вручну.
                                     </Form.Text>
                                 </Form.Group>
 
@@ -319,6 +395,7 @@ const CreateOrder = () => {
                                                 <th>Контейнер</th>
                                                 <th>Ряд</th>
                                                 <th>Кількість</th>
+                                                <th>Вага рядка</th>
                                                 <th>Дія</th>
                                             </tr>
                                         </thead>
@@ -335,6 +412,14 @@ const CreateOrder = () => {
                                                                 ? formatQuantity(item.quantity, container.unitType || 'liters')
                                                                 : `${item.quantity} л/кг`;
                                                         })()}
+                                                    </td>
+                                                    <td>
+                                                        {formatWeightKg(
+                                                            lineTotalWeightKg(
+                                                                item.quantity,
+                                                                item.weightKg
+                                                            )
+                                                        )}
                                                     </td>
                                                     <td>
                                                         <Button
@@ -357,6 +442,22 @@ const CreateOrder = () => {
                                             ))}
                                         </tbody>
                                     </Table>
+                                )}
+                                {selectedItems.length > 0 && (
+                                    <p className="small text-muted mb-0 mt-2">
+                                        <strong>Загальна вага замовлення (оцінка):</strong>{' '}
+                                        {formatWeightKg(
+                                            selectedItems.reduce(
+                                                (s, it) =>
+                                                    s +
+                                                    lineTotalWeightKg(
+                                                        it.quantity,
+                                                        it.weightKg
+                                                    ),
+                                                0
+                                            )
+                                        )}
+                                    </p>
                                 )}
                             </Card.Body>
                         </Card>
@@ -387,6 +488,8 @@ const CreateOrder = () => {
                             <Alert variant="info">
                                 <strong>Продукт:</strong> {pendingItem.productName}<br />
                                 <strong>Контейнер:</strong> {pendingItem.containerCode}<br />
+                                <strong>Вага одиниці:</strong>{' '}
+                                {formatWeightKg(pendingItem.weightKg)} (кг/од.)<br />
                                 <strong>Доступна кількість:</strong> {
                                     (() => {
                                         const container = containers.find(c => c.id === pendingItem.containerId);
@@ -429,6 +532,13 @@ const CreateOrder = () => {
                                                 : `${pendingItem.maxQuantity} л/кг`;
                                         })()
                                     })
+                                    . Орієнтовна вага рядка:{" "}
+                                    {formatWeightKg(
+                                        lineTotalWeightKg(
+                                            parseFloat(String(quantity).replace(",", ".")) || 0,
+                                            pendingItem.weightKg
+                                        )
+                                    )}
                                 </Form.Text>
                             </Form.Group>
                         </>

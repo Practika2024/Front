@@ -11,6 +11,7 @@ const CreateProduct = () => {
     const [typeId, setTypeId] = useState('');
     const [manufactureDate, setManufactureDate] = useState(new Date().toISOString().split('T')[0]);
     const [containerNumber, setContainerNumber] = useState('');
+    const [weightKg, setWeightKg] = useState('');
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -26,6 +27,7 @@ const CreateProduct = () => {
         // Автоматично витягуємо ряд з коду тари, якщо він вказаний
         const rowNumber = containerNumber ? extractRowFromCode(containerNumber) : null;
 
+        const w = parseFloat(String(weightKg).replace(',', '.'));
         const newProduct = {
             name,
             description,
@@ -33,6 +35,7 @@ const CreateProduct = () => {
             typeId,
             containerNumber: containerNumber || null,
             rowNumber: rowNumber, // Автоматично з коду тари
+            weightKg: Number.isFinite(w) && w >= 0 ? w : 0,
         };
 
         dispatch(addProduct(newProduct));
@@ -87,6 +90,21 @@ const CreateProduct = () => {
                             </option>
                         ))}
                     </select>
+                </div>
+                <div className="mb-3">
+                    <label className="form-label">Вага одиниці, кг</label>
+                    <input
+                        type="number"
+                        className="form-control"
+                        min="0"
+                        step="0.001"
+                        value={weightKg}
+                        onChange={(e) => setWeightKg(e.target.value)}
+                        placeholder="0"
+                    />
+                    <small className="form-text text-muted">
+                        Маса в кілограмах на 1 одиницю кількості замовлення (1 л, 1 шт, 1 кг тощо) — для розрахунку ваги вантажу та ящиків.
+                    </small>
                 </div>
                 <div className="mb-3">
                     <label className="form-label">Номер тари (опціонально)</label>

@@ -1,9 +1,9 @@
-// Mock Cart Registry - реєстр поємників (візків)
+// Mock Cart Registry - реєстр візків
 // Формат: англійська літера + три випадкові числа (наприклад, A123, B456)
 
 const MOCK_DELAY = 100;
 
-// Реєстр поємників
+// Реєстр візків
 const cartRegistry = [
   'A123',
   'A456',
@@ -39,20 +39,20 @@ const cartRegistry = [
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Перевірити, чи існує поємник в реєстрі
+// Перевірити, чи існує візок в реєстрі
 export const validateCartNumber = async (cartNumber) => {
   await delay(MOCK_DELAY);
   const normalizedCartNumber = cartNumber.trim().toUpperCase();
   return cartRegistry.includes(normalizedCartNumber);
 };
 
-// Отримати всі поємники з реєстру
+// Отримати всі візки з реєстру
 export const getAllCarts = async () => {
   await delay(MOCK_DELAY);
   return JSON.parse(JSON.stringify(cartRegistry));
 };
 
-// Додати новий поємник до реєстру
+// Додати новий візок до реєстру
 export const addCartToRegistry = async (cartNumber) => {
   await delay(MOCK_DELAY);
   const normalizedCartNumber = cartNumber.trim().toUpperCase();
@@ -62,7 +62,7 @@ export const addCartToRegistry = async (cartNumber) => {
   if (!formatRegex.test(normalizedCartNumber)) {
     throw {
       response: {
-        data: 'Невірний формат номера поємника. Очікується формат: літера + 3 цифри (наприклад, A123)',
+        data: 'Невірний формат номера візка. Очікується формат: літера + 3 цифри (наприклад, A123)',
         status: 400,
       },
     };
@@ -71,7 +71,7 @@ export const addCartToRegistry = async (cartNumber) => {
   if (cartRegistry.includes(normalizedCartNumber)) {
     throw {
       response: {
-        data: 'Поємник з таким номером вже існує',
+        data: 'Візок з таким номером вже існує',
         status: 400,
       },
     };
@@ -83,7 +83,7 @@ export const addCartToRegistry = async (cartNumber) => {
   return JSON.parse(JSON.stringify(cartRegistry));
 };
 
-// Видалити поємник з реєстру
+// Видалити візок з реєстру
 export const deleteCartFromRegistry = async (cartNumber) => {
   await delay(MOCK_DELAY);
   const normalizedCartNumber = cartNumber.trim().toUpperCase();
@@ -92,7 +92,7 @@ export const deleteCartFromRegistry = async (cartNumber) => {
   if (index === -1) {
     throw {
       response: {
-        data: 'Поємник з таким номером не знайдено в реєстрі',
+        data: 'Візок з таким номером не знайдено в реєстрі',
         status: 404,
       },
     };

@@ -9,6 +9,7 @@ import { fetchProducts } from '../../../../store/state/actions/productActions.js
 import { fetchAllContainerHistories } from '../../../../store/state/actions/containerHistoryActions.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { formatQuantity, getUnitLabel, getUnitFullLabel } from '../../../../utils/helpers/unitFormatter';
+import { lineTotalWeightKg, formatWeightKg } from '../../../../utils/helpers/productWeight';
 
 const ContainerDetailPage = () => {
     const { containerId } = useParams();
@@ -175,6 +176,23 @@ const ContainerDetailPage = () => {
                                     <>
                                         <strong>Поточна кількість:</strong> {formatQuantity(container.currentQuantity, container.unitType || 'liters')}<br />
                                         <strong>Залишок місця:</strong> {formatQuantity(container.volume - container.currentQuantity, container.unitType || 'liters')}<br />
+                                        <strong>Вага 1 од. товару:</strong>{' '}
+                                        {formatWeightKg(
+                                            Number(
+                                                products.find((p) => p.id === container.productId)?.weightKg
+                                            ) || 0,
+                                            3
+                                        )}
+                                        <br />
+                                        <strong>Орієнт. вага всього вмісту:</strong>{' '}
+                                        {formatWeightKg(
+                                            lineTotalWeightKg(
+                                                container.currentQuantity,
+                                                products.find((p) => p.id === container.productId)
+                                                    ?.weightKg
+                                            )
+                                        )}
+                                        <br />
                                     </>
                                 )}
                                 <strong>Нотатки:</strong> {container.notes || 'Немає'}

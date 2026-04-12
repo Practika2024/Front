@@ -14,6 +14,7 @@ const UpdateProduct = () => {
     const [typeId, setTypeId] = useState('');
     const [manufactureDate, setManufactureDate] = useState('');
     const [containerNumber, setContainerNumber] = useState('');
+    const [weightKg, setWeightKg] = useState('');
     const [validationError, setValidationError] = useState('');
 
     const dispatch = useDispatch();
@@ -34,6 +35,11 @@ const UpdateProduct = () => {
             setTypeId(product.typeId || '');
             setManufactureDate(product.manufactureDate ? new Date(product.manufactureDate).toISOString().split('T')[0] : '');
             setContainerNumber(product.containerNumber || '');
+            setWeightKg(
+                product.weightKg != null && product.weightKg !== ''
+                    ? String(product.weightKg)
+                    : ''
+            );
         }
     }, [product]);
 
@@ -44,6 +50,7 @@ const UpdateProduct = () => {
         // Автоматично витягуємо ряд з коду тари, якщо він вказаний
         const rowNumber = containerNumber ? extractRowFromCode(containerNumber) : null;
 
+        const w = parseFloat(String(weightKg).replace(',', '.'));
         const updatedProduct = {
             name,
             description,
@@ -51,6 +58,7 @@ const UpdateProduct = () => {
             typeId,
             containerNumber: containerNumber || null,
             rowNumber: rowNumber, // Автоматично з коду тари
+            weightKg: Number.isFinite(w) && w >= 0 ? w : 0,
         };
 
         dispatch(updateProduct({ id: productId, product: updatedProduct }))
@@ -131,6 +139,21 @@ const UpdateProduct = () => {
                             </option>
                         ))}
                     </select>
+                </div>
+                <div className="mb-3">
+                    <label className="form-label">Вага одиниці, кг</label>
+                    <input
+                        type="number"
+                        className="form-control"
+                        min="0"
+                        step="0.001"
+                        value={weightKg}
+                        onChange={(e) => setWeightKg(e.target.value)}
+                        placeholder="0"
+                    />
+                    <small className="form-text text-muted">
+                        Кг на 1 одиницю кількості (л / шт / кг) — для логістики та ваги ящиків.
+                    </small>
                 </div>
                 <div className="mb-3">
                     <label className="form-label">Номер тари (опціонально)</label>

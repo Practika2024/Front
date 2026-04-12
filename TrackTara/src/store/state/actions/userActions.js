@@ -9,25 +9,36 @@ import { deleteUserSlice, getAll } from "./../reduserSlises/usersSlice";
 import { AuthService, UserService } from "../../../utils/services";
 import { jwtDecode } from "jwt-decode";
 import { getCartItemsByUserId } from "./cartItemActions";
+import { normalizeUserPayloadForAuth } from "../../../utils/helpers/userRoles";
+import {
+  getAuthErrorMessage,
+  getAuthFieldErrors,
+} from "../../../utils/helpers/authErrorMessage";
 
 export const signInUser = (model) => async (dispatch) => {
   try {
     const response = await AuthService.signIn(model);
     await AuthByToken(response)(dispatch);
-    return { success: true, message: "You login successfuly!" };
+    return { success: true, message: "Успішний вхід!" };
   } catch (error) {
-    const errorMessage = error.response?.data;
-    return { success: false, message: errorMessage };
+    return {
+      success: false,
+      message: getAuthErrorMessage(error),
+      fieldErrors: getAuthFieldErrors(error),
+    };
   }
 };
 export const externalLoginUser = (model) => async (dispatch) => {
   try {
     const response = await AuthService.externalLogin(model);
     await AuthByToken(response)(dispatch);
-    return { success: true, message: "You login successfuly!" };
+    return { success: true, message: "Успішний вхід!" };
   } catch (error) {
-    const errorMessage = error.response?.data;
-    return { success: false, message: errorMessage };
+    return {
+      success: false,
+      message: getAuthErrorMessage(error),
+      fieldErrors: getAuthFieldErrors(error),
+    };
   }
 };
 
@@ -39,13 +50,10 @@ export const AuthByToken = (tokens) => async (dispatch) => {
     await AuthService.setAuthorizationToken(tokens.accessToken);
     
     try {
-      const user = jwtDecode(tokens.accessToken);
+      const decoded = jwtDecode(tokens.accessToken);
+      const user = normalizeUserPayloadForAuth(decoded);
 
-      if (
-        Array.isArray(user?.role)
-          ? user?.role.includes("User")
-          : user?.role === "User"
-      ) {
+      if (user.role.includes("User")) {
         await loadFavoriteProducts(user.id)(dispatch);
         await getCartItemsByUserId(user.id)(dispatch);
       }
@@ -122,6 +130,22 @@ export const changeRoles = (userId, roles) => async (dispatch) => {
   } catch (error) {
     const errorMessage = error.response?.data;
     return { success: false, message: errorMessage };
+  }
+};
+
+export const adminResetPassword = (userId, newPassword) => async () => {
+  try {
+    await UserService.adminResetPassword(userId, { newPassword });
+    return { success: true, message: "Пароль оновлено" };
+  } catch (error) {
+    const d = error?.response?.data;
+    const msg =
+      typeof d === "object" && d?.message
+        ? d.message
+        : typeof d === "string"
+          ? d
+          : "Не вдалося змінити пароль";
+    return { success: false, message: msg };
   }
 };
 

@@ -2,11 +2,20 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ErrorMessage from "../components/layout/ErrorMessage";
 import { jwtDecode } from "jwt-decode";
+import {
+  getNormalizedRolesFromAccessToken,
+  isRoleAllowed,
+} from "../utils/helpers/userRoles";
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const navigate = useNavigate();
   const token = localStorage.getItem("accessToken");
-  const user = token ? jwtDecode(token) : null;
+  let user = null;
+  try {
+    user = token ? jwtDecode(token) : null;
+  } catch {
+    user = null;
+  }
 
   useEffect(() => {
     if (!user) {
@@ -14,15 +23,17 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     }
   }, [user, navigate]);
 
-  const userRoles = user
-      ? Array.isArray(user.role)
-          ? user.role
-          : [user.role]
-      : [];
-  const isAuthorized = allowedRoles.some((role) => userRoles.includes(role) || userRoles.includes("Administrator"));
+  const userRoles = getNormalizedRolesFromAccessToken(token);
+  const isAuthorized = isRoleAllowed(userRoles, allowedRoles);
 
   return (
-      <>{isAuthorized ? children : <ErrorMessage error="Unauthorized user" />}</>
+    <>
+      {isAuthorized ? (
+        children
+      ) : (
+        <ErrorMessage error="Немає доступу до цього розділу. Зверніться до адміністратора." />
+      )}
+    </>
   );
 };
 

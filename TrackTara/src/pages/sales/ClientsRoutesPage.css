@@ -1,0 +1,29 @@
+/* Активна вкладка — помітний сірий фон; неактивні — світліші */
+.clients-routes-tabs .nav-link {
+  color: #495057;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-bottom: none;
+  margin-right: 0.25rem;
+  border-radius: 0.375rem 0.375rem 0 0;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.clients-routes-tabs .nav-link:hover:not(.active) {
+  background-color: #e9ecef;
+  color: #212529;
+}
+
+.clients-routes-tabs .nav-link.active {
+  background-color: #adb5bd;
+  color: #fff;
+  border-color: #adb5bd #adb5bd #adb5bd;
+  font-weight: 600;
+  position: relative;
+  z-index: 1;
+}
+
+.clients-routes-tabs .nav-link.active:hover {
+  background-color: #9ca3af;
+  color: #fff;
+}

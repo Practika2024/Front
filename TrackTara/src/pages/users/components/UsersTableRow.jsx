@@ -2,6 +2,7 @@ import React, { useCallback, useState, useMemo } from "react";
 import { Select, MenuItem, Button } from "@mui/material";
 import userImage from "../../../hooks/userImage";
 import DeleteUserModal from "./usersModals/DeleteUserModal";
+import AdminResetPasswordModal from "./usersModals/AdminResetPasswordModal";
 import { useRenderCount } from "../../../hooks/useRenderCount";
 import useActions from "../../../hooks/useActions";
 import { toast } from "react-toastify";
@@ -11,6 +12,7 @@ import PropTypes from 'prop-types';
 const UsersTableRow = React.memo(
     ({ user, roleList }) => {
         const [showDeleteModal, setShowDeleteModal] = useState(false);
+        const [showPasswordModal, setShowPasswordModal] = useState(false);
         const { changeRoles, getUsers } = useActions();
         const renderCount = useRenderCount();
         const [selectedRole, setSelectedRole] = useState(user.role || '');
@@ -73,15 +75,30 @@ const UsersTableRow = React.memo(
                         />
                     </td>
                     <td>
-                        <Button
-                            variant="contained"
-                            color="error"
-                            onClick={() => setShowDeleteModal(true)}
-                        >
-                            Видалити
-                        </Button>
+                        <div className="d-flex flex-wrap gap-2">
+                            <Button
+                                variant="outlined"
+                                color="primary"
+                                onClick={() => setShowPasswordModal(true)}
+                            >
+                                Пароль
+                            </Button>
+                            <Button
+                                variant="contained"
+                                color="error"
+                                onClick={() => setShowDeleteModal(true)}
+                            >
+                                Видалити
+                            </Button>
+                        </div>
                     </td>
                 </tr>
+                <AdminResetPasswordModal
+                    show={showPasswordModal}
+                    onHide={() => setShowPasswordModal(false)}
+                    userId={user.id}
+                    userEmail={user.email}
+                />
                 <DeleteUserModal
                     showModal={showDeleteModal}
                     closeModal={closeModal}

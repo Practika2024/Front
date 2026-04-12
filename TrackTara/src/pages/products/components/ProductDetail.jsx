@@ -5,6 +5,8 @@ import { fetchAllProductHistories } from '../../../store/state/actions/productHi
 import { useParams } from 'react-router-dom';
 import { Card, Button, Table, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import useAppRoles from '../../../hooks/useAppRoles';
+import { formatWeightKg } from '../../../utils/helpers/productWeight';
 
 const ProductDetail = () => {
     const { productId } = useParams();
@@ -13,6 +15,9 @@ const ProductDetail = () => {
     const status = useSelector((state) => state.product.status);
     const productHistory = useSelector((state) => state.productHistory?.histories || []);
     const navigate = useNavigate();
+    const roles = useAppRoles();
+    const canEditCatalog =
+        roles.includes('Operator') || roles.includes('Administrator');
 
     useEffect(() => {
         dispatch(fetchProductById(productId));
@@ -60,14 +65,20 @@ const ProductDetail = () => {
                                     <Card.Text>
                                         <strong>Дата виробництва:</strong> {product.manufactureDate ? new Date(product.manufactureDate).toLocaleDateString('uk-UA') : '-'}
                                     </Card.Text>
+                                    <Card.Text>
+                                        <strong>Вага одиниці:</strong>{' '}
+                                        {formatWeightKg(product.weightKg ?? 0)} (кг на 1 од. кількості)
+                                    </Card.Text>
                                     {product.containerNumber && (
                                         <Card.Text>
                                             <strong>Номер тари:</strong> {product.containerNumber}
                                         </Card.Text>
                                     )}
-                                    <Button variant="primary" onClick={() => navigate(`/product/update/${product.id}`)}>
-                                        Змінити
-                                    </Button>
+                                    {canEditCatalog && (
+                                        <Button variant="primary" onClick={() => navigate(`/product/update/${product.id}`)}>
+                                            Змінити
+                                        </Button>
+                                    )}
                                 </div>
                             )}
                         </Card.Body>

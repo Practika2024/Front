@@ -23,16 +23,19 @@ const Login = () => {
       ...formValues,
       [name]: value,
     });
+    setErrors((prev) => ({ ...prev, [name]: undefined }));
   };
 
   const validate = () => {
+    const email = formValues.email.trim();
+    const password = formValues.password.trim();
     const newErrors = {};
-    if (!formValues.email) {
+    if (!email) {
       newErrors.email = "Обов'язкове поле";
-    } else if (!/\S+@\S+\.\S+/.test(formValues.email)) {
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
       newErrors.email = "Некоректний email";
     }
-    if (!formValues.password) {
+    if (!password) {
       newErrors.password = "Обов'язкове поле";
     }
     setErrors(newErrors);
@@ -41,15 +44,26 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validate()) {
-      const response = await signInUser(formValues);
-      if (!response.success) {
+    setErrors({});
+    if (!validate()) return;
+
+    const response = await signInUser({
+      email: formValues.email.trim(),
+      password: formValues.password.trim(),
+    });
+
+    if (!response.success) {
+      if (response.message) {
         toast.error(response.message);
-      } else {
-        toast.success("Успішний вхід!");
-        navigate("/");
       }
+      if (response.fieldErrors && Object.keys(response.fieldErrors).length > 0) {
+        setErrors(response.fieldErrors);
+      }
+      return;
     }
+
+    toast.success(response.message || "Успішний вхід!");
+    navigate("/");
   };
 
   useEffect(() => {

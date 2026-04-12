@@ -1,6 +1,32 @@
 // Mock Order Service - імітує роботу OrderService з мок-даними
 
+import {
+  getClientById,
+  getRouteMasterByCode,
+  resolvePackingTableForCart,
+  normalizeRouteCode,
+} from './salesDomainStore';
+
 const MOCK_DELAY = 300;
+
+/** Перший товар у візок → присвоюємо трасу замовлення, лінію пакування та стіл (автолінія). */
+const ensureCartForCartNumber = (order, cartNumber) => {
+  let cart = order.carts.find((c) => c.cartNumber === cartNumber && !c.leftOnLine);
+  if (cart) return cart;
+  cart = {
+    cartNumber,
+    items: [],
+    leftOnLine: false,
+    issueLineCode: null,
+  };
+  if (order.routeCode) {
+    cart.routeCode = order.routeCode;
+    cart.packingLineCode = order.packingLineCode;
+    cart.packingTableCode = resolvePackingTableForCart(order.routeCode);
+  }
+  order.carts.push(cart);
+  return cart;
+};
 
 // Мок-дані замовлень
 // Замовлення містить список продуктів, які потрібно вийняти з контейнерів
@@ -11,7 +37,11 @@ let mockOrders = [
     status: 'active',
     createdAt: '2024-01-20T10:00:00',
     createdBy: 'admin@test.com',
-    issueLineCode: 'LINE-001',
+    issueLineCode: 'PACK-LINE-AC',
+    clientId: 1,
+    clientName: 'ТОВ «Рітейл Захід»',
+    routeCode: 'AC',
+    packingLineCode: 'PACK-LINE-AC',
     carts: [],
     items: [
       {
@@ -24,6 +54,7 @@ let mockOrders = [
         productCode: 'PRD-001',
         quantity: 35,
         unitType: 'liters',
+        weightKg: 1.03,
         status: 'pending',
         pickedQuantity: 0,
         pickedBy: null,
@@ -40,6 +71,7 @@ let mockOrders = [
         productCode: 'PRD-002',
         quantity: 25,
         unitType: 'pieces',
+        weightKg: 0.45,
         status: 'pending',
         pickedQuantity: 0,
         pickedBy: null,
@@ -56,6 +88,7 @@ let mockOrders = [
         productCode: 'PRD-004',
         quantity: 40,
         unitType: 'liters',
+        weightKg: 1.03,
         status: 'pending',
         pickedQuantity: 0,
         pickedBy: null,
@@ -83,6 +116,7 @@ let mockOrders = [
         productCode: 'PRD-003',
         quantity: 20,
         unitType: 'pieces',
+        weightKg: 0.062,
         status: 'pending',
         pickedQuantity: 0,
         pickedBy: null,
@@ -99,6 +133,7 @@ let mockOrders = [
         productCode: 'PRD-007',
         quantity: 30,
         unitType: 'kilograms',
+        weightKg: 1,
         status: 'pending',
         pickedQuantity: 0,
         pickedBy: null,
@@ -115,6 +150,7 @@ let mockOrders = [
         productCode: 'PRD-008',
         quantity: 20,
         unitType: 'kilograms',
+        weightKg: 1,
         status: 'pending',
         pickedQuantity: 0,
         pickedBy: null,
@@ -142,6 +178,7 @@ let mockOrders = [
         productCode: 'PRD-005',
         quantity: 15,
         unitType: 'kilograms',
+        weightKg: 1,
         status: 'pending',
         pickedQuantity: 0,
         pickedBy: null,
@@ -158,6 +195,7 @@ let mockOrders = [
         productCode: 'PRD-006',
         quantity: 10,
         unitType: 'kilograms',
+        weightKg: 1,
         status: 'pending',
         pickedQuantity: 0,
         pickedBy: null,
@@ -185,6 +223,7 @@ let mockOrders = [
         productCode: 'PRD-010',
         quantity: 25,
         unitType: 'kilograms',
+        weightKg: 1,
         status: 'pending',
         pickedQuantity: 0,
         pickedBy: null,
@@ -201,6 +240,7 @@ let mockOrders = [
         productCode: 'PRD-011',
         quantity: 40,
         unitType: 'liters',
+        weightKg: 1.05,
         status: 'pending',
         pickedQuantity: 0,
         pickedBy: null,
@@ -217,6 +257,7 @@ let mockOrders = [
         productCode: 'PRD-012',
         quantity: 60,
         unitType: 'liters',
+        weightKg: 1,
         status: 'pending',
         pickedQuantity: 0,
         pickedBy: null,
@@ -233,6 +274,7 @@ let mockOrders = [
         productCode: 'PRD-013',
         quantity: 30,
         unitType: 'kilograms',
+        weightKg: 1,
         status: 'pending',
         pickedQuantity: 0,
         pickedBy: null,
@@ -269,6 +311,7 @@ let mockOrders = [
         productCode: 'PRD-003',
         quantity: 15,
         unitType: 'pieces',
+        weightKg: 0.062,
         status: 'in_progress',
         pickedQuantity: 10,
         pickedBy: 'operator@test.com',
@@ -285,6 +328,7 @@ let mockOrders = [
         productCode: 'PRD-009',
         quantity: 30,
         unitType: 'kilograms',
+        weightKg: 1,
         status: 'pending',
         pickedQuantity: 0,
         pickedBy: null,
@@ -351,13 +395,35 @@ export const OrderService = {
     const newId = Math.max(...mockOrders.map(o => o.id), 0) + 1;
     const userLogin = getUserLoginFromToken();
     
+    let routeCode = orderData.routeCode ? normalizeRouteCode(orderData.routeCode) : null;
+    let packingLineCode = orderData.packingLineCode || orderData.issueLineCode || null;
+    let clientName = orderData.clientName || null;
+    let clientId = orderData.clientId != null ? Number(orderData.clientId) : null;
+
+    if (clientId) {
+      const client = getClientById(clientId);
+      if (client) {
+        clientName = client.name;
+        routeCode = client.routeCode;
+        const rm = getRouteMasterByCode(routeCode);
+        packingLineCode = rm?.packingLineCode ?? packingLineCode;
+      }
+    } else if (routeCode) {
+      const rm = getRouteMasterByCode(routeCode);
+      packingLineCode = rm?.packingLineCode ?? packingLineCode;
+    }
+
     const newOrder = {
       id: newId,
       sector: orderData.sector.toUpperCase(),
       status: 'active',
       createdAt: new Date().toISOString(),
       createdBy: userLogin,
-      issueLineCode: orderData.issueLineCode || null, // Лінія видання для замовлення
+      issueLineCode: packingLineCode,
+      clientId,
+      clientName,
+      routeCode,
+      packingLineCode,
       carts: [], // Візки з товарами
       items: orderData.items.map((item, index) => ({
         id: index + 1,
@@ -369,6 +435,7 @@ export const OrderService = {
         productCode: item.productCode,
         quantity: item.quantity,
         unitType: item.unitType || 'liters', // Тип одиниць вимірювання
+        weightKg: item.weightKg != null ? Number(item.weightKg) : 0,
         status: 'pending',
         pickedQuantity: 0,
         pickedBy: null,
@@ -450,15 +517,7 @@ export const OrderService = {
 
     // Додаємо товар до візка
     if (cartNumber) {
-      let cart = order.carts.find(c => c.cartNumber === cartNumber && !c.leftOnLine);
-      if (!cart) {
-        cart = {
-          cartNumber: cartNumber,
-          items: [],
-          leftOnLine: false // Чи залишений візок на лінії видання
-        };
-        order.carts.push(cart);
-      }
+      const cart = ensureCartForCartNumber(order, cartNumber);
       cart.items.push({
         itemId: item.id,
         containerCode: containerCode,
@@ -579,15 +638,7 @@ export const OrderService = {
 
     // Додаємо товар до візка
     if (cartNumber) {
-      let cart = order.carts.find(c => c.cartNumber === cartNumber && !c.leftOnLine);
-      if (!cart) {
-        cart = {
-          cartNumber: cartNumber,
-          items: [],
-          leftOnLine: false // Чи залишений візок на лінії видання
-        };
-        order.carts.push(cart);
-      }
+      const cart = ensureCartForCartNumber(order, cartNumber);
       cart.items.push({
         itemId: item.id,
         containerCode: containerCode,

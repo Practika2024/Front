@@ -19,13 +19,19 @@ export {
   RoleService,
   SectorService,
   OrderService,
+  ClientRouteService,
+  getAllPackingBoxes,
+  createPackingBox,
+  deletePackingBox,
+  addToPackingBox,
+  transferPackingBoxContent,
 } from './ServiceFactory';
 
 // Експортуємо всі функції (включаючи функції для ContainerService, ContainerTypesService, ProductTypesService)
 // для зворотної сумісності з існуючим кодом
 export * from './ServiceFactory';
 
-// Експортуємо функції для реєстру поємників
+// Експортуємо функції для реєстру візків
 export {
     validateCartNumber,
     getAllCarts,

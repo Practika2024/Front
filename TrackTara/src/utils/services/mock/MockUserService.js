@@ -1,5 +1,7 @@
 // Mock User Service - імітує роботу UserService з мок-даними
 
+import { MockAuthService } from "./MockAuthService";
+
 const MOCK_DELAY = 500;
 
 // Мок-дані користувачів (зберігаються в пам'яті)
@@ -28,6 +30,14 @@ let mockUsers = [
     image: 'N/A',
     favoriteProducts: [1],
   },
+  {
+    id: 4,
+    email: 'sales@test.com',
+    name: 'Менеджер з продажу',
+    role: ['SalesManager'],
+    image: 'N/A',
+    favoriteProducts: [],
+  },
 ];
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -55,6 +65,19 @@ export class MockUserService {
       user.role = Array.isArray(roles) ? roles : [roles];
     }
     return { success: true };
+  }
+
+  /** Адмін задає новий пароль працівнику (мок-логін за email з картки користувача). */
+  static async adminResetPassword(userId, newPassword) {
+    await delay(MOCK_DELAY);
+    const mu = mockUsers.find((u) => Number(u.id) === Number(userId));
+    if (!mu?.email) {
+      throw {
+        response: { status: 404, data: { message: "Користувача не знайдено" } },
+      };
+    }
+    MockAuthService.adminSetPasswordForEmail(mu.email, newPassword);
+    return { success: true, message: "Пароль оновлено" };
   }
 
   static async uploadImage(userId, file) {

@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { fetchProducts } from '../../store/state/actions/productActions';
 import { useDispatch, useSelector } from 'react-redux';
 import { formatQuantity, getUnitLabel, getUnitFullLabel } from '../../utils/helpers/unitFormatter';
+import { lineTotalWeightKg, formatWeightKg } from '../../utils/helpers/productWeight';
 
 const HomePage = () => {
     const dispatch = useDispatch();
@@ -29,7 +30,7 @@ const HomePage = () => {
     const [pickStep, setPickStep] = useState(0); // 0 - введення номера візка, 1 - введення коду продукту, 2 - введення коду контейнера, 3 - введення кількості для вийняття, 4 - введення коду лінії видання (тільки при повному вийнятті)
     const [showChangeCartModal, setShowChangeCartModal] = useState(false); // Модальне вікно для зміни візка
     const [newCartNumber, setNewCartNumber] = useState(''); // Новий номер візка
-    const [oldCartIssueLine, setOldCartIssueLine] = useState(''); // Лінія видачі для старого поємника
+    const [oldCartIssueLine, setOldCartIssueLine] = useState(''); // Лінія видачі для старого візка
     const [showBrakiMagModal, setShowBrakiMagModal] = useState(false); // Модальне вікно для додавання до бракімагу
     const [brakiMagQuantity, setBrakiMagQuantity] = useState(''); // Кількість для бракімагу
     const [brakiMagReason, setBrakiMagReason] = useState('Не вистачило товару'); // Причина додавання до бракімагу
@@ -114,21 +115,21 @@ const HomePage = () => {
         setError('');
 
         if (!cartNumber.trim()) {
-            setError('Введіть номер поємника');
+            setError('Введіть номер візка');
             return;
         }
 
-        // Перевіряємо, чи існує поємник в реєстрі
+        // Перевіряємо, чи існує візок в реєстрі
         try {
             const isValid = await validateCartNumber(cartNumber.trim());
             if (!isValid) {
-                setError('Поємник з таким номером не існує в реєстрі. Перевірте правильність введення.');
+                setError('Візок з таким номером не існує в реєстрі. Перевірте правильність введення.');
                 return;
             }
             setPickStep(1);
         } catch (error) {
             console.error('Error validating cart number:', error);
-            setError('Помилка перевірки номера поємника');
+            setError('Помилка перевірки номера візка');
         }
     };
 
@@ -303,21 +304,21 @@ const HomePage = () => {
     const handleConfirmChangeCart = async () => {
         setError('');
         if (!newCartNumber.trim()) {
-            setError('Введіть номер нового поємника');
+            setError('Введіть номер нового візка');
             return;
         }
 
-        // Перевіряємо, чи вказано лінію видачі для старого поємника
+        // Перевіряємо, чи вказано лінію видачі для старого візка
         if (!oldCartIssueLine.trim()) {
-            setError('Введіть лінію видачі для поточного поємника');
+            setError('Введіть лінію видачі для поточного візка');
             return;
         }
 
-        // Перевіряємо, чи існує поємник в реєстрі
+        // Перевіряємо, чи існує візок в реєстрі
         try {
             const isValid = await validateCartNumber(newCartNumber.trim());
             if (!isValid) {
-                setError('Поємник з таким номером не існує в реєстрі. Перевірте правильність введення.');
+                setError('Візок з таким номером не існує в реєстрі. Перевірте правильність введення.');
                 return;
             }
 
@@ -335,10 +336,10 @@ const HomePage = () => {
             setShowChangeCartModal(false);
             setNewCartNumber('');
             setOldCartIssueLine('');
-            toast.success(`Поємник змінено на ${newCartNumber.trim().toUpperCase()}. Старий поємник ${cartNumber} залишено на лінії ${oldCartIssueLine.trim()}`);
+            toast.success(`Візок змінено на ${newCartNumber.trim().toUpperCase()}. Старий візок ${cartNumber} залишено на лінії ${oldCartIssueLine.trim()}`);
         } catch (error) {
             console.error('Error validating cart number:', error);
-            setError('Помилка перевірки номера поємника');
+            setError('Помилка перевірки номера візка');
         }
     };
 
@@ -388,6 +389,7 @@ const HomePage = () => {
                 containerCode: currentItem.containerCode,
                 quantity: quantity,
                 unitType: currentContainer?.unitType || 'liters',
+                weightKg: Number(currentItem.weightKg) || 0,
                 reason: brakiMagReason,
                 orderId: currentOrder?.id || null,
             });
@@ -426,6 +428,7 @@ const HomePage = () => {
                 containerCode: currentItem.containerCode,
                 quantity: remainingQuantity,
                 unitType: unitType,
+                weightKg: Number(currentItem.weightKg) || 0,
                 reason: 'Не вистачило товару',
                 orderId: currentOrder?.id || null,
             });
@@ -525,7 +528,7 @@ const HomePage = () => {
                                     <p><strong>Очікуваний код контейнера:</strong> {currentItem.containerCode}</p>
                                     <p><strong>Ряд:</strong> {currentItem.rowNumber}</p>
                                     <p>
-                                        <strong>Куди класти поємнік (лінія видачі):</strong>{' '}
+                                        <strong>Куди класти візок (лінія видачі):</strong>{' '}
                                         {currentOrder?.issueLineCode || '—'}
                                     </p>
                                     <p><strong>Замовлена кількість:</strong> {
@@ -545,6 +548,13 @@ const HomePage = () => {
                                             ? formatQuantity(currentItem.quantity - (currentItem.pickedQuantity || 0), currentContainer.unitType || 'liters')
                                             : `${currentItem.quantity - (currentItem.pickedQuantity || 0)} л/кг`
                                     }</p>
+                                    <p><strong>Вага одиниці:</strong> {formatWeightKg(Number(currentItem.weightKg) || 0)}</p>
+                                    <p><strong>Вага залишку (оцінка):</strong> {formatWeightKg(
+                                        lineTotalWeightKg(
+                                            currentItem.quantity - (currentItem.pickedQuantity || 0),
+                                            currentItem.weightKg
+                                        )
+                                    )}</p>
                                 </Card.Body>
                             </Card>
                         </div>
@@ -553,7 +563,7 @@ const HomePage = () => {
                     {pickStep === 0 && (
                         <Form onSubmit={handleCartNumberSubmit}>
                             <Form.Group className="mb-3">
-                                <Form.Label>Крок 0: Введіть номер поємника</Form.Label>
+                                <Form.Label>Крок 0: Введіть номер візка</Form.Label>
                                 <Form.Control
                                     type="text"
                                     value={cartNumber}
@@ -561,12 +571,12 @@ const HomePage = () => {
                                         setCartNumber(e.target.value.toUpperCase());
                                         setError('');
                                     }}
-                                    placeholder="Введіть номер поємника (наприклад, A123)"
+                                    placeholder="Введіть номер візка (наприклад, A123)"
                                     autoFocus
                                     style={{ textTransform: 'uppercase' }}
                                 />
                                 <Form.Text className="text-muted">
-                                    Вкажіть номер поємника, в який буде покладено товар. Формат: літера + 3 цифри (наприклад, A123)
+                                    Вкажіть номер візка, в який буде покладено товар. Формат: літера + 3 цифри (наприклад, A123)
                                 </Form.Text>
                             </Form.Group>
                             <Button type="submit" variant="primary">Далі</Button>
@@ -715,16 +725,16 @@ const HomePage = () => {
                     {error && <Alert variant="danger">{error}</Alert>}
                     {cartNumber && (
                         <Alert variant="info" className="mb-3">
-                            Поточний поємник: <strong>{cartNumber}</strong>
+                            Поточний візок: <strong>{cartNumber}</strong>
                             {currentOrder && (
                                 <div className="mt-2">
-                                    <small>Вкажіть лінію видачі, на яку покладено поточний поємник.</small>
+                                    <small>Вкажіть лінію видачі, на яку покладено поточний візок.</small>
                                 </div>
                             )}
                         </Alert>
                     )}
                     <Form.Group className="mb-3">
-                        <Form.Label>Лінія видачі для поточного поємника ({cartNumber})</Form.Label>
+                        <Form.Label>Лінія видачі для поточного візка ({cartNumber})</Form.Label>
                         <Form.Control
                             type="text"
                             value={oldCartIssueLine}
@@ -736,11 +746,11 @@ const HomePage = () => {
                             autoFocus
                         />
                         <Form.Text className="text-muted">
-                            Вкажіть лінію видачі, на яку покладено поточний поємник
+                            Вкажіть лінію видачі, на яку покладено поточний візок
                         </Form.Text>
                     </Form.Group>
                     <Form.Group className="mb-3">
-                        <Form.Label>Введіть номер нового поємника</Form.Label>
+                        <Form.Label>Введіть номер нового візка</Form.Label>
                         <Form.Control
                             type="text"
                             value={newCartNumber}
@@ -783,15 +793,25 @@ const HomePage = () => {
                             <Card.Body>
                                 <Card.Title>
                                     Замовлення #{order.id} 
+                                    {order.clientName && (
+                                        <Badge bg="secondary" className="ms-2">
+                                            Клієнт: {order.clientName}
+                                        </Badge>
+                                    )}
+                                    {order.routeCode && (
+                                        <Badge bg="dark" className="ms-2">
+                                            Траса: {order.routeCode}
+                                        </Badge>
+                                    )}
                                     {order.issueLineCode && (
                                         <Badge bg="info" className="ms-2">
-                                            Лінія видачі: {order.issueLineCode}
+                                            Лінія пакування: {order.issueLineCode}
                                         </Badge>
                                     )}
                                 </Card.Title>
                                 {order.issueLineCode && (
                                     <Alert variant="info" className="mb-3">
-                                        <strong>Лінія видачі для поємника:</strong> {order.issueLineCode}
+                                        <strong>Лінія пакування для візка:</strong> {order.issueLineCode}
                                     </Alert>
                                 )}
                                 
@@ -801,13 +821,21 @@ const HomePage = () => {
                                         <h6>Візки:</h6>
                                         {order.carts.map((cart, cartIndex) => (
                                             <div key={cartIndex} className={`mb-2 p-2 border rounded ${cart.leftOnLine ? 'bg-light' : ''}`}>
-                                                <div className="d-flex justify-content-between align-items-center">
+                                                <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                                     <strong>Візок: {cart.cartNumber}</strong>
-                                                    {cart.leftOnLine && (
-                                                        <Badge bg="success">
-                                                            Залишено на лінії {cart.issueLineCode || 'видання'}
-                                                        </Badge>
-                                                    )}
+                                                    <div className="d-flex flex-wrap gap-1">
+                                                        {cart.routeCode && (
+                                                            <Badge bg="dark">Траса {cart.routeCode}</Badge>
+                                                        )}
+                                                        {cart.packingTableCode && (
+                                                            <Badge bg="primary">Стіл {cart.packingTableCode}</Badge>
+                                                        )}
+                                                        {cart.leftOnLine && (
+                                                            <Badge bg="success">
+                                                                На лінії {cart.issueLineCode || order.issueLineCode || 'видачі'}
+                                                            </Badge>
+                                                        )}
+                                                    </div>
                                                 </div>
                                                 <ul className="mb-0 mt-2">
                                                     {cart.items.map((cartItem, itemIndex) => {
@@ -816,6 +844,9 @@ const HomePage = () => {
                                                         return (
                                                             <li key={itemIndex}>
                                                                 Контейнер {cartItem.containerCode}: {formatQuantity(cartItem.quantity, container?.unitType || orderItem?.unitType || 'liters')}
+                                                                {orderItem
+                                                                    ? ` · ${formatWeightKg(lineTotalWeightKg(cartItem.quantity, orderItem.weightKg))}`
+                                                                    : ''}
                                                             </li>
                                                         );
                                                     })}
@@ -834,6 +865,7 @@ const HomePage = () => {
                                             <th>Контейнер</th>
                                             <th>Номер продукту</th>
                                             <th>Кількість</th>
+                                            <th>Вага (залишок)</th>
                                             <th>Статус</th>
                                             <th>Дія</th>
                                         </tr>
@@ -854,6 +886,14 @@ const HomePage = () => {
                                                             ? formatQuantity(remainingQuantity, container.unitType || 'liters')
                                                             : `${remainingQuantity} л/кг`;
                                                     })()}
+                                                </td>
+                                                <td className="text-nowrap small">
+                                                    {formatWeightKg(
+                                                        lineTotalWeightKg(
+                                                            item.quantity - (item.pickedQuantity || 0),
+                                                            item.weightKg
+                                                        )
+                                                    )}
                                                 </td>
                                                 <td>
                                                     {item.status === 'pending' && (
@@ -914,6 +954,13 @@ const HomePage = () => {
                                     ? formatQuantity(currentItem.quantity - (currentItem.pickedQuantity || 0), currentContainer.unitType || 'liters')
                                     : `${currentItem.quantity - (currentItem.pickedQuantity || 0)} л/кг`
                             }</p>
+                            <p><strong>Вага одиниці:</strong> {formatWeightKg(Number(currentItem.weightKg) || 0)}</p>
+                            <p><strong>Вага залишку:</strong> {formatWeightKg(
+                                lineTotalWeightKg(
+                                    currentItem.quantity - (currentItem.pickedQuantity || 0),
+                                    currentItem.weightKg
+                                )
+                            )}</p>
                         </div>
                     )}
                     <Form.Group className="mb-3">
