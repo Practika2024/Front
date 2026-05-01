@@ -8,6 +8,7 @@ import { store, persistor } from "./store/store";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import BootstrapAuth from "./components/BootstrapAuth.jsx";
+import CrossTabAuthSync from "./components/CrossTabAuthSync.jsx";
 import { ToastContainer } from "react-toastify";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
@@ -28,6 +29,7 @@ createRoot(document.getElementById("root")).render(
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <BootstrapAuth />
+        <CrossTabAuthSync />
         <App />
       </PersistGate>
     </Provider>

@@ -1,8 +1,8 @@
-import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { store } from "../../store/store";
 import { authUser } from "./../../store/state/reduserSlises/userSlice";
 import { logoutUser } from "../../store/state/actions/userActions";
+import { normalizeUserPayloadForAuth } from "../helpers/userRoles";
 
 let isRefreshing = false;
 let failedQueue = [];
@@ -22,12 +22,14 @@ export const refreshToken = async (originalRequest, setAuthorizationToken) => {
   if (isRefreshing) {
     return new Promise((resolve, reject) => {
       failedQueue.push({ resolve, reject });
-    })
-      .then((token) => {
-        originalRequest.headers["Authorization"] = `Bearer ${token}`;
-        return axios(originalRequest);
-      })
-      .catch((err) => Promise.reject(err));
+    }).then((token) => {
+      if (token == null || token === "") {
+        return Promise.reject(new Error("Refresh queue: empty token"));
+      }
+      originalRequest.headers["Authorization"] = `Bearer ${token}`;
+      setAuthorizationToken(token);
+      return token;
+    });
   }
 
   isRefreshing = true;
@@ -46,7 +48,8 @@ export const refreshToken = async (originalRequest, setAuthorizationToken) => {
 
       setAuthorizationToken(tokens.accessToken);
 
-      const user = jwtDecode(tokens.accessToken);
+      const decoded = jwtDecode(tokens.accessToken);
+      const user = normalizeUserPayloadForAuth(decoded);
       store.dispatch(authUser(user));
 
       processQueue(null, tokens.accessToken);
