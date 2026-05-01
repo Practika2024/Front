@@ -12,11 +12,21 @@ npm install
 
 ### Налаштування
 
-Створіть файл `.env` в корені проекту:
+Скопіюйте шаблон у `.env` у корені проекту (PowerShell: `Copy-Item .env.example .env`; bash: `cp .env.example .env`).
+
+Мінімум для демо на моках:
 
 ```env
 VITE_USE_MOCK_API=true
 ```
+
+Вхід через **Google**: додайте Client ID з Google Cloud Console (тип **Web application**):
+
+```env
+VITE_GOOGLE_CLIENT_ID=xxxxxxxx.apps.googleusercontent.com
+```
+
+На **Vercel** задайте ту саму змінну в Settings → Environment Variables і перезбереріть проєкт. У GCP для цього Client ID вкажіть **Authorized JavaScript origins**: `http://localhost:5173` та URL продакшену (`https://….vercel.app`). Поки застосунок у статусі **Testing**, додайте свій Gmail у **Test users** на екрані згоди OAuth.
 
 ### Запуск проекту
 

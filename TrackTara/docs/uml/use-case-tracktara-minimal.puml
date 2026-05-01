@@ -1,0 +1,72 @@
+@startuml use-case-tracktara-minimal
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+skinparam usecase {
+  BorderColor black
+  BackgroundColor white
+}
+skinparam actor {
+  BorderColor black
+  BackgroundColor white
+}
+
+title Діаграма варіантів використання TrackTara\n(узагальнена модель доступу за ролями)
+
+left to right direction
+
+actor "Гість" as Guest
+actor "Оператор" as Operator
+actor "Адміністратор" as Admin
+actor "Менеджер з продажу\n(SalesManager)" as Sales
+
+rectangle "TrackTara" {
+  usecase "Авторизація та реєстрація" as UC_Auth
+  usecase "Каталог і профіль" as UC_Catalog
+  usecase "Відбір у візок" as UC_Pick
+  usecase "Пакування" as UC_Pack
+  usecase "Тара та облік\nконтейнерів" as UC_Tare
+  usecase "Товар:\nстворення й оновлення" as UC_ProductEdit
+  usecase "Продажі:\nпанель, клієнти, траси" as UC_Sales
+  usecase "Замовлення:\nстворення" as UC_Order
+  usecase "Адміністрування\nкористувачів і довідників" as UC_Admin
+}
+
+Guest --> UC_Auth
+
+Operator --> UC_Catalog
+Operator --> UC_Pick
+Operator --> UC_Pack
+Operator --> UC_Tare
+Operator --> UC_ProductEdit
+
+Admin --> UC_Catalog
+Admin --> UC_Pick
+Admin --> UC_Pack
+Admin --> UC_Sales
+Admin --> UC_Order
+Admin --> UC_Admin
+
+Sales --> UC_Catalog
+Sales --> UC_Sales
+Sales --> UC_Order
+
+note right of UC_Tare
+  Доступ лише для Оператора
+  (маршрути /tare). Не намагайся
+  показати це для Адміністратора.
+end note
+
+note right of UC_ProductEdit
+  Доступ лише для Оператора
+  (/product/add, /product/update).
+end note
+
+note bottom of UC_Admin
+  Користувачі, типи продуктів,
+  типи контейнерів, реєстр візків,
+  реєстр нестач — лише Адміністратор.
+end note
+
+@enduml

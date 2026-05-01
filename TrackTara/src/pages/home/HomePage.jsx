@@ -31,9 +31,9 @@ const HomePage = () => {
     const [showChangeCartModal, setShowChangeCartModal] = useState(false); // Модальне вікно для зміни візка
     const [newCartNumber, setNewCartNumber] = useState(''); // Новий номер візка
     const [oldCartIssueLine, setOldCartIssueLine] = useState(''); // Лінія видачі для старого візка
-    const [showBrakiMagModal, setShowBrakiMagModal] = useState(false); // Модальне вікно для додавання до бракімагу
-    const [brakiMagQuantity, setBrakiMagQuantity] = useState(''); // Кількість для бракімагу
-    const [brakiMagReason, setBrakiMagReason] = useState('Не вистачило товару'); // Причина додавання до бракімагу
+    const [showBrakiMagModal, setShowBrakiMagModal] = useState(false); // Модальне вікно для реєстру нестач (бракімаг)
+    const [brakiMagQuantity, setBrakiMagQuantity] = useState(''); // Кількість для реєстру нестач
+    const [brakiMagReason, setBrakiMagReason] = useState('Не вистачило товару'); // Причина додавання в реєстр нестач
     const [error, setError] = useState('');
 
     useEffect(() => {
@@ -365,7 +365,7 @@ const HomePage = () => {
 
     const handleAddToBrakiMag = async () => {
         if (!brakiMagQuantity.trim()) {
-            setError('Введіть кількість для бракімагу');
+            setError('Введіть кількість для реєстру нестач');
             return;
         }
 
@@ -394,7 +394,7 @@ const HomePage = () => {
                 orderId: currentOrder?.id || null,
             });
 
-            toast.success(`Додано ${formatQuantity(quantity, currentContainer?.unitType || 'liters')} до бракімагу`);
+            toast.success(`Додано ${formatQuantity(quantity, currentContainer?.unitType || 'liters')} до реєстру нестач`);
             setShowBrakiMagModal(false);
             setBrakiMagQuantity('');
             setBrakiMagReason('Не вистачило товару');
@@ -403,7 +403,7 @@ const HomePage = () => {
             await loadOrders(selectedSector);
         } catch (error) {
             console.error('Error adding to braki mag:', error);
-            setError(error.response?.data || 'Помилка додавання до бракімагу');
+            setError(error.response?.data || 'Помилка додавання до реєстру нестач');
         }
     };
 
@@ -412,7 +412,7 @@ const HomePage = () => {
 
         const remainingQuantity = currentItem.quantity - (currentItem.pickedQuantity || 0);
         if (remainingQuantity <= 0) {
-            toast.warning('Немає товару для додавання до бракімагу');
+            toast.warning('Немає товару для додавання до реєстру нестач');
             return;
         }
 
@@ -433,14 +433,14 @@ const HomePage = () => {
                 orderId: currentOrder?.id || null,
             });
 
-            toast.success(`Додано повністю позицію (${formatQuantity(remainingQuantity, unitType)}) до бракімагу`);
+            toast.success(`Додано повністю позицію (${formatQuantity(remainingQuantity, unitType)}) до реєстру нестач`);
             
             // Закриваємо модальне вікно та оновлюємо замовлення
             handleClosePickModal();
             await loadOrders(selectedSector);
         } catch (error) {
             console.error('Error adding full item to braki mag:', error);
-            setError(error.response?.data || 'Помилка додавання до бракімагу');
+            setError(error.response?.data || 'Помилка додавання до реєстру нестач');
         }
     };
 
@@ -607,7 +607,7 @@ const HomePage = () => {
                                     onClick={handleAddFullItemToBrakiMag}
                                     className="w-100"
                                 >
-                                    Додати всю позицію до бракімагу
+                                    Додати всю позицію в реєстр нестач
                                 </Button>
                             </div>
                             <div className="d-flex gap-2">
@@ -679,7 +679,7 @@ const HomePage = () => {
                                     onClick={() => setShowBrakiMagModal(true)}
                                     className="w-100"
                                 >
-                                    Додати до бракімагу (якщо не вистачило або не знайшли)
+                                    Додати в реєстр нестач (якщо не вистачило або не знайшли)
                                 </Button>
                             </div>
                             <div className="d-flex gap-2">
@@ -932,7 +932,7 @@ const HomePage = () => {
                 </div>
             )}
 
-            {/* Модальне вікно додавання до бракімагу */}
+            {/* Модальне вікно додавання в реєстр нестач */}
             <Modal show={showBrakiMagModal} onHide={() => {
                 setShowBrakiMagModal(false);
                 setBrakiMagQuantity('');
@@ -940,7 +940,7 @@ const HomePage = () => {
                 setError('');
             }}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Додати до бракімагу</Modal.Title>
+                    <Modal.Title>Додати в реєстр нестач</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {error && <Alert variant="danger">{error}</Alert>}
@@ -964,7 +964,7 @@ const HomePage = () => {
                         </div>
                     )}
                     <Form.Group className="mb-3">
-                        <Form.Label>Кількість для бракімагу</Form.Label>
+                        <Form.Label>Кількість для реєстру нестач</Form.Label>
                         <Form.Control
                             type="number"
                             step={currentContainer?.unitType === 'pieces' ? '1' : '0.01'}
@@ -1007,7 +1007,7 @@ const HomePage = () => {
                         Скасувати
                     </Button>
                     <Button variant="warning" onClick={handleAddToBrakiMag}>
-                        Додати до бракімагу
+                        Додати в реєстр нестач
                     </Button>
                 </Modal.Footer>
             </Modal>

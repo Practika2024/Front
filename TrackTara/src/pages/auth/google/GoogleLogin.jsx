@@ -6,8 +6,8 @@ import { toast } from "react-toastify";
 
 const GSI_SCRIPT_PREFIX = "https://accounts.google.com/gsi/client";
 
-/** Якщо в консолі 403 / «origin is not allowed» — у Google Cloud Console для цього client_id
- *  додайте поточний origin (напр. http://localhost:5173) у Authorized JavaScript origins. */
+/** Потрібен VITE_GOOGLE_CLIENT_ID (.env / Vercel). У GCP: Authorized JavaScript origins — ваш dev і продакшен origin (без шляху).
+ * Під час Testing у OAuth consent screen логін лише для email із списку Test users. */
 
 /** Один раз на сесію — повторний initialize() дає попередження GSI_LOGGER */
 let gsiInitialized = false;
@@ -96,12 +96,14 @@ const GoogleLogin = () => {
     };
   }, []);
 
+  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim();
+
   useEffect(() => {
     if (!googleApiLoaded || !window.google?.accounts?.id) return;
 
-    const clientId =
-      import.meta.env.VITE_GOOGLE_CLIENT_ID ||
-      "219955824362-0rhvb42q1827djp1m7ao56921c6ivn9o.apps.googleusercontent.com";
+    if (!clientId) {
+      return;
+    }
 
     if (!gsiInitialized) {
       try {
@@ -131,14 +133,19 @@ const GoogleLogin = () => {
     } catch (e) {
       console.warn("[GoogleLogin] renderButton:", e);
     }
-  }, [googleApiLoaded, handleLoginSuccess]);
+  }, [googleApiLoaded, handleLoginSuccess, clientId]);
 
   return (
     <div className="d-flex flex-column align-items-center my-3 mx-3">
-      {googleApiLoaded ? (
-        <div id="loginGoogleBtn" />
-      ) : (
+      {!googleApiLoaded ? (
         <div className="text-muted small">Завантаження Google…</div>
+      ) : !clientId ? (
+        <p className="text-muted small text-center mb-0" style={{ maxWidth: "22rem" }}>
+          Вхід через Google вимкнено: задайте <code className="small">VITE_GOOGLE_CLIENT_ID</code> у{" "}
+          <code className="small">.env</code> або у змінних середовища деплою (наприклад Vercel).
+        </p>
+      ) : (
+        <div id="loginGoogleBtn" />
       )}
     </div>
   );

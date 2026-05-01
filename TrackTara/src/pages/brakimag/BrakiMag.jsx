@@ -24,7 +24,7 @@ const BrakiMag = () => {
             setItems(data);
         } catch (error) {
             console.error('Error loading braki mag items:', error);
-            toast.error('Помилка завантаження бракімагу');
+            toast.error('Помилка завантаження реєстру нестач');
         } finally {
             setLoading(false);
         }
@@ -40,7 +40,7 @@ const BrakiMag = () => {
 
         try {
             await removeFromBrakiMag(itemToDelete.id);
-            toast.success(`Товар "${itemToDelete.productName}" видалено з бракімагу`);
+            toast.success(`Товар "${itemToDelete.productName}" видалено з реєстру нестач`);
             setShowDeleteModal(false);
             setItemToDelete(null);
             loadItems();
@@ -57,7 +57,7 @@ const BrakiMag = () => {
                     <Button variant="outline-secondary" onClick={() => navigate('/')} className="me-3">
                         ← Назад
                     </Button>
-                    <h2>Бракімаг</h2>
+                    <h2>Реєстр нестач (бракімаг)</h2>
                 </div>
             </div>
 
@@ -84,7 +84,7 @@ const BrakiMag = () => {
                         {items.length === 0 ? (
                             <tr>
                                 <td colSpan="11" className="text-center text-muted">
-                                    Бракімаг порожній
+                                    Реєстр нестач порожній
                                 </td>
                             </tr>
                         ) : (
@@ -125,7 +125,7 @@ const BrakiMag = () => {
                     <Modal.Title>Підтвердження видалення</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <p>Ви впевнені, що хочете видалити товар <strong>{itemToDelete?.productName}</strong> з бракімагу?</p>
+                    <p>Ви впевнені, що хочете видалити товар <strong>{itemToDelete?.productName}</strong> з реєстру нестач?</p>
                     <Alert variant="warning">
                         Ця дія незворотна.
                     </Alert>

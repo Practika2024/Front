@@ -53,7 +53,7 @@ export function getNavSections(roles) {
         { to: "/productType", label: "Типи продуктів", end: true },
         { to: "/container/containerTypes", label: "Типи контейнерів", end: true },
         { to: "/carts/registry", label: "Реєстр візків", end: true },
-        { to: "/brakimag", label: "Бракімаг", end: true },
+        { to: "/brakimag", label: "Реєстр нестач", end: true },
       ],
     });
   }

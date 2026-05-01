@@ -163,8 +163,8 @@ export default function WarehouseHub() {
             />
             <HubCard
               to="/brakimag"
-              title="Бракімаг"
-              description="Некондиція та списання"
+              title="Реєстр нестач (бракімаг)"
+              description="Нестачі, пошкодження, списання"
               icon={PackageX}
             />
             <HubCard

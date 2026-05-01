@@ -519,7 +519,7 @@ ${bodyInner}
       0
     );
     const body = `
-  <h1>Pack list — ${escapeHtml(bx.boxCode || bx.labelNumber)}</h1>
+  <h1>Пакувальний лист (pack list) — ${escapeHtml(bx.boxCode || bx.labelNumber)}</h1>
   <div class="meta">
     ${escapeHtml(bx.displayName || bx.clientName || "")}<br/>
     Замовлення: #${escapeHtml(bx.orderId)} · ${escapeHtml(bx.clientName || "")}
@@ -572,7 +572,7 @@ ${bodyInner}
       })
       .join("");
     const body = `
-  <h1>Pack list — замовлення #${escapeHtml(orderId)}</h1>
+  <h1>Пакувальний лист (pack list) — замовлення #${escapeHtml(orderId)}</h1>
   <div class="meta">${escapeHtml(ord?.clientName || "")}${
       ord?.routeCode ? ` · траса ${escapeHtml(ord.routeCode)}` : ""
     }</div>
@@ -596,7 +596,7 @@ ${bodyInner}
       </div>
       <Alert variant="info" className="mb-3">
         Спочатку вкажіть <strong>трасу, на якій пакуєте</strong> (для попередження про чужі візки), потім{" "}
-        <strong>номер візка / поїмника</strong> — за потреби перегляньте вміст кнопкою під полем. Далі{" "}
+        <strong>номер візка</strong> — за потреби перегляньте вміст кнопкою під полем. Далі{" "}
         <strong>код товару або тари</strong> та «Перевірити». Покласти в коробку — у блоці «Коробка» праворуч або
         через «З візка» в таблиці нижче.
       </Alert>
@@ -646,7 +646,7 @@ ${bodyInner}
                     <Row className="g-2 mb-3">
                       <Col sm={6}>
                         <Form.Group>
-                          <Form.Label>Номер візка / поїмника</Form.Label>
+                          <Form.Label>Номер візка</Form.Label>
                           <Form.Control
                             className="font-monospace"
                             value={scanCartNumber}
@@ -831,7 +831,7 @@ ${bodyInner}
                       disabled={!scanResult}
                       onClick={() => printPackListForOrder(scanResult.order.id)}
                     >
-                      Друк pack list усіх коробок цього замовлення
+                      Друк пакувального листа для всіх коробок цього замовлення
                     </Button>
                     <p className="small text-muted mb-0 mt-2">
                       Після перевірки з’являється «Додати в коробку» (якщо коробка вже створена).
@@ -980,7 +980,7 @@ ${bodyInner}
                                 className="me-1"
                                 onClick={() => printPackListForBox(bx)}
                               >
-                                Pack list
+                                Пакувальний лист
                               </Button>
                               <Button
                                 variant="outline-danger"
