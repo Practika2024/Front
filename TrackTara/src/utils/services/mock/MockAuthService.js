@@ -29,11 +29,11 @@ const MOCK_USERS = [
     image: 'N/A',
   },
   {
-    id: 4,
+    id: 5,
     email: 'vetal05most@gmail.com',
     password: 'password123',
-    name: 'Sales Manager',
-    role: 'SalesManager',
+    name: 'Новий користувач (очікує ролі)',
+    role: 'Guest',
     image: 'N/A',
   },
 ];
@@ -77,6 +77,15 @@ export class MockAuthService {
       .trim()
       .toLowerCase();
     return MOCK_USERS.find((x) => x.email.toLowerCase() === n) || null;
+  }
+
+  /** Оновити роль у мок-автентифікації після зміни в картці користувача (адмін). */
+  static syncRoleForEmail(email, roles) {
+    const u = MockAuthService.findAuthUserByEmail(email);
+    if (!u) return;
+    const arr = Array.isArray(roles) ? roles : [roles];
+    const first = arr.find(Boolean);
+    u.role = first != null ? String(first) : "Guest";
   }
 
   static adminSetPassword(userId, newPassword) {
@@ -186,7 +195,7 @@ export class MockAuthService {
             id: MOCK_USERS.length + 1,
             email: payload.email || 'google@test.com',
             name: payload.name || payload.given_name || 'Google User',
-            role: 'Operator',
+            role: 'Guest',
             image: payload.picture || 'N/A',
           };
         } else {
@@ -198,7 +207,7 @@ export class MockAuthService {
           id: MOCK_USERS.length + 1,
           email: 'google@test.com',
           name: 'Google User',
-          role: 'Operator',
+          role: 'Guest',
           image: 'N/A',
         };
       }
@@ -208,7 +217,7 @@ export class MockAuthService {
         id: MOCK_USERS.length + 1,
         email: model.email || 'external@test.com',
         name: model.name || 'External User',
-        role: 'Operator',
+        role: 'Guest',
         image: model.image || 'N/A',
       };
     }
@@ -251,7 +260,7 @@ export class MockAuthService {
       email: model.email,
       password: model.password,
       name: model.name || model.email.split('@')[0],
-      role: 'Operator',
+      role: 'Guest',
       image: 'N/A',
     };
 

@@ -89,6 +89,12 @@ export function getMobileDockItems(roles) {
 }
 
 export function getHomePath(roles) {
+  const hasWorkRole = roles.some((r) =>
+    ["Operator", "Administrator", "SalesManager"].includes(r)
+  );
+  if (roles.includes("Guest") && !hasWorkRole) {
+    return "/pending-role";
+  }
   const onlySales =
     roles.includes("SalesManager") &&
     !roles.includes("Operator") &&

@@ -1,6 +1,7 @@
 import React, { memo, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { isAwaitingRoleAssignment } from "../../utils/helpers/userRoles";
 import Header from "./Header";
 import Footer from "./Footer";
 import AppSidebar from "./AppSidebar";
@@ -14,6 +15,7 @@ const Layout = memo(() => {
   const [menuOpen, setMenuOpen] = useState(false);
   const isAuthenticated = useSelector((s) => s.user.isAuthenticated);
   const roles = useAppRoles();
+  const awaitingAssignment = isAwaitingRoleAssignment(roles);
 
   return (
     <>
@@ -24,14 +26,14 @@ const Layout = memo(() => {
           isAuthenticated={isAuthenticated}
         />
         <div className="app-shell-body">
-          {isAuthenticated ? <AppSidebar roles={roles} /> : null}
+          {isAuthenticated && !awaitingAssignment ? <AppSidebar roles={roles} /> : null}
           <main className="app-main">
             <div className="app-main-inner">
               <Outlet />
             </div>
           </main>
         </div>
-        {isAuthenticated ? (
+        {isAuthenticated && !awaitingAssignment ? (
           <>
             <MobileDock roles={roles} onOpenMenu={() => setMenuOpen(true)} />
             <NavDrawer

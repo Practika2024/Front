@@ -25,6 +25,7 @@ import CreateOrder from "../pages/orders/CreateOrder.jsx";
 import CartRegistry from "../pages/carts/CartRegistry.jsx";
 import BrakiMag from "../pages/brakimag/BrakiMag.jsx";
 import HomePage from "../pages/home/HomePage.jsx";
+import PendingRolePage from "../pages/pendingRole/PendingRolePage.jsx";
 
 // eslint-disable-next-line react/display-name
 const BasicRoute = memo(() => {
@@ -37,6 +38,15 @@ const BasicRoute = memo(() => {
                         element={
                             <ProtectedRoute allowedRoles={["Operator", "Administrator", "SalesManager"]}>
                                 <RoleHomeRedirect/>
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/pending-role"
+                        element={
+                            <ProtectedRoute allowedRoles={["Guest"]}>
+                                <PendingRolePage />
                             </ProtectedRoute>
                         }
                     />

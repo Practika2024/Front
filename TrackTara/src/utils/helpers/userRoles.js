@@ -6,6 +6,8 @@ export const APP_ROLES = {
   Operator: "Operator",
   SalesManager: "SalesManager",
   User: "User",
+  /** Обліковий запис без робочих прав — очікує призначення ролі адміністратором */
+  Guest: "Guest",
 };
 
 const CLAIM_ROLE =
@@ -16,6 +18,7 @@ const CANONICAL_ORDER = [
   "Operator",
   "SalesManager",
   "User",
+  "Guest",
 ];
 
 /**
@@ -59,8 +62,22 @@ export function normalizeRoleName(raw) {
     operator: APP_ROLES.Operator,
     salesmanager: APP_ROLES.SalesManager,
     user: APP_ROLES.User,
+    guest: APP_ROLES.Guest,
   };
   return aliases[compact] || null;
+}
+
+/**
+ * Користувач у статусі «гість»: є лише роль Guest, без складських/продажних прав.
+ */
+export function isAwaitingRoleAssignment(userRoles) {
+  if (!Array.isArray(userRoles) || userRoles.length === 0) return false;
+  const hasWorkRole = userRoles.some((r) =>
+    [APP_ROLES.Operator, APP_ROLES.Administrator, APP_ROLES.SalesManager].includes(
+      r
+    )
+  );
+  return userRoles.includes(APP_ROLES.Guest) && !hasWorkRole;
 }
 
 /**

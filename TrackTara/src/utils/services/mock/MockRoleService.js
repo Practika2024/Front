@@ -6,7 +6,8 @@ const mockRoles = [
   { id: 1, name: 'Administrator' },
   { id: 2, name: 'Operator' },
   { id: 3, name: 'SalesManager' },
-  { id: 3, name: 'User' },
+  { id: 4, name: 'User' },
+  { id: 5, name: 'Guest' },
 ];
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));

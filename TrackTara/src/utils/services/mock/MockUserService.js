@@ -38,6 +38,14 @@ let mockUsers = [
     image: 'N/A',
     favoriteProducts: [],
   },
+  {
+    id: 5,
+    email: 'vetal05most@gmail.com',
+    name: 'Новий користувач (очікує ролі)',
+    role: ['Guest'],
+    image: 'N/A',
+    favoriteProducts: [],
+  },
 ];
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -63,6 +71,7 @@ export class MockUserService {
     const user = mockUsers.find(u => u.id === userId);
     if (user) {
       user.role = Array.isArray(roles) ? roles : [roles];
+      MockAuthService.syncRoleForEmail(user.email, user.role);
     }
     return { success: true };
   }

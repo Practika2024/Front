@@ -1,14 +1,14 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import ErrorMessage from "../components/layout/ErrorMessage";
 import { jwtDecode } from "jwt-decode";
 import {
+  APP_ROLES,
   getNormalizedRolesFromAccessToken,
+  isAwaitingRoleAssignment,
   isRoleAllowed,
 } from "../utils/helpers/userRoles";
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
-  const navigate = useNavigate();
   const token = localStorage.getItem("accessToken");
   let user = null;
   try {
@@ -17,13 +17,19 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     user = null;
   }
 
-  useEffect(() => {
-    if (!user) {
-      navigate("/login");
-    }
-  }, [user, navigate]);
+  if (!token || !user) {
+    return <Navigate to="/login" replace />;
+  }
 
   const userRoles = getNormalizedRolesFromAccessToken(token);
+
+  if (
+    isAwaitingRoleAssignment(userRoles) &&
+    !allowedRoles.includes(APP_ROLES.Guest)
+  ) {
+    return <Navigate to="/pending-role" replace />;
+  }
+
   const isAuthorized = isRoleAllowed(userRoles, allowedRoles);
 
   return (

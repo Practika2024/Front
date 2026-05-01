@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import SectorsManagement from "./SectorsManagement";
 import useAppRoles from "../../hooks/useAppRoles";
 import { getHomePath } from "./warehouseNav";
+import { isAwaitingRoleAssignment } from "../../utils/helpers/userRoles";
 
 const Header = memo(({ onOpenMenu, isAuthenticated }) => {
   const currentUser = useSelector((store) => store.user.currentUser);
@@ -21,6 +22,7 @@ const Header = memo(({ onOpenMenu, isAuthenticated }) => {
 
   const [showSectorsModal, setShowSectorsModal] = useState(false);
   const userRoles = useAppRoles();
+  const awaitingAssignment = isAwaitingRoleAssignment(userRoles);
   const isAdministrator = userRoles.includes("Administrator");
   const homePath = getHomePath(userRoles);
 
@@ -28,7 +30,7 @@ const Header = memo(({ onOpenMenu, isAuthenticated }) => {
     <header className="app-topbar">
       <nav className="navbar navbar-expand-lg navbar-dark app-topbar-inner px-2 px-sm-3">
         <div className="container-fluid app-topbar-container">
-          {isAuthenticated ? (
+          {isAuthenticated && !awaitingAssignment ? (
             <button
               type="button"
               className="btn btn-link text-white d-lg-none p-2 app-topbar-icon-btn"
@@ -127,11 +129,13 @@ const Header = memo(({ onOpenMenu, isAuthenticated }) => {
                         {currentUser?.email}
                       </div>
                     </li>
-                    <li>
-                      <Link className="dropdown-item" to="/profile">
-                        Профіль
-                      </Link>
-                    </li>
+                    {!awaitingAssignment ? (
+                      <li>
+                        <Link className="dropdown-item" to="/profile">
+                          Профіль
+                        </Link>
+                      </li>
+                    ) : null}
                     <li>
                       <button className="dropdown-item" type="button" onClick={logoutHandler}>
                         Вихід
