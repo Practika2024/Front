@@ -5,6 +5,8 @@ import {
   getRouteMasterByCode,
   resolvePackingTableForCart,
   normalizeRouteCode,
+  getClients,
+  getRouteMasters,
 } from './salesDomainStore';
 import { defineTable } from './_mockDb';
 
@@ -104,7 +106,11 @@ const mockOrders = defineTable('orders', [
     status: 'active',
     createdAt: '2024-01-20T11:00:00',
     createdBy: 'admin@test.com',
-    issueLineCode: 'LINE-002',
+    issueLineCode: 'PACK-LINE-HR',
+    clientId: 2,
+    clientName: 'ФОП Іваненко',
+    routeCode: 'HR',
+    packingLineCode: 'PACK-LINE-HR',
     carts: [],
     items: [
       {
@@ -166,7 +172,11 @@ const mockOrders = defineTable('orders', [
     status: 'active',
     createdAt: '2024-01-20T12:00:00',
     createdBy: 'admin@test.com',
-    issueLineCode: 'LINE-003',
+    issueLineCode: 'PACK-LINE-HR',
+    clientId: 2,
+    clientName: 'ФОП Іваненко',
+    routeCode: 'HR',
+    packingLineCode: 'PACK-LINE-HR',
     carts: [],
     items: [
       {
@@ -211,7 +221,11 @@ const mockOrders = defineTable('orders', [
     status: 'active',
     createdAt: '2024-01-20T13:00:00',
     createdBy: 'admin@test.com',
-    issueLineCode: 'LINE-004',
+    issueLineCode: 'PACK-LINE-AC',
+    clientId: 1,
+    clientName: 'ТОВ «Рітейл Захід»',
+    routeCode: 'AC',
+    packingLineCode: 'PACK-LINE-AC',
     carts: [],
     items: [
       {
@@ -290,7 +304,11 @@ const mockOrders = defineTable('orders', [
     status: 'in_progress',
     createdAt: '2024-01-20T09:00:00',
     createdBy: 'admin@test.com',
-    issueLineCode: 'LINE-005',
+    issueLineCode: 'PACK-LINE-AC',
+    clientId: 1,
+    clientName: 'ТОВ «Рітейл Захід»',
+    routeCode: 'AC',
+    packingLineCode: 'PACK-LINE-AC',
     carts: [
       {
         cartNumber: 'A123',
@@ -299,6 +317,9 @@ const mockOrders = defineTable('orders', [
         ],
         leftOnLine: false,
         issueLineCode: null,
+        routeCode: 'AC',
+        packingLineCode: 'PACK-LINE-AC',
+        packingTableCode: 'ST-AC-1',
       },
     ],
     items: [
@@ -339,6 +360,48 @@ const mockOrders = defineTable('orders', [
     ],
   },
 ]);
+
+// Міграція раніше збережених у localStorage замовлень: жодного "невідомого клієнта" / "Траса —".
+// Якщо у мок-замовленні відсутній clientId / clientName / routeCode — підтягуємо з довідника.
+// Дефолтний фолбек — перший клієнт зі списку (ТОВ «Рітейл Захід», траса AC).
+(function ensureOrdersHaveClientAndRoute() {
+  const clients = getClients();
+  const routes = getRouteMasters();
+  if (!clients.length) return;
+
+  const pickByRouteCode = (code) =>
+    code ? clients.find((c) => c.routeCode === code) : null;
+  const pickByName = (name) =>
+    name ? clients.find((c) => c.name === name) : null;
+
+  const fallbackClient = clients[0];
+  const fallbackRoute =
+    routes.find((r) => r.routeCode === fallbackClient.routeCode) || null;
+
+  for (const order of mockOrders) {
+    const hasClient =
+      order.clientId != null && !!order.clientName && !!order.routeCode;
+    if (hasClient) continue;
+
+    const inferred =
+      (order.clientId != null && clients.find((c) => c.id === order.clientId)) ||
+      pickByRouteCode(order.routeCode) ||
+      pickByName(order.clientName) ||
+      fallbackClient;
+
+    const route =
+      routes.find((r) => r.routeCode === inferred.routeCode) || fallbackRoute;
+
+    order.clientId = inferred.id;
+    order.clientName = inferred.name;
+    order.routeCode = inferred.routeCode;
+    order.packingLineCode =
+      order.packingLineCode || route?.packingLineCode || null;
+    if (!order.issueLineCode) {
+      order.issueLineCode = order.packingLineCode || null;
+    }
+  }
+})();
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 

@@ -24,7 +24,12 @@ const CreateOrder = () => {
     const [error, setError] = useState('');
 
     const userRoles = useAppRoles();
-    const salesManagerMustPickClient = userRoles.includes('SalesManager');
+    /**
+     * Клієнт обов'язковий для всіх ролей — без нього замовлення не має ні
+     * траси, ні лінії пакування, що ламає інтеграцію зі стіл-лініями.
+     */
+    const salesManagerMustPickClient = true;
+    void userRoles;
     
     // Стани для модального вікна введення кількості
     const [showQuantityModal, setShowQuantityModal] = useState(false);
@@ -232,14 +237,14 @@ const CreateOrder = () => {
             return;
         }
 
-        if (salesManagerMustPickClient && !selectedClientId) {
-            setError('Оберіть клієнта для замовлення');
+        if (!selectedClientId || !selectedClient) {
+            setError('Оберіть клієнта для замовлення — без нього не визначити трасу і лінію пакування');
             return;
         }
 
         const line = (packingLineFromClient || issueLineCode).trim();
         if (!line) {
-            setError('Вкажіть лінію пакування: оберіть клієнта або введіть лінію вручну');
+            setError('Не вдалося визначити лінію пакування для обраного клієнта');
             return;
         }
 
@@ -314,13 +319,13 @@ const CreateOrder = () => {
                                 </p>
 
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Клієнт {salesManagerMustPickClient ? '(обов’язково)' : ''}</Form.Label>
+                                    <Form.Label>Клієнт (обов’язково)</Form.Label>
                                     <Form.Select
                                         value={selectedClientId}
                                         onChange={(e) => setSelectedClientId(e.target.value)}
-                                        required={salesManagerMustPickClient}
+                                        required
                                     >
-                                        <option value="">— Не обрано —</option>
+                                        <option value="">— Оберіть клієнта —</option>
                                         {clients.map((c) => (
                                             <option key={c.id} value={c.id}>
                                                 {c.name} (траса {c.routeCode})
@@ -523,10 +528,19 @@ const CreateOrder = () => {
                     <Button
                         type="submit"
                         variant="primary"
-                        disabled={selectedItems.length === 0 || isSubmitting}
+                        disabled={
+                            selectedItems.length === 0 ||
+                            isSubmitting ||
+                            !selectedClientId
+                        }
                     >
                         {isSubmitting ? 'Створення…' : 'Створити замовлення'}
                     </Button>
+                    {!selectedClientId && (
+                        <Form.Text className="text-muted ms-2">
+                            Оберіть клієнта вище — без цього замовлення не створиться.
+                        </Form.Text>
+                    )}
                 </div>
             </Form>
 
