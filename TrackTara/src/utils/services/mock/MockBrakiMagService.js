@@ -1,9 +1,11 @@
 // Mock BrakiMag Service - реєстр бракованих товарів
 
+import { defineTable } from './_mockDb';
+
 const MOCK_DELAY = 100;
 
 // Реєстр бракованих товарів
-let brakiMagItems = [
+const brakiMagItems = defineTable('brakiMag', [
   {
     id: 1,
     productId: 1,
@@ -46,7 +48,7 @@ let brakiMagItems = [
     addedBy: 'operator@test.com',
     addedAt: '2024-01-20T11:30:00',
   },
-];
+]);
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -127,4 +129,57 @@ export const updateBrakiMagItem = async (itemId, updateData) => {
   });
   
   return JSON.parse(JSON.stringify(item));
+};
+
+/**
+ * Частково або повністю забрати з реєстру нестач і покласти в контейнер (спочатку оновлення тури — брак лише після успіху).
+ */
+export const transferBrakiMagToContainer = async (brakiMagItemId, containerId, quantity) => {
+  await delay(MOCK_DELAY);
+  const idx = brakiMagItems.findIndex((i) => i.id === parseInt(brakiMagItemId));
+  if (idx === -1) {
+    throw {
+      response: { data: 'Запис не знайдено в реєстрі нестач', status: 404 },
+    };
+  }
+  const entry = brakiMagItems[idx];
+  const q = parseFloat(String(quantity).replace(',', '.'));
+  const max = Number(entry.quantity) || 0;
+  if (!(q > 0) || Number.isNaN(q)) {
+    throw {
+      response: { data: 'Вкажіть кількість більше 0', status: 400 },
+    };
+  }
+  if (q > max + 1e-9) {
+    throw {
+      response: {
+        data: `У браку лише ${max}; не можна забрати ${q}`,
+        status: 400,
+      },
+    };
+  }
+
+  const { setProductToContainer } = await import('./MockContainerService');
+  let updatedContainer;
+  try {
+    updatedContainer = await setProductToContainer(
+      parseInt(containerId),
+      entry.productId,
+      q,
+    );
+  } catch (e) {
+    throw e;
+  }
+
+  entry.quantity = max - q;
+  if (entry.quantity <= 1e-9) {
+    brakiMagItems.splice(idx, 1);
+  }
+
+  return JSON.parse(
+    JSON.stringify({
+      container: updatedContainer,
+      brakiMagEntry: entry.quantity > 1e-9 ? { ...entry } : null,
+    }),
+  );
 };

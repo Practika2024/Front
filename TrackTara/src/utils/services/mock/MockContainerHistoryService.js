@@ -1,19 +1,20 @@
-// Mock Container History Service - імітує роботу ContainerHistoryService з мок-даними
+// Mock Container History Service — журнал подій контейнера (лише додавання записів).
+// Жоден попередній рядок не змінюється після наступних операцій: кожне покладання / знімання — окремий факт.
+
+import { defineTable } from './_mockDb';
 
 const MOCK_DELAY = 300;
 
-// Мок-дані історії контейнерів
-// Кожен запис містить інформацію про те, коли продукт був покладений у контейнер або вийнятий з нього
-let mockContainerHistories = [
+const mockContainerHistories = defineTable('containerHistories', [
   {
     id: 1,
     containerId: 1,
     productId: 1,
     startDate: '2024-01-15T10:30:00',
-    endDate: null, // null означає, що продукт досі в контейнері
-    userLogin: 'operator@test.com', // Логін користувача, який поклав продукт
-    action: 'placed', // 'placed' - покладено, 'removed' - вийнято
-    quantity: 35, // Кількість продукту (літри/кілограми)
+    endDate: null,
+    userLogin: 'operator@test.com',
+    action: 'placed',
+    quantity: 35,
   },
   {
     id: 2,
@@ -54,16 +55,17 @@ let mockContainerHistories = [
     userLogin: 'admin@test.com',
     action: 'removed',
   },
-];
+]);
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+const nextHistoryId = () => Math.max(0, ...mockContainerHistories.map((h) => h.id)) + 1;
+
 export const getAllContainerHistories = async (containerId) => {
   await delay(MOCK_DELAY);
-  // Фільтруємо історію для конкретного контейнера
   const histories = mockContainerHistories.filter(h => h.containerId === parseInt(containerId));
-  // Сортуємо за датою (найновіші спочатку)
-  return histories.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+  const sorted = [...histories].sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+  return sorted.map((h) => ({ ...h }));
 };
 
 export const getContainerHistoryById = async (containerHistoryId) => {
@@ -77,21 +79,33 @@ export const getContainerHistoryById = async (containerHistoryId) => {
       },
     };
   }
-  return history;
+  return { ...history };
 };
 
-// Функція для додавання нового запису в історію (викликається з MockContainerService)
-export const addContainerHistory = async (containerId, productId, action, userLogin, quantity = null) => {
+/**
+ * Лише нові записи в кінець масиву; існуючі id не перезаписуються.
+ * @param {'created'|'placed'|'removed'} action
+ * @param {number|null} quantity — для placed: обсяг цієї операції; для removed: знято за раз
+ * @param {{ orderId?: number, orderItemId?: number }} [meta] — лише для removed (комплектація); зберігається в записі
+ */
+export const addContainerHistory = async (
+  containerId,
+  productId,
+  action,
+  userLogin,
+  quantity = null,
+  meta = {},
+) => {
   await delay(MOCK_DELAY);
-  const newId = Math.max(...mockContainerHistories.map(h => h.id), 0) + 1;
-  
-  // Якщо контейнер створено
+  const newId = nextHistoryId();
+  const now = new Date().toISOString();
+
   if (action === 'created') {
     const newHistory = {
       id: newId,
       containerId: parseInt(containerId),
       productId: null,
-      startDate: new Date().toISOString(),
+      startDate: now,
       endDate: null,
       userLogin: userLogin || 'unknown@test.com',
       action: 'created',
@@ -100,40 +114,50 @@ export const addContainerHistory = async (containerId, productId, action, userLo
     mockContainerHistories.push(newHistory);
     return newHistory;
   }
-  // Якщо продукт покладено, створюємо новий запис з startDate і без endDate
-  else if (action === 'placed') {
-    const newHistory = {
+
+  if (action === 'placed') {
+    const cid = parseInt(containerId);
+    const pid = productId != null ? parseInt(productId) : null;
+    const addQty = quantity != null ? Number(quantity) : 0;
+    const row = {
       id: newId,
-      containerId: parseInt(containerId),
-      productId: productId ? parseInt(productId) : null,
-      startDate: new Date().toISOString(),
-      endDate: null,
+      containerId: cid,
+      productId: pid,
+      startDate: now,
+      endDate: now,
       userLogin: userLogin || 'unknown@test.com',
       action: 'placed',
-      quantity: quantity || 0,
+      quantity: addQty,
     };
-    mockContainerHistories.push(newHistory);
-    return newHistory;
-  } 
-  // Якщо продукт вийнято, знаходимо останній запис для цього контейнера і продукта і встановлюємо endDate
-  else if (action === 'removed') {
-    // Знаходимо останній активний запис (без endDate) для цього контейнера
-    const activeHistory = mockContainerHistories
-      .filter(h => h.containerId === parseInt(containerId) && h.endDate === null)
-      .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0];
-    
-    if (activeHistory) {
-      activeHistory.endDate = new Date().toISOString();
-      activeHistory.action = 'removed';
-      activeHistory.userLogin = userLogin || activeHistory.userLogin;
-      activeHistory.quantity = quantity !== null ? quantity : activeHistory.quantity;
-      return activeHistory;
-    }
+    mockContainerHistories.push(row);
+    return row;
   }
-  
+
+  if (action === 'removed') {
+    const cid = parseInt(containerId);
+    const pid = productId != null ? parseInt(productId) : null;
+    const qtyRemoved =
+      quantity !== null && quantity !== undefined ? Number(quantity) : 0;
+
+    const row = {
+      id: newId,
+      containerId: cid,
+      productId: pid,
+      startDate: now,
+      endDate: now,
+      userLogin: userLogin || 'unknown@test.com',
+      action: 'removed',
+      quantity: qtyRemoved,
+    };
+    if (meta && meta.orderId != null && meta.orderId !== undefined) {
+      row.orderId = meta.orderId;
+      row.orderItemId = meta.orderItemId ?? null;
+    }
+    mockContainerHistories.push(row);
+    return row;
+  }
+
   return null;
 };
 
-// Експортуємо дані для доступу з інших модулів
 export { mockContainerHistories };
-

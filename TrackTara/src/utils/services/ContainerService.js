@@ -50,6 +50,6 @@ export const updateContainer = async (id, tareData) => {
     }
 };
 
-export const clearProductFromTare = async (containerId, quantity = null) => {
+export const clearProductFromTare = async (containerId, quantity = null, _meta = {}) => {
     await axios.put(`${API_URL}/clear-content/${containerId}`, { quantity }, getAuthHeaders());
 };

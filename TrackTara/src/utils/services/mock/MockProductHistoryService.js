@@ -1,10 +1,12 @@
 // Mock Product History Service - імітує роботу ProductHistoryService з мок-даними
 
+import { defineTable, clone } from './_mockDb';
+
 const MOCK_DELAY = 300;
 
 // Мок-дані історії продуктів
 // Кожен запис містить інформацію про дії з продуктом (створення, оновлення, покладення в тару, вийняття з тари)
-let mockProductHistories = [
+const mockProductHistories = defineTable('productHistories', [
   {
     id: 1,
     productId: 1,
@@ -77,16 +79,15 @@ let mockProductHistories = [
     userLogin: 'admin@test.com',
     description: 'Інформацію про продукт оновлено',
   },
-];
+]);
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const getAllProductHistories = async (productId) => {
   await delay(MOCK_DELAY);
-  // Фільтруємо історію для конкретного продукта
   const histories = mockProductHistories.filter(h => h.productId === parseInt(productId));
-  // Сортуємо за датою (найновіші спочатку)
-  return histories.sort((a, b) => new Date(b.date) - new Date(a.date));
+  const sorted = [...histories].sort((a, b) => new Date(b.date) - new Date(a.date));
+  return clone(sorted);
 };
 
 export const getProductHistoryById = async (productHistoryId) => {
@@ -100,7 +101,7 @@ export const getProductHistoryById = async (productHistoryId) => {
       },
     };
   }
-  return history;
+  return clone(history);
 };
 
 // Функція для додавання нового запису в історію (викликається з MockProductService)
@@ -119,7 +120,7 @@ export const addProductHistory = async (productId, action, userLogin, containerI
   };
   
   mockProductHistories.push(newHistory);
-  return newHistory;
+  return clone(newHistory);
 };
 
 // Допоміжна функція для генерації опису за замовчуванням

@@ -1,20 +1,22 @@
 // Mock Product Types Service - відповідає формату ProductTypesService (функції, не клас)
 
+import { defineTable, clone } from './_mockDb';
+
 const MOCK_DELAY = 500;
 
-let mockProductTypes = [
+const mockProductTypes = defineTable('productTypes', [
   { id: 1, name: 'Молочні продукти' },
   { id: 2, name: 'Хлібобулочні вироби' },
   { id: 3, name: 'Яйця' },
   { id: 4, name: 'М\'ясні продукти' },
-];
+]);
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Експортуємо функції у тому ж форматі що й реальний ProductTypesService
 export const getAllProductTypes = async () => {
   await delay(MOCK_DELAY);
-  return [...mockProductTypes];
+  return clone(mockProductTypes);
 };
 
 export const addProductType = async (productType) => {
@@ -24,7 +26,7 @@ export const addProductType = async (productType) => {
     name: productType.name,
   };
   mockProductTypes.push(newType);
-  return newType;
+  return clone(newType);
 };
 
 export const updateProductType = async (id, productType) => {
@@ -39,7 +41,7 @@ export const updateProductType = async (id, productType) => {
     };
   }
   Object.assign(type, productType);
-  return type;
+  return clone(type);
 };
 
 export const deleteProductType = async (id) => {

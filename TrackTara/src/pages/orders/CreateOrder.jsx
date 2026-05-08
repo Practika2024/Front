@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Form, Table, Alert, Card, Row, Col, Modal } from 'react-bootstrap';
 import { OrderService } from '../../utils/services';
@@ -6,7 +6,7 @@ import { getAllContainers } from '../../utils/services';
 import { fetchProducts } from '../../store/state/actions/productActions';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { SectorService, ClientRouteService } from '../../utils/services';
+import { ClientRouteService } from '../../utils/services';
 import { formatQuantity, getUnitFullLabel } from '../../utils/helpers/unitFormatter';
 import { lineTotalWeightKg, formatWeightKg } from '../../utils/helpers/productWeight';
 import useAppRoles from '../../hooks/useAppRoles';
@@ -16,8 +16,6 @@ const CreateOrder = () => {
     const dispatch = useDispatch();
     const products = useSelector(state => state.product?.products || []);
     const [containers, setContainers] = useState([]);
-    const [sectors, setSectors] = useState([]);
-    const [selectedSector, setSelectedSector] = useState('');
     const [selectedItems, setSelectedItems] = useState([]); // [{productId, containerId, quantity}]
     const [issueLineCode, setIssueLineCode] = useState(''); // лінія пакування / видачі
     const [clients, setClients] = useState([]);
@@ -32,11 +30,15 @@ const CreateOrder = () => {
     const [showQuantityModal, setShowQuantityModal] = useState(false);
     const [pendingItem, setPendingItem] = useState(null); // {productId, containerId, productName, containerCode, rowNumber, productCode, maxQuantity}
     const [quantity, setQuantity] = useState('');
+    /** Пошук по списку доступних позицій (без урахування регістру) */
+    const [productListSearch, setProductListSearch] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    /** Синхронний захист від подвійного submit (подвійний клік / Enter поки запит йде) */
+    const submitLockRef = useRef(false);
 
     useEffect(() => {
         dispatch(fetchProducts());
         loadContainers();
-        loadSectors();
         loadClientsAndRoutes();
     }, [dispatch]);
 
@@ -75,30 +77,47 @@ const CreateOrder = () => {
         }
     };
 
-    const loadSectors = async () => {
-        try {
-            const data = await SectorService.getAllSectors();
-            setSectors(data);
-        } catch (error) {
-            console.error('Error loading sectors:', error);
-        }
-    };
-
     // Отримуємо тільки продукти, які знаходяться в контейнерах
     const productsInContainers = products.filter(product => 
         product.containerNumber && containers.some(c => c.uniqueCode === product.containerNumber)
     );
 
-    // Отримуємо контейнери з продуктами для вибраного сектора
-    const getContainersBySector = (sector) => {
-        if (!sector) return [];
-        return containers.filter(c => 
-            c.sector === sector.toUpperCase() && 
-            !c.isEmpty && 
-            c.productId &&
-            productsInContainers.some(p => p.id === c.productId)
-        );
-    };
+    // Контейнери з усіх секторів (сектор береться з контейнера; замовлення розіб’ються автоматично)
+    const pickableContainers = containers
+        .filter(
+            (c) =>
+                !c.isEmpty &&
+                c.productId &&
+                productsInContainers.some((p) => p.id === c.productId),
+        )
+        .slice()
+        .sort((a, b) => {
+            const sa = String(a.sector || '').toUpperCase();
+            const sb = String(b.sector || '').toUpperCase();
+            if (sa !== sb) return sa.localeCompare(sb);
+            return (a.rowNumber || 0) - (b.rowNumber || 0);
+        });
+
+    const productSearchNorm = productListSearch.trim().toLowerCase();
+    const filteredPickableContainers = productSearchNorm
+        ? pickableContainers.filter((container) => {
+              const product = products.find((p) => p.id === container.productId);
+              if (!product) return false;
+              const code =
+                  product.productCode ||
+                  `PRD-${String(product.id).padStart(3, '0')}`;
+              const haystack = [
+                  product.name,
+                  container.uniqueCode,
+                  String(container.sector ?? ''),
+                  String(container.rowNumber ?? ''),
+                  code,
+              ];
+              return haystack.some((field) =>
+                  String(field).toLowerCase().includes(productSearchNorm),
+              );
+          })
+        : pickableContainers;
 
     const handleAddItem = (productId, containerId) => {
         const product = products.find(p => p.id === productId);
@@ -149,6 +168,7 @@ const CreateOrder = () => {
             containerId: pendingItem.containerId,
             containerCode: pendingItem.containerCode,
             rowNumber: pendingItem.rowNumber,
+            sector: String(container?.sector || '').toUpperCase() || '?',
             productCode: pendingItem.productCode,
             quantity: quantityValue,
             unitType: container?.unitType || 'liters', // Зберігаємо тип одиниць
@@ -203,12 +223,9 @@ const CreateOrder = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
+        if (submitLockRef.current || isSubmitting) return;
 
-        if (!selectedSector) {
-            setError('Оберіть сектор');
-            return;
-        }
+        setError('');
 
         if (selectedItems.length === 0) {
             setError('Додайте хоча б один продукт до замовлення');
@@ -226,25 +243,53 @@ const CreateOrder = () => {
             return;
         }
 
+        submitLockRef.current = true;
+        setIsSubmitting(true);
+
+        const basePayload = {
+            issueLineCode: line,
+            packingLineCode: line,
+            clientId: selectedClientId ? Number(selectedClientId) : null,
+            clientName: selectedClient?.name || null,
+            routeCode: selectedClient?.routeCode || null,
+        };
+
+        const groups = new Map();
+        for (const item of selectedItems) {
+            const sec =
+                item.sector ||
+                String(
+                    containers.find((c) => c.id === item.containerId)?.sector || '',
+                ).toUpperCase() ||
+                '?';
+            if (!groups.has(sec)) groups.set(sec, []);
+            groups.get(sec).push(item);
+        }
+
+        const orderedSectors = [...groups.keys()].sort();
+
         try {
-            await OrderService.createOrder({
-                sector: selectedSector,
-                items: selectedItems,
-                issueLineCode: line,
-                packingLineCode: line,
-                clientId: selectedClientId ? Number(selectedClientId) : null,
-                clientName: selectedClient?.name || null,
-                routeCode: selectedClient?.routeCode || null,
-            });
-            toast.success('Замовлення створено успішно');
+            for (const sector of orderedSectors) {
+                await OrderService.createOrder({
+                    ...basePayload,
+                    sector,
+                    items: groups.get(sector),
+                });
+            }
+            toast.success(
+                orderedSectors.length > 1
+                    ? `Створено замовлень: ${orderedSectors.length} (${orderedSectors.map((s) => `сектор ${s}`).join(', ')})`
+                    : 'Замовлення створено успішно',
+            );
             navigate('/');
         } catch (error) {
             console.error('Error creating order:', error);
             setError(error.response?.data || 'Помилка створення замовлення');
+        } finally {
+            submitLockRef.current = false;
+            setIsSubmitting(false);
         }
     };
-
-    const sectorContainers = getContainersBySector(selectedSector);
 
     return (
         <div className="container mt-5">
@@ -263,24 +308,10 @@ const CreateOrder = () => {
                     <Col md={6}>
                         <Card className="mb-4">
                             <Card.Body>
-                                <Card.Title>Оберіть сектор</Card.Title>
-                                <Form.Group className="mb-3">
-                                    <Form.Select
-                                        value={selectedSector}
-                                        onChange={(e) => {
-                                            setSelectedSector(e.target.value);
-                                            setSelectedItems([]); // Очищаємо вибрані продукти при зміні сектора
-                                        }}
-                                        required
-                                    >
-                                        <option value="">Оберіть сектор</option>
-                                        {sectors.map(sector => (
-                                            <option key={sector.sector} value={sector.sector}>
-                                                Сектор {sector.sector}
-                                            </option>
-                                        ))}
-                                    </Form.Select>
-                                </Form.Group>
+                                <Card.Title>Продукти на складі</Card.Title>
+                                <p className="text-muted small mb-3">
+                                    Оберіть позиції з будь-яких секторів. Для кожного сектора буде створено окреме замовлення автоматично.
+                                </p>
 
                                 <Form.Group className="mb-3">
                                     <Form.Label>Клієнт {salesManagerMustPickClient ? '(обов’язково)' : ''}</Form.Label>
@@ -325,30 +356,51 @@ const CreateOrder = () => {
                                     </Form.Text>
                                 </Form.Group>
 
-                                {selectedSector && (
-                                    <div>
-                                        <h5>Продукти в секторі {selectedSector}</h5>
-                                        {sectorContainers.length === 0 ? (
-                                            <Alert variant="info">
-                                                У цьому секторі немає продуктів в контейнерах
-                                            </Alert>
-                                        ) : (
-                                            <Table striped bordered hover size="sm">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Продукт</th>
-                                                        <th>Контейнер</th>
-                                                        <th>Ряд</th>
-                                                        <th>Кількість</th>
-                                                        <th>Дія</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {sectorContainers.map(container => {
+                                <div>
+                                    <h5 className="h6">Доступні для замовлення</h5>
+                                    {pickableContainers.length === 0 ? (
+                                        <Alert variant="info">
+                                            Немає продуктів у контейнерах для замовлення
+                                        </Alert>
+                                    ) : (
+                                        <>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label className="small text-muted mb-1">
+                                                    Пошук (не залежить від капсу)
+                                                </Form.Label>
+                                                <Form.Control
+                                                    type="search"
+                                                    value={productListSearch}
+                                                    onChange={(e) =>
+                                                        setProductListSearch(e.target.value)
+                                                    }
+                                                    placeholder="Назва, код контейнера, сектор, код товару…"
+                                                    autoComplete="off"
+                                                />
+                                            </Form.Group>
+                                            {filteredPickableContainers.length === 0 ? (
+                                                <Alert variant="secondary" className="mb-0">
+                                                    Нічого не знайдено за запитом «{productListSearch.trim()}»
+                                                </Alert>
+                                            ) : (
+                                        <Table striped bordered hover size="sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Сектор</th>
+                                                    <th>Продукт</th>
+                                                    <th>Контейнер</th>
+                                                    <th>Ряд</th>
+                                                    <th>Кількість</th>
+                                                    <th>Дія</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {filteredPickableContainers.map((container) => {
                                                         const product = products.find(p => p.id === container.productId);
                                                         if (!product) return null;
                                                         return (
                                                             <tr key={container.id}>
+                                                                <td>{container.sector}</td>
                                                                 <td>{product.name}</td>
                                                                 <td>{container.uniqueCode}</td>
                                                                 <td>{container.rowNumber}</td>
@@ -369,12 +421,13 @@ const CreateOrder = () => {
                                                                 </td>
                                                             </tr>
                                                         );
-                                                    })}
-                                                </tbody>
-                                            </Table>
-                                        )}
-                                    </div>
-                                )}
+                                                })}
+                                            </tbody>
+                                        </Table>
+                                            )}
+                                        </>
+                                    )}
+                                </div>
                             </Card.Body>
                         </Card>
                     </Col>
@@ -385,12 +438,13 @@ const CreateOrder = () => {
                                 <Card.Title>Продукти в замовленні</Card.Title>
                                 {selectedItems.length === 0 ? (
                                     <Alert variant="info">
-                                        Оберіть сектор та додайте продукти до замовлення
+                                        Додайте продукти з таблиці ліворуч до замовлення
                                     </Alert>
                                 ) : (
                                     <Table striped bordered hover size="sm">
                                         <thead>
                                             <tr>
+                                                <th>Сектор</th>
                                                 <th>Продукт</th>
                                                 <th>Контейнер</th>
                                                 <th>Ряд</th>
@@ -402,6 +456,7 @@ const CreateOrder = () => {
                                         <tbody>
                                             {selectedItems.map((item, index) => (
                                                 <tr key={index}>
+                                                    <td>{item.sector || containers.find((c) => c.id === item.containerId)?.sector || '—'}</td>
                                                     <td>{item.productName}</td>
                                                     <td>{item.containerCode}</td>
                                                     <td>{item.rowNumber}</td>
@@ -465,8 +520,12 @@ const CreateOrder = () => {
                 </Row>
 
                 <div className="mt-4">
-                    <Button type="submit" variant="primary" disabled={selectedItems.length === 0 || !selectedSector}>
-                        Створити замовлення
+                    <Button
+                        type="submit"
+                        variant="primary"
+                        disabled={selectedItems.length === 0 || isSubmitting}
+                    >
+                        {isSubmitting ? 'Створення…' : 'Створити замовлення'}
                     </Button>
                 </div>
             </Form>

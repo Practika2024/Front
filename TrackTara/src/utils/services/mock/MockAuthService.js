@@ -1,9 +1,11 @@
 // Mock Auth Service - імітує роботу AuthService з мок-даними
 
+import { defineTable } from './_mockDb';
+
 const MOCK_DELAY = 500;
 
-// Мок-користувачі для тестування
-const MOCK_USERS = [
+// Мок-користувачі для тестування (включно з паролями для входу)
+const MOCK_USERS = defineTable('authUsers', [
   {
     id: 1,
     email: 'operator@test.com',
@@ -36,7 +38,7 @@ const MOCK_USERS = [
     role: 'Guest',
     image: 'N/A',
   },
-];
+]);
 
 // Генерація JWT токенів у валідному форматі (header.payload.signature)
 // jwt-decode очікує формат з 3 частинами розділеними крапками

@@ -1,11 +1,12 @@
 // Mock User Service - імітує роботу UserService з мок-даними
 
 import { MockAuthService } from "./MockAuthService";
+import { defineTable, replaceArray, clone } from './_mockDb';
 
 const MOCK_DELAY = 500;
 
 // Мок-дані користувачів (зберігаються в пам'яті)
-let mockUsers = [
+const mockUsers = defineTable('users', [
   {
     id: 1,
     email: 'operator@test.com',
@@ -46,7 +47,7 @@ let mockUsers = [
     image: 'N/A',
     favoriteProducts: [],
   },
-];
+]);
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -57,12 +58,12 @@ export class MockUserService {
 
   static async getUsers() {
     await delay(MOCK_DELAY);
-    return mockUsers.map(({ favoriteProducts, ...user }) => user);
+    return clone(mockUsers).map(({ favoriteProducts, ...user }) => user);
   }
 
   static async delete(userId) {
     await delay(MOCK_DELAY);
-    mockUsers = mockUsers.filter(u => u.id !== userId);
+    replaceArray(mockUsers, mockUsers.filter(u => u.id !== userId));
     return { success: true };
   }
 
@@ -127,7 +128,7 @@ export class MockUserService {
   static async getFavoriteProducts(userId) {
     await delay(MOCK_DELAY);
     const user = mockUsers.find(u => u.id === userId);
-    return user?.favoriteProducts || [];
+    return clone(user?.favoriteProducts || []);
   }
 
   static async addFavoriteProduct(userId, productId) {

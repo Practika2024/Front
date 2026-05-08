@@ -1,9 +1,11 @@
 // Mock Container Service - імітує роботу ContainerService з мок-даними
 
+import { defineTable, clone } from './_mockDb';
+
 const MOCK_DELAY = 500;
 
 // Мок-дані контейнерів
-let mockContainers = [
+const mockContainers = defineTable('containers', [
   // Сектор A
   {
     id: 1,
@@ -217,7 +219,7 @@ let mockContainers = [
     rowNumber: 2,
     sector: 'C',
   },
-];
+]);
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -267,12 +269,12 @@ export const createContainer = async (containerData) => {
   const { addContainerHistory } = await import('./MockContainerHistoryService');
   await addContainerHistory(newId, null, 'created', userLogin);
   
-  return newContainer;
+  return clone(newContainer);
 };
 
 export const getAllContainers = async () => {
   await delay(MOCK_DELAY);
-  return [...mockContainers];
+  return clone(mockContainers);
 };
 
 export const getContainerById = async (id) => {
@@ -286,7 +288,7 @@ export const getContainerById = async (id) => {
       },
     };
   }
-  return container;
+  return clone(container);
 };
 
 export const deleteContainer = async (id) => {
@@ -390,7 +392,7 @@ export const setProductToContainer = async (containerId, productId, quantity = n
   const { addProductHistory } = await import('./MockProductHistoryService');
   await addProductHistory(productId, 'placed_in_container', userLogin, containerId, `Додано ${quantityToAdd} л/кг продукту в контейнер ${container.uniqueCode}`);
   
-  return container;
+  return clone(container);
 };
 
 export const updateContainer = async (id, containerData) => {
@@ -420,10 +422,11 @@ export const updateContainer = async (id, containerData) => {
   // Оновлюємо об'єкт в масиві
   mockContainers[containerIndex] = container;
   
-  return container;
+  return clone(container);
 };
 
-export const clearProductFromTare = async (containerId, quantity = null) => {
+/** @param {{ orderId?: number, orderItemId?: number }} [meta] — якщо є orderId, подія йде як комплектація за замовленням */
+export const clearProductFromTare = async (containerId, quantity = null, meta = {}) => {
   await delay(MOCK_DELAY);
   const containerIndex = mockContainers.findIndex(c => c.id === parseInt(containerId));
   if (containerIndex === -1 || !mockContainers[containerIndex].productId) {
@@ -481,12 +484,12 @@ export const clearProductFromTare = async (containerId, quantity = null) => {
   // Записуємо в історію контейнера
   const userLogin = getUserLoginFromToken();
   const { addContainerHistory } = await import('./MockContainerHistoryService');
-  await addContainerHistory(containerId, productId, 'removed', userLogin, quantityToRemove);
+  await addContainerHistory(containerId, productId, 'removed', userLogin, quantityToRemove, meta);
   
   // Записуємо в історію продукта
   const { addProductHistory } = await import('./MockProductHistoryService');
   await addProductHistory(productId, 'removed_from_container', userLogin, containerId, `Вийнято ${quantityToRemove} л/кг продукту з контейнера ${container.uniqueCode}`);
   
-  return container;
+  return clone(container);
 };
 

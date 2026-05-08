@@ -6,6 +6,7 @@ import {
   resolvePackingTableForCart,
   normalizeRouteCode,
 } from './salesDomainStore';
+import { defineTable } from './_mockDb';
 
 const MOCK_DELAY = 300;
 
@@ -30,7 +31,7 @@ const ensureCartForCartNumber = (order, cartNumber) => {
 
 // Мок-дані замовлень
 // Замовлення містить список продуктів, які потрібно вийняти з контейнерів
-let mockOrders = [
+const mockOrders = defineTable('orders', [
   {
     id: 1,
     sector: 'A',
@@ -337,7 +338,7 @@ let mockOrders = [
       },
     ],
   },
-];
+]);
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -548,7 +549,10 @@ export const OrderService = {
     // Оновлюємо контейнер - виймаємо продукт
     try {
       const { clearProductFromTare } = await import('./MockContainerService');
-      await clearProductFromTare(item.containerId, item.quantity);
+      await clearProductFromTare(item.containerId, item.quantity, {
+        orderId: order.id,
+        orderItemId: item.id,
+      });
     } catch (error) {
       console.error('Error updating container:', error);
       // Не викидаємо помилку, оскільки замовлення вже оновлено
@@ -654,7 +658,10 @@ export const OrderService = {
     // Оновлюємо контейнер - виймаємо продукт частково
     try {
       const { clearProductFromTare } = await import('./MockContainerService');
-      await clearProductFromTare(item.containerId, quantityToPick);
+      await clearProductFromTare(item.containerId, quantityToPick, {
+        orderId: order.id,
+        orderItemId: item.id,
+      });
     } catch (error) {
       console.error('Error updating container:', error);
       // Не викидаємо помилку, оскільки замовлення вже оновлено

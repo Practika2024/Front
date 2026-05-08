@@ -45,5 +45,6 @@ export {
     addToBrakiMag,
     removeFromBrakiMag,
     updateBrakiMagItem,
+    transferBrakiMagToContainer,
 } from './mock/MockBrakiMagService';
 

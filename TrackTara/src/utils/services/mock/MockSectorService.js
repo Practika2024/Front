@@ -1,15 +1,17 @@
 // Mock Sector Service - управління секторами та рядами складу
 
+import { defineTable, clone } from './_mockDb';
+
 const MOCK_DELAY = 500;
 
 // Мок-дані секторів та рядів
 // Структура: { sector: 'A', rows: [1, 2, 3, ...] }
-let mockSectors = [
+const mockSectors = defineTable('sectors', [
   { sector: 'A', rows: [1, 2, 3, 4, 5] },
   { sector: 'B', rows: [1, 2, 3, 4] },
   { sector: 'C', rows: [1, 2, 3] },
   { sector: 'D', rows: [1, 2] },
-];
+]);
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -17,13 +19,13 @@ export const MockSectorService = {
   // Отримати всі сектори з рядами
   getAllSectors: async () => {
     await delay(MOCK_DELAY);
-    return [...mockSectors];
+    return clone(mockSectors);
   },
 
   // Отримати сектор за назвою
   getSector: async (sectorName) => {
     await delay(MOCK_DELAY);
-    return mockSectors.find(s => s.sector === sectorName.toUpperCase());
+    return clone(mockSectors.find(s => s.sector === sectorName.toUpperCase()));
   },
 
   // Створити новий сектор
@@ -46,7 +48,7 @@ export const MockSectorService = {
       rows: [],
     };
     mockSectors.push(newSector);
-    return newSector;
+    return clone(newSector);
   },
 
   // Видалити сектор
@@ -101,7 +103,7 @@ export const MockSectorService = {
 
     sector.rows.push(row);
     sector.rows.sort((a, b) => a - b); // Сортуємо ряди
-    return sector;
+    return clone(sector);
   },
 
   // Видалити ряд з сектора
@@ -130,7 +132,7 @@ export const MockSectorService = {
     }
 
     sector.rows.splice(index, 1);
-    return sector;
+    return clone(sector);
   },
 
   // Перевірити чи існує сектор

@@ -3,20 +3,22 @@
  * Траса — довільний короткий код (2 символи: літери/цифри), до неї прив’язані лінія пакування та столи.
  */
 
+import { defineTable, replaceArray } from './_mockDb';
+
 /** @typedef {{ id: number, name: string, routeCode: string }} Client */
 
 /** @typedef {{ routeCode: string, packingLineCode: string, packingTableCodes: string[] }} RouteMaster */
 
-let mockClients = [
+const mockClients = defineTable('clients', [
   { id: 1, name: 'ТОВ «Рітейл Захід»', routeCode: 'AC' },
   { id: 2, name: 'ФОП Іваненко', routeCode: 'HR' },
-];
+]);
 
-let mockRouteMasters = [
+const mockRouteMasters = defineTable('routeMasters', [
   { routeCode: 'AC', packingLineCode: 'PACK-LINE-AC', packingTableCodes: ['ST-AC-1', 'ST-AC-2'] },
   { routeCode: 'HR', packingLineCode: 'PACK-LINE-HR', packingTableCodes: ['ST-HR-1'] },
   { routeCode: 'HC', packingLineCode: 'PACK-LINE-HC', packingTableCodes: ['ST-HC-1', 'ST-HC-2'] },
-];
+]);
 
 /**
  * @typedef {{
@@ -46,9 +48,9 @@ let mockRouteMasters = [
  * }} PackingBox
  */
 
-let mockBoxes = [];
-let packingLineUid = 1;
-const nextPackingLineId = () => `PLC-${Date.now()}-${packingLineUid++}`;
+const mockBoxes = defineTable('packingBoxes', []);
+const _boxMeta = defineTable('packingBoxMeta', { lineUid: 1 });
+const nextPackingLineId = () => `PLC-${Date.now()}-${_boxMeta.lineUid++}`;
 
 function generateBoxCode() {
   const d = new Date();
@@ -98,7 +100,7 @@ export const updateClient = (id, { name, routeCode }) => {
 };
 
 export const deleteClient = (id) => {
-  mockClients = mockClients.filter((c) => c.id !== Number(id));
+  replaceArray(mockClients, mockClients.filter((c) => c.id !== Number(id)));
 };
 
 export const getRouteMasters = () => JSON.parse(JSON.stringify(mockRouteMasters));
@@ -131,7 +133,7 @@ export const deleteRouteMaster = (routeCode) => {
   if (mockClients.some((c) => c.routeCode === rc)) {
     throw new Error('Є клієнти з цією трасою — спочатку змініть їм траси');
   }
-  mockRouteMasters = mockRouteMasters.filter((r) => r.routeCode !== rc);
+  replaceArray(mockRouteMasters, mockRouteMasters.filter((r) => r.routeCode !== rc));
 };
 
 export const getRouteMasterByCode = (routeCode) => {
@@ -298,5 +300,5 @@ export const deletePackingBox = (id, force = false) => {
       'У коробці є товар. Перекладіть вміст в іншу коробку або підтвердіть примусове видалення.'
     );
   }
-  mockBoxes = mockBoxes.filter((x) => x.id !== Number(id));
+  replaceArray(mockBoxes, mockBoxes.filter((x) => x.id !== Number(id)));
 };

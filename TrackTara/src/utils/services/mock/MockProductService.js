@@ -1,9 +1,11 @@
 // Mock Product Service - імітує роботу ProductService з мок-даними
 
+import { defineTable, clone } from './_mockDb';
+
 const MOCK_DELAY = 500;
 
 // Мок-дані продуктів (експортуємо для доступу з інших модулів)
-export let mockProducts = [
+export const mockProducts = defineTable('products', [
   {
     id: 1,
     name: 'Молоко 3.2%',
@@ -147,7 +149,7 @@ export let mockProducts = [
     rowNumber: 2,
     weightKg: 1,
   },
-];
+]);
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -171,7 +173,7 @@ const getUserLoginFromToken = () => {
 export const MockProductService = {
   getAll: async () => {
     await delay(MOCK_DELAY);
-    return [...mockProducts];
+    return clone(mockProducts);
   },
 
   getById: async (id) => {
@@ -185,7 +187,7 @@ export const MockProductService = {
         },
       };
     }
-    return product;
+    return clone(product);
   },
 
   addProduct: async (product) => {
@@ -206,7 +208,7 @@ export const MockProductService = {
     const { addProductHistory } = await import('./MockProductHistoryService');
     await addProductHistory(newProduct.id, 'created', userLogin, null, 'Продукт створено');
     
-    return newProduct;
+    return clone(newProduct);
   },
 
   updateProduct: async (id, product) => {
@@ -232,7 +234,7 @@ export const MockProductService = {
     const { addProductHistory } = await import('./MockProductHistoryService');
     await addProductHistory(id, 'updated', userLogin, null, 'Інформацію про продукт оновлено');
     
-    return updatedProduct;
+    return clone(updatedProduct);
   },
 
   deleteProduct: async (id) => {
@@ -246,7 +248,7 @@ export const MockProductService = {
         },
       };
     }
-    const deleted = mockProducts[index];
+    const deleted = clone(mockProducts[index]);
     mockProducts.splice(index, 1);
     return deleted;
   },

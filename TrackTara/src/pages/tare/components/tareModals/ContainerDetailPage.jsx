@@ -242,8 +242,8 @@ const ContainerDetailPage = () => {
                                             <td>{history.productId ? getProductName(history.productId) : '-'}</td>
                                             <td>
                                                 {history.action === 'created' ? 'Створено' :
-                                                 history.action === 'placed' ? 'Покладено' : 
-                                                 history.action === 'removed' ? 'Вийнято' : 
+                                                 history.action === 'placed' ? 'Покладено' :
+                                                 history.action === 'removed' ? 'Вийнято' :
                                                  history.action || '-'}
                                             </td>
                                             <td>{history.quantity !== undefined && history.quantity !== null 

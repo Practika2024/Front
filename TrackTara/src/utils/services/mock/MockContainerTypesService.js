@@ -1,19 +1,21 @@
 // Mock Container Types Service
 
+import { defineTable, clone } from './_mockDb';
+
 const MOCK_DELAY = 500;
 
-let mockContainerTypes = [
+const mockContainerTypes = defineTable('containerTypes', [
   { id: 1, name: 'Пластиковий' },
   { id: 2, name: 'Металевий' },
   { id: 3, name: 'Картонний' },
   { id: 4, name: 'Скляний' },
-];
+]);
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const getAllContainerTypes = async () => {
   await delay(MOCK_DELAY);
-  return [...mockContainerTypes];
+  return clone(mockContainerTypes);
 };
 
 export const createContainerType = async (typeData) => {
@@ -23,7 +25,7 @@ export const createContainerType = async (typeData) => {
     name: typeData.name,
   };
   mockContainerTypes.push(newType);
-  return newType;
+  return clone(newType);
 };
 
 export const getContainerTypeNameById = async (id) => {
@@ -44,7 +46,7 @@ export const updateContainerType = async (id, typeData) => {
     };
   }
   Object.assign(type, typeData);
-  return type;
+  return clone(type);
 };
 
 export const deleteContainerType = async (id) => {

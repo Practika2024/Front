@@ -1,10 +1,12 @@
 // Mock Cart Registry - реєстр візків
 // Формат: англійська літера + три випадкові числа (наприклад, A123, B456)
 
+import { defineTable } from './_mockDb';
+
 const MOCK_DELAY = 100;
 
 // Реєстр візків
-const cartRegistry = [
+const cartRegistry = defineTable('cartRegistry', [
   'A123',
   'A456',
   'A789',
@@ -35,7 +37,7 @@ const cartRegistry = [
   'J123',
   'J456',
   'J789',
-];
+]);
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
