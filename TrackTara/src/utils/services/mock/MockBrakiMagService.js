@@ -1,5 +1,6 @@
 // Mock BrakiMag Service - реєстр бракованих товарів
 
+import { jwtDecode } from 'jwt-decode';
 import { defineTable } from './_mockDb';
 
 const MOCK_DELAY = 100;
@@ -55,11 +56,11 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 // Допоміжна функція для отримання логіну користувача з токену
 const getUserLoginFromToken = () => {
   try {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (!token) return 'unknown';
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.sub || payload.email || 'unknown';
-  } catch (error) {
+    const payload = jwtDecode(token);
+    return payload.email || payload.sub || payload.name || 'unknown';
+  } catch {
     return 'unknown';
   }
 };

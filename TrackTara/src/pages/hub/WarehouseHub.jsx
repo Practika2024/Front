@@ -138,6 +138,13 @@ export default function WarehouseHub() {
           <h2 className="h6 text-uppercase text-muted mb-3 letter-spacing-1">Адміністрування</h2>
           <Row className="g-3">
             <HubCard
+              to="/admin/dashboard"
+              title="Адмін-дашборд"
+              description="Статистика по користувачах, товарах, тарі, замовленнях і пакуванню"
+              icon={LayoutDashboard}
+              badge="Статистика"
+            />
+            <HubCard
               to="/users"
               title="Користувачі"
               description="Ролі та скидання паролів"

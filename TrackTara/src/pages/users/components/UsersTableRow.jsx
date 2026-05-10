@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useMemo } from "react";
 import { Select, MenuItem, Button } from "@mui/material";
-import userImage from "../../../hooks/userImage";
+import RoleAvatarMark from "../../../components/common/RoleAvatarMark";
 import DeleteUserModal from "./usersModals/DeleteUserModal";
 import AdminResetPasswordModal from "./usersModals/AdminResetPasswordModal";
 import { useRenderCount } from "../../../hooks/useRenderCount";
@@ -15,7 +15,9 @@ const UsersTableRow = React.memo(
         const [showPasswordModal, setShowPasswordModal] = useState(false);
         const { changeRoles, getUsers } = useActions();
         const renderCount = useRenderCount();
-        const [selectedRole, setSelectedRole] = useState(user.role || '');
+        const [selectedRole, setSelectedRole] = useState(
+            Array.isArray(user.role) ? (user.role[0] ?? "") : (user.role || ""),
+        );
 
         const closeModal = useCallback(() => {
             setShowDeleteModal(false);
@@ -43,7 +45,6 @@ const UsersTableRow = React.memo(
             [user.id, selectedRole, changeRoles, getUsers]
         );
 
-        const userAvatar = useMemo(() => userImage(user.image?.filePath), [user.image]);
         const roleOptions = useMemo(() => roleList.length ? roleList : [{ name: "Ролі відсутні" }], [roleList]);
 
         return (
@@ -66,13 +67,7 @@ const UsersTableRow = React.memo(
                         </Select>
                     </td>
                     <td>
-                        <img
-                            height="50"
-                            width="50"
-                            alt="Аватар користувача"
-                            loading="lazy"
-                            src={userAvatar}
-                        />
+                        <RoleAvatarMark user={user} sizePx={50} />
                     </td>
                     <td>
                         <div className="d-flex flex-wrap gap-2">
@@ -119,15 +114,15 @@ UsersTableRow.propTypes = {
         id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
         email: PropTypes.string.isRequired,
-        role: PropTypes.string.isRequired,
+        role: PropTypes.oneOfType([
+            PropTypes.string,
+            PropTypes.arrayOf(PropTypes.string),
+        ]).isRequired,
         roles: PropTypes.arrayOf(
             PropTypes.shape({
                 name: PropTypes.string.isRequired
             })
         ),
-        image: PropTypes.shape({
-            filePath: PropTypes.string
-        })
     }).isRequired,
     roleList: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string.isRequired

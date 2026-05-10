@@ -13,7 +13,6 @@ const mockUsers = defineTable('users', [
     name: 'Operator User',
     role: ['Operator'],
     image: 'N/A',
-    favoriteProducts: [1, 2],
   },
   {
     id: 2,
@@ -21,7 +20,6 @@ const mockUsers = defineTable('users', [
     name: 'Admin User',
     role: ['Administrator'],
     image: 'N/A',
-    favoriteProducts: [],
   },
   {
     id: 3,
@@ -29,7 +27,6 @@ const mockUsers = defineTable('users', [
     name: 'Test User',
     role: ['Operator'],
     image: 'N/A',
-    favoriteProducts: [1],
   },
   {
     id: 4,
@@ -37,7 +34,6 @@ const mockUsers = defineTable('users', [
     name: 'Менеджер з продажу',
     role: ['SalesManager'],
     image: 'N/A',
-    favoriteProducts: [],
   },
   {
     id: 5,
@@ -45,7 +41,6 @@ const mockUsers = defineTable('users', [
     name: 'Новий користувач (очікує ролі)',
     role: ['Guest'],
     image: 'N/A',
-    favoriteProducts: [],
   },
 ]);
 
@@ -58,7 +53,7 @@ export class MockUserService {
 
   static async getUsers() {
     await delay(MOCK_DELAY);
-    return clone(mockUsers).map(({ favoriteProducts, ...user }) => user);
+    return clone(mockUsers);
   }
 
   static async delete(userId) {
@@ -125,30 +120,6 @@ export class MockUserService {
     };
   }
 
-  static async getFavoriteProducts(userId) {
-    await delay(MOCK_DELAY);
-    const user = mockUsers.find(u => u.id === userId);
-    return clone(user?.favoriteProducts || []);
-  }
-
-  static async addFavoriteProduct(userId, productId) {
-    await delay(MOCK_DELAY);
-    const user = mockUsers.find(u => u.id === userId);
-    if (user && !user.favoriteProducts.includes(productId)) {
-      user.favoriteProducts.push(productId);
-    }
-    return { success: true };
-  }
-
-  static async removeFavoriteProduct(userId, productId) {
-    await delay(MOCK_DELAY);
-    const user = mockUsers.find(u => u.id === userId);
-    if (user) {
-      user.favoriteProducts = user.favoriteProducts.filter(id => id !== productId);
-    }
-    return { success: true };
-  }
-
   static async createUser(model) {
     await delay(MOCK_DELAY);
 
@@ -169,12 +140,10 @@ export class MockUserService {
       name: model.name || model.email.split('@')[0],
       role: model.roles || ['Operator'],
       image: 'N/A',
-      favoriteProducts: [],
     };
 
     mockUsers.push(newUser);
     return { success: true, id: newUser.id };
   }
 }
-
 

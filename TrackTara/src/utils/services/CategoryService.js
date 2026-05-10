@@ -1,8 +1,9 @@
 import HttpClient from "../http/HttpClient";
+import { API_CONFIG } from "../config/apiConfig";
 
 export class CategoryService {
   static httpClient = new HttpClient({
-    baseURL: "http://13.60.245.135:4312/categories",
+    baseURL: API_CONFIG.BASE_URLS.CATEGORIES,
   });
 
   static setAuthorizationToken(token) {

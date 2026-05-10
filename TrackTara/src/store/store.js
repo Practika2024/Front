@@ -24,6 +24,7 @@ import containersReducer from '../store/state/reduserSlises/containerSlice';
 import productTypeReducer from '../store/state/reduserSlises/productTypeSlice';
 import containerHistoryReducer from '../store/state/reduserSlises/containerHistorySlice';
 import productHistoryReducer from '../store/state/reduserSlises/productHistorySlice';
+import containerTypesReducer from '../store/state/reduserSlises/containerTypeSlice';
 
 export const rootReducer = combineReducers({
     user: userReducer,
@@ -39,11 +40,12 @@ export const rootReducer = combineReducers({
     containers: containersReducer,
     cartItem: cartItemReducer,
     productTypes: productTypeReducer,
+    containerTypes: containerTypesReducer,
 });
 
 const persistConfig = {
     key: 'tracktara',
-    version: 1,
+    version: 2,
     storage,
     /** Усі зведені редʼюсери — кошик, фільтри, кеш списків тощо між F5 (localStorage, ~5 МБ ліміт). */
     whitelist: [
@@ -60,7 +62,16 @@ const persistConfig = {
         'containers',
         'cartItem',
         'productTypes',
+        'containerTypes',
     ],
+    migrate: (persistedState) => {
+        if (!persistedState) return Promise.resolve(undefined);
+        const next = { ...persistedState };
+        if (next.user && Object.prototype.hasOwnProperty.call(next.user, 'favoriteProducts')) {
+            delete next.user.favoriteProducts;
+        }
+        return Promise.resolve(next);
+    },
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

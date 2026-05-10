@@ -13,7 +13,6 @@ import * as ContainerHistoryService from './ContainerHistoryService';
 import * as ProductHistoryService from './ProductHistoryService';
 import { OrderService } from './OrderService';
 import { ClientRouteService } from './ClientRouteService';
-import * as RealPackingBoxService from './PackingBoxService';
 
 // Мок-сервіси
 import { MockAuthService } from './mock/MockAuthService';
@@ -28,7 +27,7 @@ import * as MockContainerHistoryService from './mock/MockContainerHistoryService
 import * as MockProductHistoryService from './mock/MockProductHistoryService';
 import { OrderService as MockOrderService } from './mock/MockOrderService';
 import { MockClientRouteService } from './mock/MockClientRouteService';
-import * as MockPackingBoxService from './mock/MockPackingBoxService';
+import { SectorService as RealSectorService } from './SectorService';
 
 /**
  * Service Factory - вибирає між реальними та мок-сервісами
@@ -95,8 +94,8 @@ export const {
   deleteProductType,
 } = ProductTypesServiceInstance;
 
-// Експортуємо SectorService
-export { MockSectorService as SectorService };
+// Сектори: мок або HTTP (див. VITE_API_SECTORS_URL у apiConfig)
+export const SectorService = useMock ? MockSectorService : RealSectorService;
 
 // Експортуємо функції для ContainerHistoryService
 export const {
@@ -114,10 +113,27 @@ export const {
 export { OrderServiceInstance as OrderService };
 export { ClientRouteServiceInstance as ClientRouteService };
 
-const PackingBoxModule = useMock ? MockPackingBoxService : RealPackingBoxService;
-export const getAllPackingBoxes = PackingBoxModule.getAllPackingBoxes;
-export const createPackingBox = PackingBoxModule.createPackingBox;
-export const deletePackingBox = PackingBoxModule.deletePackingBox;
-export const addToPackingBox = PackingBoxModule.addToPackingBox;
-export const transferPackingBoxContent = PackingBoxModule.transferPackingBoxContent;
+/** Пакування, бракімаг, реєстр візків: при `VITE_USE_MOCK_API=false` — HTTP до бекенду з відкатом на персистентні моки, якщо endpoint відсутній; при `true` — напряму моки. */
+export {
+  getAllPackingBoxes,
+  createPackingBox,
+  deletePackingBox,
+  addToPackingBox,
+  transferPackingBoxContent,
+} from './PackingBoxService';
+
+export {
+  getAllBrakiMagItems,
+  addToBrakiMag,
+  removeFromBrakiMag,
+  updateBrakiMagItem,
+  transferBrakiMagToContainer,
+} from './BrakiMagService';
+
+export {
+  validateCartNumber,
+  getAllCarts,
+  addCartToRegistry,
+  deleteCartFromRegistry,
+} from './CartRegistryService';
 

@@ -1,7 +1,8 @@
 // src/utils/services/ProductTypesService.js
 import axios from 'axios';
+import { API_CONFIG } from '../config/apiConfig';
 
-const API_URL = 'http://localhost:5081/products-type';
+const API_URL = String(API_CONFIG.BASE_URLS.PRODUCT_TYPES || '').replace(/\/$/, '');
 
 const getAuthHeaders = () => {
     const token = localStorage.getItem('accessToken');

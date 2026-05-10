@@ -124,8 +124,7 @@ TrackTara/
 │   │   ├── useActions.js            # Хук для Redux actions
 │   │   ├── useFilters.js            # Хук для фільтрів
 │   │   ├── useDebouncedEffect.js    # Debounce ефект
-│   │   ├── userImage.js             # Хук для зображень користувачів
-│   │   └── productImage.js           # Хук для зображень продуктів
+│   │   └── productImage.js           # URL зображень продуктів (через apiConfig)
 │   ├── pages/                       # Сторінки додатку
 │   │   ├── auth/                    # Автентифікація
 │   │   │   ├── login/                # Сторінка входу
@@ -300,6 +299,15 @@ npm run preview
 
 # Перевірка коду (lint)
 npm run lint
+
+# Unit / інтеграційні тести (Vitest)
+npm run test
+
+# Тести в watch-режимі
+npm run test:watch
+
+# Покриття (v8)
+npm run test:coverage
 ```
 
 ## 🏗️ Архітектура
@@ -390,7 +398,7 @@ npm run lint
 - [ ] Персистентність мок-даних (localStorage)
 - [ ] Додаткові тестові дані
 - [ ] Покращена обробка помилок
-- [ ] Unit тести
+- [x] Unit тести (Vitest + Testing Library — хелпери, RBAC, навігація, операційні сервіси, статистика трас)
 - [ ] E2E тести
 
 ## 📄 Ліцензія

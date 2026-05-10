@@ -3,7 +3,14 @@ import {
     getAllContainerTypes,
     getContainerTypeNameById, updateContainerType
 } from '../../../utils/services';
-import { getAll, setLoading, setError } from '../reduserSlises/containerTypeSlice.js';
+import {
+    getAll,
+    addType,
+    updateType,
+    deleteType,
+    setLoading,
+    setError,
+} from '../reduserSlises/containerTypeSlice.js';
 
 
 export const fetchContainerTypes = () => async (dispatch) => {

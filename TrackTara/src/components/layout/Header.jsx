@@ -3,7 +3,7 @@ import { Link, NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Menu } from "lucide-react";
 import useActions from "../../hooks/useActions";
-import userImage from "../../hooks/userImage";
+import RoleAvatarMark from "../common/RoleAvatarMark";
 import { useNavigate } from "react-router-dom";
 import SectorsManagement from "./SectorsManagement";
 import useAppRoles from "../../hooks/useAppRoles";
@@ -109,13 +109,7 @@ const Header = memo(({ onOpenMenu, isAuthenticated }) => {
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
-                    <img
-                      src={userImage(currentUser?.image)}
-                      className="rounded-circle"
-                      height={32}
-                      width={32}
-                      alt=""
-                    />
+                    <RoleAvatarMark roles={userRoles} sizePx={32} />
                   </a>
                   <ul
                     className="dropdown-menu dropdown-menu-end"

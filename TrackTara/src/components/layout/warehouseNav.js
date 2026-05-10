@@ -49,6 +49,7 @@ export function getNavSections(roles) {
       title: "Адміністрування",
       subtitle: "Довідники та облік",
       items: [
+        { to: "/admin/dashboard", label: "Дашборд", end: true },
         { to: "/users", label: "Користувачі", end: true },
         { to: "/productType", label: "Типи продуктів", end: true },
         { to: "/container/containerTypes", label: "Типи контейнерів", end: true },

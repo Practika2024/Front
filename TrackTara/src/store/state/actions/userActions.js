@@ -1,10 +1,4 @@
-import {
-  authUser,
-  logout,
-  getAllFavoriteProducts,
-  addFavoriteProduct,
-  removeFavoriteProduct,
-} from "./../reduserSlises/userSlice";
+import { authUser, logout } from "./../reduserSlises/userSlice";
 import { deleteUserSlice, getAll } from "./../reduserSlises/usersSlice";
 import { AuthService, UserService } from "../../../utils/services";
 import { jwtDecode } from "jwt-decode";
@@ -54,7 +48,6 @@ export const AuthByToken = (tokens) => async (dispatch) => {
       const user = normalizeUserPayloadForAuth(decoded);
 
       if (user.role.includes("User")) {
-        await loadFavoriteProducts(user.id)(dispatch);
         await getCartItemsByUserId(user.id)(dispatch);
       }
 
@@ -184,40 +177,3 @@ export const updateUser = (userId, model) => async (dispatch) => {
   }
 };
 
-export const loadFavoriteProducts = (userId) => async (dispatch) => {
-  try {
-    UserService.setAuthorizationToken(localStorage.getItem("accessToken"));
-
-    const response = await UserService.getFavoriteProducts(userId);
-    dispatch(getAllFavoriteProducts(response));
-  } catch (error) {
-    const errorMessage = error.response?.data;
-    console.error("Error loading favorite products:", errorMessage);
-    return { success: false, message: errorMessage };
-  }
-};
-
-export const addProductToFavorites =
-  (userId, productId) => async (dispatch) => {
-    try {
-      await UserService.addFavoriteProduct(userId, productId);
-      dispatch(addFavoriteProduct(productId));
-      await loadFavoriteProducts(userId)(dispatch);
-      return { success: true, message: "Product added to favorites" };
-    } catch (error) {
-      const errorMessage = error.response?.data;
-      return { success: false, message: errorMessage };
-    }
-  };
-
-export const removeProductFromFavorites =
-  (userId, productId) => async (dispatch) => {
-    try {
-      await UserService.removeFavoriteProduct(userId, productId);
-      dispatch(removeFavoriteProduct(productId));
-      return { success: true, message: "Product removed from favorites" };
-    } catch (error) {
-      const errorMessage = error.response?.data;
-      return { success: false, message: errorMessage };
-    }
-  };

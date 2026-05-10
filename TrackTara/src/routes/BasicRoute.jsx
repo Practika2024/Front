@@ -26,6 +26,7 @@ import CartRegistry from "../pages/carts/CartRegistry.jsx";
 import BrakiMag from "../pages/brakimag/BrakiMag.jsx";
 import HomePage from "../pages/home/HomePage.jsx";
 import PendingRolePage from "../pages/pendingRole/PendingRolePage.jsx";
+import AdminDashboard from "../pages/admin/AdminDashboard.jsx";
 
 // eslint-disable-next-line react/display-name
 const BasicRoute = memo(() => {
@@ -219,6 +220,14 @@ const BasicRoute = memo(() => {
                                     <BrakiMag/>
                                 </ProtectedRoute>
                             }
+                    />
+                    <Route
+                        path="/admin/dashboard"
+                        element={
+                            <ProtectedRoute allowedRoles={["Administrator"]}>
+                                <AdminDashboard />
+                            </ProtectedRoute>
+                        }
                     />
                     <Route path="/register" element={<Register/>}/>
                     <Route path="/login" element={<Login/>}/>
