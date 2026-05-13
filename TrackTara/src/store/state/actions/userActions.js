@@ -2,7 +2,6 @@ import { authUser, logout } from "./../reduserSlises/userSlice";
 import { deleteUserSlice, getAll } from "./../reduserSlises/usersSlice";
 import { AuthService, UserService } from "../../../utils/services";
 import { jwtDecode } from "jwt-decode";
-import { getCartItemsByUserId } from "./cartItemActions";
 import { normalizeUserPayloadForAuth } from "../../../utils/helpers/userRoles";
 import {
   getAuthErrorMessage,
@@ -46,11 +45,6 @@ export const AuthByToken = (tokens) => async (dispatch) => {
     try {
       const decoded = jwtDecode(tokens.accessToken);
       const user = normalizeUserPayloadForAuth(decoded);
-
-      if (user.role.includes("User")) {
-        await getCartItemsByUserId(user.id)(dispatch);
-      }
-
       dispatch(authUser(user));
     } catch (error) {
       console.error('Error decoding token:', error);

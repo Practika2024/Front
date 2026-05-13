@@ -5,7 +5,6 @@ export const APP_ROLES = {
   Administrator: "Administrator",
   Operator: "Operator",
   SalesManager: "SalesManager",
-  User: "User",
   /** Обліковий запис без робочих прав — очікує призначення ролі адміністратором */
   Guest: "Guest",
 };
@@ -17,7 +16,6 @@ const CANONICAL_ORDER = [
   "Administrator",
   "Operator",
   "SalesManager",
-  "User",
   "Guest",
 ];
 
@@ -61,7 +59,12 @@ export function normalizeRoleName(raw) {
     administrator: APP_ROLES.Administrator,
     operator: APP_ROLES.Operator,
     salesmanager: APP_ROLES.SalesManager,
-    user: APP_ROLES.User,
+    /**
+     * Легасі-роль "User" зі старої версії продукту: ніяких прав у TrackTara
+     * вона не дає, тому мапимо на Guest — адмін одразу побачить такого юзера
+     * у списку «очікують ролі» і призначить реальну.
+     */
+    user: APP_ROLES.Guest,
     guest: APP_ROLES.Guest,
   };
   return aliases[compact] || null;

@@ -5,7 +5,7 @@ import { APP_ROLES } from "./userRoles";
 describe("roleAvatar", () => {
   it("toRoleArray приймає рядок і масив", () => {
     expect(toRoleArray("Operator")).toEqual(["Operator"]);
-    expect(toRoleArray(["Administrator", "User"])).toEqual(["Administrator", "User"]);
+    expect(toRoleArray(["Administrator", "Guest"])).toEqual(["Administrator", "Guest"]);
     expect(toRoleArray(null)).toEqual([]);
   });
 

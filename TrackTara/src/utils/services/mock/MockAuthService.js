@@ -139,30 +139,62 @@ const MOCK_USERS = defineTable('authUsers', [
 ]);
 
 /**
- * Одноразова міграція: до цього коміту generateMockToken використовував btoa без UTF-8
- * перетворення, тож Google-логін з кириличним імʼям зберігав «закарлючки» (Ð, Ñ…).
- * Лікуємо їх на старті — і в auth-таблиці, і в довіднику /users.
+ * Одноразова міграція легаси даних. Запускаємо через мікротаску, щоб усі інші
+ * мок-сервіси (передусім MockUserService) встигли зареєструвати свої таблиці
+ * через defineTable із власними seed-даними. Інакше тут можна випадково
+ * закешувати чужу таблицю порожнім масивом і назавжди втратити seed.
+ *
+ * Лікує:
+ *  • UTF-8 «закарлючки» в іменах (Ð, Ñ…) — спадщина старого btoa-флоу.
+ *  • Залишки ролі "User" — це мертва роль попередньої версії продукту,
+ *    адмін все одно нічого з нею не зможе зробити (її прибрано з селекту).
  */
-(function repairLegacyMojibakeNames() {
-  for (const u of MOCK_USERS) {
-    if (typeof u?.name === 'string') {
+queueMicrotask(() => {
+  const stripDeadRole = (role) => {
+    if (Array.isArray(role)) {
+      const out = role.filter(
+        (r) => String(r || '').toLowerCase() !== 'user',
+      );
+      return out.length ? out : ['Guest'];
+    }
+    return String(role || '').toLowerCase() === 'user' ? 'Guest' : role;
+  };
+
+  const repairUser = (u) => {
+    if (!u) return;
+    if (typeof u.name === 'string') {
       const fixed = repairMojibakeText(u.name);
       if (fixed !== u.name) u.name = fixed;
     }
-  }
-  // Довідник /users може бути ще не зареєстрований MockUserService — спробуємо мʼяко.
-  try {
-    const dir = getUsersDirectory();
-    for (const u of dir) {
-      if (typeof u?.name === 'string') {
-        const fixed = repairMojibakeText(u.name);
-        if (fixed !== u.name) u.name = fixed;
-      }
+    const nextRole = stripDeadRole(u.role);
+    if (JSON.stringify(nextRole) !== JSON.stringify(u.role)) {
+      u.role = nextRole;
     }
+  };
+
+  for (const u of MOCK_USERS) repairUser(u);
+
+  /**
+   * Auth-таблиця — джерело правди про те, кому дозволений вхід. Якщо в довіднику
+   * /users чогось бракує (наприклад, після старого бага moка довідник опинився
+   * порожнім), дзеркалимо auth → users dir. Зворотній напрям (users dir → auth)
+   * нас не цікавить: запис без пароля все одно не може залогінитись.
+   */
+  try {
+    for (const auth of MOCK_USERS) {
+      syncUserDirectoryEntry({
+        email: auth.email,
+        name: auth.name,
+        role: auth.role,
+        image: auth.image,
+      });
+    }
+    const dir = getUsersDirectory();
+    for (const u of dir) repairUser(u);
   } catch {
-    /* noop: довідник зʼявиться пізніше — там той самий seed, без legacy-даних */
+    /* noop */
   }
-})();
+});
 
 // Генерація JWT токенів у валідному форматі (header.payload.signature)
 // jwt-decode очікує формат з 3 частинами розділеними крапками
@@ -197,6 +229,18 @@ export class MockAuthService {
   static findAuthUserByEmail(email) {
     const n = normalizeEmail(email);
     return MOCK_USERS.find((x) => x.email.toLowerCase() === n) || null;
+  }
+
+  /**
+   * Прибирає запис із auth-таблиці. Викликається з MockUserService.delete, щоб
+   * видалений в адмінці користувач більше не міг увійти і щоб дзеркальний цикл
+   * `auth → users` на старті не повертав його у довідник.
+   */
+  static deleteAuthUserByEmail(email) {
+    const n = normalizeEmail(email);
+    if (!n) return;
+    const idx = MOCK_USERS.findIndex((u) => normalizeEmail(u.email) === n);
+    if (idx >= 0) MOCK_USERS.splice(idx, 1);
   }
 
   /**

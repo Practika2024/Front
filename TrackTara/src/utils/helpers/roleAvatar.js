@@ -67,9 +67,6 @@ export function getRoleBadge(roles) {
   if (canon.includes(APP_ROLES.SalesManager)) {
     return { emoji: "💼", label: "Sales-менеджер" };
   }
-  if (canon.includes(APP_ROLES.User)) {
-    return { emoji: "👤", label: "Користувач" };
-  }
   if (canon.includes(APP_ROLES.Guest)) {
     return { emoji: "❓", label: "Гість" };
   }

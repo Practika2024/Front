@@ -5,8 +5,12 @@ import { defineTable, replaceArray, clone } from './_mockDb';
 
 const MOCK_DELAY = 500;
 
-// Мок-дані користувачів (зберігаються в пам'яті)
-const mockUsers = defineTable('users', [
+/**
+ * Базовий seed користувачів. Виносимо в окрему змінну, щоб після defineTable
+ * можна було підтягнути «зниклих» — це лікує наслідок попереднього бага міграції,
+ * коли MockAuthService ще до MockUserService реєстрував таблицю порожньою.
+ */
+const USERS_SEED = [
   {
     id: 1,
     email: 'operator@test.com',
@@ -19,13 +23,6 @@ const mockUsers = defineTable('users', [
     email: 'admin@test.com',
     name: 'Admin User',
     role: ['Administrator'],
-    image: 'N/A',
-  },
-  {
-    id: 3,
-    email: 'user@test.com',
-    name: 'Test User',
-    role: ['Operator'],
     image: 'N/A',
   },
   {
@@ -42,7 +39,20 @@ const mockUsers = defineTable('users', [
     role: ['Guest'],
     image: 'N/A',
   },
-]);
+];
+
+const mockUsers = defineTable('users', USERS_SEED);
+
+/**
+ * Recovery після старого бага: якщо таблиця опинилась порожньою (через те, що
+ * стара версія MockAuthService реєструвала 'users' з [] до того, як цей модуль
+ * встигав підставити seed), повертаємо seed-користувачів. Якщо адмін навмисно
+ * видалив частину — нічого не чіпаємо: достатньо лиш одного запису, щоб міграція
+ * вважала таблицю «не порожньою».
+ */
+if (mockUsers.length === 0) {
+  for (const u of USERS_SEED) mockUsers.push({ ...u, role: [...u.role] });
+}
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -58,7 +68,11 @@ export class MockUserService {
 
   static async delete(userId) {
     await delay(MOCK_DELAY);
-    replaceArray(mockUsers, mockUsers.filter(u => u.id !== userId));
+    const victim = mockUsers.find((u) => u.id === userId);
+    replaceArray(mockUsers, mockUsers.filter((u) => u.id !== userId));
+    if (victim?.email) {
+      MockAuthService.deleteAuthUserByEmail(victim.email);
+    }
     return { success: true };
   }
 
