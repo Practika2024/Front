@@ -123,8 +123,19 @@ export class MockUserService {
   static async createUser(model) {
     await delay(MOCK_DELAY);
 
-    // Перевірка на дублікат
-    const existingUser = mockUsers.find(u => u.email === model.email);
+    const emailNorm = String(model.email || '').trim().toLowerCase();
+    if (!emailNorm) {
+      throw {
+        response: {
+          data: 'Email is required',
+          status: 400,
+        },
+      };
+    }
+
+    const existingUser = mockUsers.find(
+      (u) => String(u.email).toLowerCase() === emailNorm,
+    );
     if (existingUser) {
       throw {
         response: {
@@ -134,15 +145,44 @@ export class MockUserService {
       };
     }
 
+    const displayName =
+      [model.surname, model.name, model.patronymic]
+        .map((part) => (part || '').toString().trim())
+        .filter(Boolean)
+        .join(' ') ||
+      model.name ||
+      model.email.split('@')[0];
+
+    const roles = Array.isArray(model.roles)
+      ? model.roles
+      : model.role
+        ? Array.isArray(model.role)
+          ? model.role
+          : [model.role]
+        : ['Operator'];
+
     const newUser = {
-      id: Math.max(...mockUsers.map(u => u.id)) + 1,
+      id: mockUsers.length
+        ? Math.max(...mockUsers.map((u) => Number(u.id) || 0)) + 1
+        : 1,
       email: model.email,
-      name: model.name || model.email.split('@')[0],
-      role: model.roles || ['Operator'],
+      name: displayName,
+      role: roles,
       image: 'N/A',
     };
 
     mockUsers.push(newUser);
+
+    // Дзеркало в auth-таблицю: користувач, створений адміном, має
+    // одразу могти увійти введеним при створенні паролем.
+    MockAuthService.ensureAuthUser({
+      email: newUser.email,
+      name: newUser.name,
+      role: roles[0] || 'Operator',
+      image: newUser.image,
+      password: model.password,
+    });
+
     return { success: true, id: newUser.id };
   }
 }

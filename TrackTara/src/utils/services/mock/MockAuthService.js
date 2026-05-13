@@ -4,6 +4,52 @@ import { defineTable } from './_mockDb';
 
 const MOCK_DELAY = 500;
 
+/**
+ * Звертаємось до тієї ж 'users' таблиці, що її реєструє MockUserService.
+ * Викликаємо тільки з runtime-функцій (вже після завантаження всіх сервісів
+ * у ServiceFactory) — інакше тут можна випадково перетерти seed порожнім масивом.
+ */
+const getUsersDirectory = () => defineTable('users', []);
+
+const normalizeEmail = (email) => String(email || '').trim().toLowerCase();
+
+/**
+ * Тримає auth-таблицю (логін/пароль) і довідник користувачів синхронізованими.
+ * Викликається на кожне «створення» користувача — чи то self-register, чи Google, чи адмін.
+ */
+const syncUserDirectoryEntry = (user) => {
+  const email = normalizeEmail(user.email);
+  if (!email) return;
+  const dir = getUsersDirectory();
+  const existing = dir.find((u) => normalizeEmail(u.email) === email);
+  const role = Array.isArray(user.role)
+    ? [...user.role]
+    : [user.role || 'Guest'];
+
+  if (existing) {
+    if (user.name && user.name !== existing.name) existing.name = user.name;
+    if (user.image && user.image !== existing.image) existing.image = user.image;
+    if (!Array.isArray(existing.role) || existing.role.length === 0) {
+      existing.role = role;
+    }
+    return existing;
+  }
+
+  const nextId = dir.length
+    ? Math.max(...dir.map((u) => Number(u.id) || 0)) + 1
+    : Math.max(Number(user.id) || 0, 1);
+
+  const entry = {
+    id: nextId,
+    email: user.email,
+    name: user.name || user.email,
+    role,
+    image: user.image || 'N/A',
+  };
+  dir.push(entry);
+  return entry;
+};
+
 // Мок-користувачі для тестування (включно з паролями для входу)
 const MOCK_USERS = defineTable('authUsers', [
   {
@@ -75,10 +121,43 @@ export class MockAuthService {
    * Скидання пароля користувача (тільки для адмін-флоу в моках).
    */
   static findAuthUserByEmail(email) {
-    const n = String(email || "")
-      .trim()
-      .toLowerCase();
+    const n = normalizeEmail(email);
     return MOCK_USERS.find((x) => x.email.toLowerCase() === n) || null;
+  }
+
+  /**
+   * Гарантує, що для користувача існує запис в auth-таблиці (логін/пароль)
+   * і паралельний запис у довіднику /users. Викликається з MockUserService.createUser,
+   * щоб користувачі створені адміном могли потім увійти.
+   */
+  static ensureAuthUser({ email, name, role, image, password } = {}) {
+    const emailNorm = normalizeEmail(email);
+    if (!emailNorm) return null;
+
+    const roleStr = Array.isArray(role) ? role.find(Boolean) || 'Guest' : role || 'Guest';
+    syncUserDirectoryEntry({ email, name, role, image });
+
+    let authUser = MockAuthService.findAuthUserByEmail(email);
+    if (!authUser) {
+      const nextId = MOCK_USERS.length
+        ? Math.max(...MOCK_USERS.map((u) => Number(u.id) || 0)) + 1
+        : 1;
+      authUser = {
+        id: nextId,
+        email,
+        password: String(password ?? 'password123'),
+        name: name || email,
+        role: roleStr,
+        image: image || 'N/A',
+      };
+      MOCK_USERS.push(authUser);
+    } else {
+      if (password) authUser.password = String(password);
+      if (name && authUser.name !== name) authUser.name = name;
+      if (image && authUser.image !== image) authUser.image = image;
+      authUser.role = roleStr;
+    }
+    return authUser;
   }
 
   /** Оновити роль у мок-автентифікації після зміни в картці користувача (адмін). */
@@ -225,11 +304,14 @@ export class MockAuthService {
     }
 
     // Перевірка чи користувач вже існує
-    let existingUser = MOCK_USERS.find(u => u.email === user.email);
+    let existingUser = MOCK_USERS.find(u => normalizeEmail(u.email) === normalizeEmail(user.email));
     if (!existingUser) {
       MOCK_USERS.push(user);
       existingUser = user;
     }
+
+    // Зеркалимо у адмінський довідник /users, щоб новий гість був видимий списком.
+    syncUserDirectoryEntry(existingUser);
 
     const accessToken = generateMockToken(existingUser);
     const refreshToken = generateMockToken({ ...existingUser, type: 'refresh' });
@@ -257,16 +339,26 @@ export class MockAuthService {
       };
     }
 
+    const nextAuthId = MOCK_USERS.length
+      ? Math.max(...MOCK_USERS.map((u) => Number(u.id) || 0)) + 1
+      : 1;
+    const displayName = [model.surname, model.name, model.patronymic]
+      .map((part) => (part || '').toString().trim())
+      .filter(Boolean)
+      .join(' ') || model.name || model.email.split('@')[0];
     const newUser = {
-      id: MOCK_USERS.length + 1,
+      id: nextAuthId,
       email: model.email,
       password: model.password,
-      name: model.name || model.email.split('@')[0],
+      name: displayName,
       role: 'Guest',
       image: 'N/A',
     };
 
     MOCK_USERS.push(newUser);
+
+    // Дзеркало в адмінський довідник: новий гість має одразу зʼявлятись на /users.
+    syncUserDirectoryEntry(newUser);
 
     const accessToken = generateMockToken(newUser);
     const refreshToken = generateMockToken({ ...newUser, type: 'refresh' });

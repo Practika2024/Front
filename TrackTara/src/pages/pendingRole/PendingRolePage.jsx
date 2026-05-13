@@ -1,4 +1,5 @@
 import { Card, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import useActions from "../../hooks/useActions";
 
 /**
@@ -6,6 +7,19 @@ import useActions from "../../hooks/useActions";
  */
 const PendingRolePage = () => {
   const { logoutUser } = useActions();
+  const navigate = useNavigate();
+
+  /**
+   * Гість не має до куди редіректнутись після logout (роль ще порожня),
+   * тож робимо explicit navigate('/login') після очищення токенів.
+   */
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+    } finally {
+      navigate("/login", { replace: true });
+    }
+  };
 
   return (
     <div className="container py-5" style={{ maxWidth: "36rem" }}>
@@ -17,7 +31,7 @@ const PendingRolePage = () => {
             надасть вам права (оператор, менеджер продажів тощо). Після цього вийдіть і увійдіть знову —
             або оновіть сесію, якщо ваш сервер видасть новий токен з ролями.
           </Card.Text>
-          <Button variant="outline-secondary" onClick={() => logoutUser()}>
+          <Button variant="outline-secondary" onClick={handleLogout}>
             Вийти з облікового запису
           </Button>
         </Card.Body>

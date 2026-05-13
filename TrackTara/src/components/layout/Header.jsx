@@ -15,9 +15,12 @@ const Header = memo(({ onOpenMenu, isAuthenticated }) => {
   const logoutUser = useActions().logoutUser;
   const navigate = useNavigate();
 
-  const logoutHandler = () => {
-    logoutUser();
-    navigate("/login");
+  const logoutHandler = async () => {
+    try {
+      await logoutUser();
+    } finally {
+      navigate("/login", { replace: true });
+    }
   };
 
   const [showSectorsModal, setShowSectorsModal] = useState(false);
