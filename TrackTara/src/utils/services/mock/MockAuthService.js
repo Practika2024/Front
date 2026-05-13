@@ -14,6 +14,58 @@ const getUsersDirectory = () => defineTable('users', []);
 const normalizeEmail = (email) => String(email || '').trim().toLowerCase();
 
 /**
+ * UTF-8-безпечні base64url (як у справжньому JWT). `btoa` приймає лише Latin-1,
+ * тож для кирилиці потрібно спочатку кодувати в UTF-8 байти, інакше отримаємо
+ * `InvalidCharacterError` або «закарлюки» при наступному декодуванні.
+ */
+const b64UrlEncodeJson = (obj) => {
+  const json = JSON.stringify(obj);
+  const bytes = new TextEncoder().encode(json);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary)
+    .replace(/=+$/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_');
+};
+
+/**
+ * Декодування base64url → об'єкт. Інтерпретує байти як UTF-8 — це лікує
+ * «мояубейку» (UTF-8, прочитаний як Latin-1) при роботі з реальними Google JWT.
+ */
+const b64UrlDecodeJson = (b64Url) => {
+  const b64 = String(b64Url || '')
+    .replace(/-/g, '+')
+    .replace(/_/g, '/')
+    .padEnd(Math.ceil(String(b64Url || '').length / 4) * 4, '=');
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  const json = new TextDecoder('utf-8').decode(bytes);
+  return JSON.parse(json);
+};
+
+/**
+ * Спроба полікувати UTF-8 рядок, який раніше зберегли як Latin-1
+ * (типове «Ð» / «Ñ» на початку слів — ознака зіпсованої кирилиці).
+ */
+const repairMojibakeText = (str) => {
+  if (typeof str !== 'string' || !/[ÐÑ][\u0080-\u00FF]/.test(str)) return str;
+  try {
+    const bytes = new Uint8Array(str.length);
+    for (let i = 0; i < str.length; i++) {
+      const code = str.charCodeAt(i);
+      if (code > 0xff) return str; // вже не «бінарний» рядок — не чіпаємо
+      bytes[i] = code;
+    }
+    const fixed = new TextDecoder('utf-8', { fatal: false }).decode(bytes);
+    return fixed && fixed.length ? fixed : str;
+  } catch {
+    return str;
+  }
+};
+
+/**
  * Тримає auth-таблицю (логін/пароль) і довідник користувачів синхронізованими.
  * Викликається на кожне «створення» користувача — чи то self-register, чи Google, чи адмін.
  */
@@ -86,6 +138,32 @@ const MOCK_USERS = defineTable('authUsers', [
   },
 ]);
 
+/**
+ * Одноразова міграція: до цього коміту generateMockToken використовував btoa без UTF-8
+ * перетворення, тож Google-логін з кириличним імʼям зберігав «закарлючки» (Ð, Ñ…).
+ * Лікуємо їх на старті — і в auth-таблиці, і в довіднику /users.
+ */
+(function repairLegacyMojibakeNames() {
+  for (const u of MOCK_USERS) {
+    if (typeof u?.name === 'string') {
+      const fixed = repairMojibakeText(u.name);
+      if (fixed !== u.name) u.name = fixed;
+    }
+  }
+  // Довідник /users може бути ще не зареєстрований MockUserService — спробуємо мʼяко.
+  try {
+    const dir = getUsersDirectory();
+    for (const u of dir) {
+      if (typeof u?.name === 'string') {
+        const fixed = repairMojibakeText(u.name);
+        if (fixed !== u.name) u.name = fixed;
+      }
+    }
+  } catch {
+    /* noop: довідник зʼявиться пізніше — там той самий seed, без legacy-даних */
+  }
+})();
+
 // Генерація JWT токенів у валідному форматі (header.payload.signature)
 // jwt-decode очікує формат з 3 частинами розділеними крапками
 const generateMockToken = (user) => {
@@ -103,14 +181,10 @@ const generateMockToken = (user) => {
     iat: Math.floor(Date.now() / 1000),
   };
   
-  // Кодуємо header та payload в base64
-  const encodedHeader = btoa(JSON.stringify(header)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-  const encodedPayload = btoa(JSON.stringify(payload)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-  
-  // Створюємо підпис (спрощений - просто "mock_signature")
-  const signature = btoa('mock_signature').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-  
-  // Повертаємо валідний JWT формат: header.payload.signature
+  const encodedHeader = b64UrlEncodeJson(header);
+  const encodedPayload = b64UrlEncodeJson(payload);
+  const signature = b64UrlEncodeJson('mock_signature');
+
   return `${encodedHeader}.${encodedPayload}.${signature}`;
 };
 
@@ -271,7 +345,7 @@ export class MockAuthService {
         // Спроба декодувати Google JWT токен (якщо він валідний)
         const parts = model.token.split('.');
         if (parts.length === 3) {
-          const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+          const payload = b64UrlDecodeJson(parts[1]);
           user = {
             id: MOCK_USERS.length + 1,
             email: payload.email || 'google@test.com',
@@ -380,8 +454,7 @@ export class MockAuthService {
         throw new Error('Invalid token format');
       }
       
-      // Декодуємо payload (друга частина)
-      const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+      const payload = b64UrlDecodeJson(parts[1]);
       const user = MOCK_USERS.find(u => u.id === payload.id);
 
       if (!user) {
