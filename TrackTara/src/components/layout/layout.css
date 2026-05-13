@@ -473,3 +473,197 @@
 .letter-spacing-1 {
   letter-spacing: 0.07em;
 }
+
+/* ——— Global mobile polish for legacy pages ——— */
+.app-main-inner,
+.app-main-inner * {
+  box-sizing: border-box;
+}
+
+.app-main-inner .container,
+.app-main-inner .container-fluid {
+  max-width: 100%;
+}
+
+.app-main-inner .card {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.app-main-inner .card-body {
+  min-width: 0;
+}
+
+.app-main-inner .table-responsive {
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 767.98px) {
+  .app-main {
+    min-height: calc(100vh - var(--app-topbar-h) - var(--app-dock-h));
+  }
+
+  .app-main-inner {
+    padding: 0.75rem 0.5rem calc(var(--app-dock-h) + 1.25rem);
+  }
+
+  .app-main-inner .container,
+  .app-main-inner .container-fluid {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .app-main-inner .container.mt-5,
+  .app-main-inner .container-fluid.mt-5,
+  .app-main-inner .mt-5 {
+    margin-top: 1rem !important;
+  }
+
+  .app-main-inner h1,
+  .app-main-inner h2 {
+    font-size: clamp(1.35rem, 6vw, 1.7rem);
+    line-height: 1.2;
+  }
+
+  .app-main-inner .d-flex.justify-content-between,
+  .app-main-inner .d-flex.justify-content-start {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .app-main-inner .btn,
+  .app-main-inner button,
+  .app-main-inner .form-control,
+  .app-main-inner .form-select {
+    min-height: 2.5rem;
+  }
+
+  .app-main-inner .btn {
+    white-space: normal;
+  }
+
+  .app-main-inner .btn-sm {
+    min-height: 2.25rem;
+  }
+
+  .app-main-inner .table {
+    display: block;
+    width: 100%;
+    min-width: 42rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+
+  .app-main-inner .table-responsive > .table {
+    display: table;
+    overflow: visible;
+  }
+
+  .app-main-inner .table > :not(caption) > * > * {
+    vertical-align: middle;
+  }
+
+  .app-main-inner .table td,
+  .app-main-inner .table th {
+    padding: 0.55rem 0.6rem;
+  }
+
+  .app-main-inner .pagination {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .app-main-inner .nav-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .app-main-inner .nav-tabs .nav-link {
+    white-space: nowrap;
+  }
+
+  .app-main-inner .dropdown-menu,
+  .app-topbar .dropdown-menu {
+    max-width: calc(100vw - 1rem);
+    overflow-x: auto;
+  }
+
+  .app-main-inner .modal-dialog {
+    margin: 0.5rem;
+    max-width: calc(100vw - 1rem);
+  }
+
+  .app-main-inner .modal-body {
+    max-height: calc(100vh - 10rem);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .app-main-inner .modal-footer {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .app-main-inner .modal-footer .btn {
+    flex: 1 1 8rem;
+  }
+
+  .app-main-inner .w-25,
+  .app-main-inner .w-50,
+  .app-main-inner .w-75 {
+    width: 100% !important;
+  }
+
+  .app-main-inner .form {
+    width: 100%;
+  }
+
+  .app-main-inner .form-group {
+    width: 100%;
+  }
+
+  .app-main-inner .MuiSelect-select {
+    min-width: 7rem;
+  }
+
+  .app-mobile-dock {
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+
+  .app-dock-item {
+    min-width: 4.75rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .app-topbar-inner {
+    min-height: 3.25rem;
+  }
+
+  .app-topbar-actions {
+    gap: 0.25rem !important;
+  }
+
+  .app-topbar .btn-sm {
+    padding-left: 0.45rem;
+    padding-right: 0.45rem;
+  }
+
+  .app-main-inner .card-body {
+    padding: 0.85rem;
+  }
+
+  .app-main-inner .alert {
+    padding: 0.75rem;
+  }
+
+  .app-main-inner .table {
+    min-width: 38rem;
+  }
+}

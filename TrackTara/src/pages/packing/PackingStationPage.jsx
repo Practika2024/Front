@@ -998,7 +998,7 @@ ${bodyInner}
                                   {contents.length === 0 ? (
                                     <p className="small text-muted mb-0">У коробці ще нічого немає.</p>
                                   ) : (
-                                    <Table size="sm" bordered className="mb-0 bg-white">
+                                    <Table responsive size="sm" bordered className="mb-0 bg-white">
                                       <thead>
                                         <tr>
                                           <th>Код</th>

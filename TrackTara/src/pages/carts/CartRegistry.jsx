@@ -91,12 +91,12 @@ const CartRegistry = () => {
 
     return (
         <Container className="mt-5">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <Button variant="outline-secondary" onClick={() => navigate('/')} className="me-3">
+            <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+                <div className="d-flex align-items-center flex-wrap gap-2">
+                    <Button variant="outline-secondary" onClick={() => navigate('/')} className="me-sm-2">
                         ← Назад
                     </Button>
-                    <h2>Реєстр візків</h2>
+                    <h2 className="mb-0">Реєстр візків</h2>
                 </div>
                 <Button variant="primary" onClick={() => setShowCreateModal(true)}>
                     + Додати візок

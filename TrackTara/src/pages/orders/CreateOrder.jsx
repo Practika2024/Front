@@ -388,7 +388,7 @@ const CreateOrder = () => {
                                                     Нічого не знайдено за запитом «{productListSearch.trim()}»
                                                 </Alert>
                                             ) : (
-                                        <Table striped bordered hover size="sm">
+                                        <Table striped bordered hover size="sm" responsive>
                                             <thead>
                                                 <tr>
                                                     <th>Сектор</th>
@@ -446,7 +446,7 @@ const CreateOrder = () => {
                                         Додайте продукти з таблиці ліворуч до замовлення
                                     </Alert>
                                 ) : (
-                                    <Table striped bordered hover size="sm">
+                                    <Table striped bordered hover size="sm" responsive>
                                         <thead>
                                             <tr>
                                                 <th>Сектор</th>

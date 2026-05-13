@@ -23,24 +23,30 @@ const UsersTable = () => {
 
   return (
       <>
-        <button onClick={handleOpenModal}>Створити користувача</button>
+        <div className="d-flex justify-content-center justify-content-sm-start mb-3">
+          <button className="btn btn-dark" onClick={handleOpenModal}>
+            Створити користувача
+          </button>
+        </div>
         <RegisterUserModal open={isModalOpen} onClose={handleCloseModal} />
-        <table className="table">
-          <thead>
-          <tr>
-            <th>Ім&#39;я</th>
-            <th>Email</th>
-            <th>Ролі</th>
-            <th>Позначка ролі</th>
-            <th>Дії</th>
-          </tr>
-          </thead>
-          <tbody>
-          {userList.map((user) => (
-              <UsersTableRow key={user.id} user={user} roleList={roleList} />
-          ))}
-          </tbody>
-        </table>
+        <div className="table-responsive">
+          <table className="table align-middle">
+            <thead>
+            <tr>
+              <th>Ім&#39;я</th>
+              <th>Email</th>
+              <th>Ролі</th>
+              <th>Позначка ролі</th>
+              <th>Дії</th>
+            </tr>
+            </thead>
+            <tbody>
+            {userList.map((user) => (
+                <UsersTableRow key={user.id} user={user} roleList={roleList} />
+            ))}
+            </tbody>
+          </table>
+        </div>
       </>
   );
 };

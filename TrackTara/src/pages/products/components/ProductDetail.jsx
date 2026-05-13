@@ -89,7 +89,7 @@ const ProductDetail = () => {
                         <Card.Body>
                             <Card.Title>Історія продукту</Card.Title>
                             {productHistory.length > 0 ? (
-                                <Table striped bordered hover>
+                                <Table striped bordered hover responsive>
                                     <thead>
                                     <tr>
                                         <th>#</th>

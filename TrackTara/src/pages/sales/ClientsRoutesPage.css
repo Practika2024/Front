@@ -27,3 +27,18 @@
   background-color: #9ca3af;
   color: #fff;
 }
+
+@media (max-width: 575.98px) {
+  .clients-routes-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 0.15rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .clients-routes-tabs .nav-link {
+    white-space: nowrap;
+    margin-right: 0.35rem;
+  }
+}

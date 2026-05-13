@@ -140,7 +140,7 @@ const SectorsManagement = ({ show, onHide }) => {
               {sectors.length === 0 ? (
                 <Alert variant="info">Секторів поки що немає. Створіть перший сектор.</Alert>
               ) : (
-                <Table striped bordered hover>
+                <Table striped bordered hover responsive>
                   <thead>
                     <tr>
                       <th>Сектор</th>

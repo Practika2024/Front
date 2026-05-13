@@ -57,7 +57,9 @@ const UsersTableRow = React.memo(
                             value={selectedRole}
                             onChange={handleRoleChange}
                             displayEmpty
+                            size="small"
                             inputProps={{ 'aria-label': 'Роль' }}
+                            sx={{ minWidth: 120, maxWidth: '100%' }}
                         >
                             {roleOptions.map((role) => (
                                 <MenuItem key={role.name} value={role.name} disabled={role.name === "Ролі відсутні"}>
@@ -74,6 +76,7 @@ const UsersTableRow = React.memo(
                             <Button
                                 variant="outlined"
                                 color="primary"
+                                size="small"
                                 onClick={() => setShowPasswordModal(true)}
                             >
                                 Пароль
@@ -81,6 +84,7 @@ const UsersTableRow = React.memo(
                             <Button
                                 variant="contained"
                                 color="error"
+                                size="small"
                                 onClick={() => setShowDeleteModal(true)}
                             >
                                 Видалити

@@ -115,7 +115,7 @@ const ClientsRoutesPage = () => {
                   Спочатку додайте траси. Кожна траса має одну лінію пакування та хоча б один стіл (куди
                   автоматично направляється візок після першого товару).
                 </p>
-                <Table striped bordered hover size="sm">
+                <Table striped bordered hover size="sm" responsive>
                   <thead>
                     <tr>
                       <th>Траса</th>
@@ -184,7 +184,7 @@ const ClientsRoutesPage = () => {
           <Tab eventKey="clients" title="Клієнти">
             <Card className="mt-3">
               <Card.Body>
-                <Table striped bordered hover size="sm">
+                <Table striped bordered hover size="sm" responsive>
                   <thead>
                     <tr>
                       <th>Клієнт</th>

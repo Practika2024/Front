@@ -42,7 +42,7 @@ const ProductTypesPage = () => {
                     <Card className="mb-4 shadow-sm">
                         <Card.Body>
                             <Card.Title>Список типів продуктів</Card.Title>
-                            <Table striped bordered hover>
+                            <Table striped bordered hover responsive>
                                 <thead>
                                 <tr>
                                     <th>Назва</th>
